@@ -1,3 +1,14 @@
+# 🛍️ Voida Shop – Accessibility-Focused UI/UX Design
+
+This repository contains the UI/UX design of **Voida Shop**, a mobile shopping application tailored for **visually impaired users**.  
+Our goal is to create a clean, accessible, and user-friendly interface that enables everyone to easily interact with online shopping platforms.
+
+**Branch:** `hw_aliboev`  
+**Tool:** Figma  
+**Focus:** Accessibility, Minimalism, Inclusivity
+
+---
+
 ![Login Page](PNG/Login.png)
 
 ---
