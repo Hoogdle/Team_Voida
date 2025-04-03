@@ -1,11 +1,14 @@
 package com.example.hwhw;
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Switch;
@@ -20,88 +23,40 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView text1, text2;
-    Switch switchAgree;
-    RadioGroup rGroup1;
-    RadioButton radioArray[] = new RadioButton[3];
-    ImageView imgPet;
-    Button btnQuit, btnRerun;
+    EditText edt;
+    Button btn;
+    TextView tview;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        setTitle("안드로이드 사진 보기");
 
-        // 위젯을 변수에 대입
-        text1 = (TextView) findViewById(R.id.Text1);
-        switchAgree = (Switch) findViewById(R.id.switchAgree);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        LinearLayout baseLayout = new LinearLayout(this);
+        baseLayout.setOrientation(LinearLayout.VERTICAL);
+        setContentView(baseLayout, params);
 
-        text2 = (TextView) findViewById(R.id.Text2);
-        rGroup1 = (RadioGroup) findViewById(R.id.Rgroup1);
-        radioArray[0] = (RadioButton) findViewById(R.id.Rdo120);
-        radioArray[1] = (RadioButton) findViewById(R.id.Rdo130);
-        radioArray[2] = (RadioButton) findViewById(R.id.Rdo140);
+        edt = new EditText(this);
+        edt.setHint("여기에 입력하세요");
 
-        imgPet = (ImageView) findViewById(R.id.ImgIcon);
+        baseLayout.addView(edt);
 
-        btnQuit = (Button) findViewById(R.id.BtnQuit);
-        btnRerun = (Button) findViewById(R.id.BtnRerun);
+        btn = new Button(this);
+        btn.setText("버튼입니다");
+        btn.setBackgroundColor(Color.YELLOW);
+        baseLayout.addView(btn);
 
-        // 동의함 체크박스의 체크가 변경되면
-        switchAgree
-                .setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    public void onCheckedChanged(CompoundButton arg0,
-                                                 boolean arg1) {
-                        // 체크되면 모두 보이도록 설정
-                        if (switchAgree.isChecked() == true) {
-                            text2.setVisibility(android.view.View.VISIBLE);
-                            rGroup1.setVisibility(android.view.View.VISIBLE);
-                            imgPet.setVisibility(android.view.View.VISIBLE);
-                            btnQuit.setVisibility(android.view.View.VISIBLE);
-                            btnRerun.setVisibility(android.view.View.VISIBLE);
-                        } else {
-                            text2.setVisibility(android.view.View.INVISIBLE);
-                            rGroup1.setVisibility(android.view.View.INVISIBLE);
-                            imgPet.setVisibility(android.view.View.INVISIBLE);
-                            btnQuit.setVisibility(android.view.View.INVISIBLE);
-                            btnRerun.setVisibility(android.view.View.INVISIBLE);
-                        }
-                    }
-                });
+        tview = new TextView(this);
+        tview.setText("텍스트뷰입니다.");
+        tview.setTextSize(20);
+        tview.setTextColor(Color.MAGENTA);
+        baseLayout.addView(tview);
 
-        // 라디오버튼을 클릭할 때, 이미지 뷰를 변경시킴 ==> 배열로 처리함.
-        final int draw[] = { R.drawable.s12, R.drawable.t13, R.drawable.u14};
-
-        for (int i = 0; i < radioArray.length; i++) {
-            final int index; // 주의! 꼭 필요함.
-            index = i;
-            radioArray[index].setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    imgPet.setImageResource(draw[index]);
-                }
-            });
-        }
-
-        // 종료 버튼을 클릭하면
-        btnQuit.setOnClickListener(new View.OnClickListener() {
+        btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {
-                finish();
-            }
-        });
-
-        // 처음으로 버튼을 클릭하면
-        btnRerun.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View arg0) {
-                text2.setVisibility(android.view.View.INVISIBLE);
-                rGroup1.setVisibility(android.view.View.INVISIBLE);
-                imgPet.setVisibility(android.view.View.INVISIBLE);
-                btnQuit.setVisibility(android.view.View.INVISIBLE);
-                btnRerun.setVisibility(android.view.View.INVISIBLE);
-
-                rGroup1.clearCheck();
-                switchAgree.setChecked(false);
-
+                tview.setText(edt.getText().toString());
             }
         });
 

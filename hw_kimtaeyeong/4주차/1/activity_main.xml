@@ -7,33 +7,11 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            android:background="#00ff00"
-            android:text="버튼1"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            android:text="안녕하세요"/>
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            android:background="#0000ff"
-            android:text = "저는 에디트 텍스트에요!"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_margin="20dp"
-            android:enabled="false"
-            android:text ="저는 button2입니다"/>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent" android:layout_height="fill_parent" android:orientation="vertical"
+        tools:ignore="MissingConstraints">
+        <Button android:id="@+id/button1" android:layout_width="110dp" android:layout_height="100dp" android:layout_gravity="center" android:gravity="top|right" android:text="버튼1"/>
+        <Button android:id="@+id/button2" android:layout_width="110dp" android:layout_height="100dp" android:layout_gravity="left" android:gravity="center|left" android:text="버튼2"/>
+        <Button android:id="@+id/button3" android:layout_width="110dp" android:layout_height="100dp" android:layout_gravity="right" android:gravity="bottom|right" android:text="버튼3"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

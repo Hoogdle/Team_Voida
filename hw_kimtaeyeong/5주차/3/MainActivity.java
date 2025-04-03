@@ -1,64 +1,41 @@
 package com.example.hwhw;
 
-import android.graphics.Color;
+
+import android.app.TabActivity;
 import android.os.Bundle;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.Switch;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.TabHost;
+import android.widget.TabHost.TabSpec;
 
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+@SuppressWarnings("deprecation")
+public class MainActivity extends TabActivity {
 
-public class MainActivity extends AppCompatActivity {
-
-    EditText edt;
-    Button btn;
-    TextView tview;
-
+    @SuppressWarnings("deprecation")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        LinearLayout baseLayout = new LinearLayout(this);
-        baseLayout.setOrientation(LinearLayout.VERTICAL);
-        setContentView(baseLayout, params);
+        TabHost tabHost = getTabHost();
 
-        edt = new EditText(this);
-        edt.setHint("여기에 입력하세요");
+        TabSpec tabSpec1 = tabHost.newTabSpec("TAG1").setIndicator("강아지");
+        tabSpec1.setContent(R.id.imageView1);
+        tabHost.addTab(tabSpec1);
 
-        baseLayout.addView(edt);
+        TabSpec tabSpec2 = tabHost.newTabSpec("TAG2").setIndicator("고양이");
+        tabSpec2.setContent(R.id.imageView2);
+        tabHost.addTab(tabSpec2);
 
-        btn = new Button(this);
-        btn.setText("버튼입니다");
-        btn.setBackgroundColor(Color.YELLOW);
-        baseLayout.addView(btn);
+        TabSpec tabSpec3 = tabHost.newTabSpec("TAG3").setIndicator("토끼");
+        tabSpec3.setContent(R.id.imageView3);
+        tabHost.addTab(tabSpec3);
 
-        tview = new TextView(this);
-        tview.setText("텍스트뷰입니다.");
-        tview.setTextSize(20);
-        tview.setTextColor(Color.MAGENTA);
-        baseLayout.addView(tview);
+        TabSpec tabSpec4 = tabHost.newTabSpec("TAG4").setIndicator("말");
+        tabSpec4.setContent(R.id.imageView4);
+        tabHost.addTab(tabSpec4);
 
-        btn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View arg0) {
-                tview.setText(edt.getText().toString());
-            }
-        });
+        tabHost.setCurrentTab(0);
 
     }
+
+
 }
