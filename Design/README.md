@@ -1,4 +1,3 @@
-
 ![Login Page](PNG/Login.png)
 
 ---
@@ -6,8 +5,11 @@
 ## 🚧 Notes
 
 - This project is a work in progress.
-- Additional features and pages will be added in future commits.
-- Feedback and contributions are welcome.
+- ✅ Login page is completed.
+- 🔨 Shop page is currently in progress.
+- 📝 Profile and Settings pages are planned next.
+- Additional features and accessibility improvements will be added in upcoming commits.
+- Feedback and contributions are always welcome.
 
 ---
 
