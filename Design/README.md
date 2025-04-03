@@ -16,7 +16,7 @@
 ## 👤 Author
 
 **Abbos Aliboev**  
-Computer Science student @ Chungbuk National University  
+Computer Science student Chungbuk National University  
 Focusing on accessible technology and inclusive design
 
 ---
