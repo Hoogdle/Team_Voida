@@ -21,11 +21,9 @@ Mana siz yuborgan eski README bo‘yicha **yangilangan versiyasi** — hozirgi h
 
 ## ✅ Completed Pages
 
-- **Login Page**  
+- **Login Page**
+- **Create Account Page**   
   ![Login Page](PNG/Login.png)
-
-- **Create Account Page**  
-  ![Create Account Page](PNG/CreateAccount.png)
 
 - **Profile Page**  
   ![Profile Page](PNG/Profile.png)
