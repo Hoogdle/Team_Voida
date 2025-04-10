@@ -25,21 +25,26 @@ Mana siz yuborgan eski README bo‘yicha **yangilangan versiyasi** — hozirgi h
 - **Create Account Page**   
   ![Login Page](PNG/Login.png)
 
+
 - **Profile Page**  
   ![Profile Page](PNG/profile.png)
 
+
 - **Shop Page**  
   ![Shop Page](PNG/shop.png)
+
 
 - **Search Page**
 - **Search Results Page**
 - **Filter Page**  
   ![Search Page](PNG/search.png)
 
+
 - **Product Page**
 - **Product Sale Page** 
   ![Product Page](PNG/product.png)
   ![Product Sale Page](PNG/ProductSale.png)
+
 
 - **Cart Page**
 - **Add to Cart Options Page (Color & Size)**  
@@ -47,8 +52,10 @@ Mana siz yuborgan eski README bo‘yicha **yangilangan versiyasi** — hozirgi h
   ![Cart Page](PNG/cart.png)
   ![Payment Page](PNG/payment.png)
 
+
 - **Reviews Page**  
   ![Reviews Page](PNG/review.png)
+
 
 ---
 
