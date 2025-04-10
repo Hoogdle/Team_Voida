@@ -11,18 +11,74 @@ Our goal is to create a clean, accessible, and user-friendly interface that enab
 
 ![Login Page](PNG/Login.png)
 
----
-
-## 🚧 Notes
-
-- This project is a work in progress.
-- ✅ Login page is completed.
-- 🔨 Shop page is currently in progress.
-- 📝 Profile and Settings pages are planned next.
-- Additional features and accessibility improvements will be added in upcoming commits.
-- Feedback and contributions are always welcome.
+Mana siz yuborgan eski README bo‘yicha **yangilangan versiyasi** — hozirgi holatga moslab yozilgan. Unda barcha tugagan sahifalar ko‘rsatilgan, faqat **delivery** va **history** sahifalari qolgan, shuningdek yangi sahifalarning skrinshotlari ham qo‘shilgan:
 
 ---
+
+# 🛍️ Visually Impaired Shopping App
+
+---
+
+## ✅ Completed Pages
+
+- **Login Page**  
+  ![Login Page](PNG/Login.png)
+
+- **Create Account Page**  
+  ![Create Account Page](PNG/CreateAccount.png)
+
+- **Profile Page**  
+  ![Profile Page](PNG/Profile.png)
+
+- **Shop Page**  
+  ![Shop Page](PNG/Shop.png)
+
+- **Search Page**  
+  ![Search Page](PNG/Search.png)
+
+- **Search Results Page**  
+  ![Search Results Page](PNG/SearchResults.png)
+
+- **Product Page**  
+  ![Product Page](PNG/Product.png)
+
+- **Product Sale Page**  
+  ![Product Sale Page](PNG/ProductSale.png)
+
+- **Cart Page**  
+  ![Cart Page](PNG/Cart.png)
+
+- **Payment Page**  
+  ![Payment Page](PNG/Payment.png)
+
+- **Filter Page**  
+  ![Filter Page](PNG/Filter.png)
+
+- **Reviews Page**  
+  ![Reviews Page](PNG/Reviews.png)
+
+- **Add to Cart Options Page (Color & Size)**  
+  ![Options Page](PNG/Options.png)
+
+---
+
+## 🚧 In Progress
+
+- **Delivery Page**
+- **Order History Page**
+
+---
+
+## 📌 Notes
+
+- Most core pages are completed and functional.
+- Accessibility features (e.g. screen reader-friendly texts) are integrated in every page.
+- Only **Delivery** and **Order History** pages are left to implement.
+- Feedback and contributions are always welcome!
+
+---
+
+Agar sahifa nomlari yoki rasm joylashuvlari boshqacha bo‘lsa, ayting — sozlab chiqaman. Yana boshqa sahifalarni qo‘shish yoki README dizaynini o‘zgartirish kerak bo‘lsa ham bemalol ayting! 😎
 
 ## 👤 Author
 
