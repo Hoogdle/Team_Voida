@@ -43,6 +43,7 @@ Mana siz yuborgan eski README bo‘yicha **yangilangan versiyasi** — hozirgi h
 - **Product Page**
 - **Product Sale Page** 
   ![Product Page](PNG/product.png)
+  <br/>
 
 
 - **Cart Page**
