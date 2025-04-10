@@ -74,7 +74,6 @@ Mana siz yuborgan eski README bo‘yicha **yangilangan versiyasi** — hozirgi h
 
 ---
 
-Agar sahifa nomlari yoki rasm joylashuvlari boshqacha bo‘lsa, ayting — sozlab chiqaman. Yana boshqa sahifalarni qo‘shish yoki README dizaynini o‘zgartirish kerak bo‘lsa ham bemalol ayting! 😎
 
 ## 👤 Author
 
