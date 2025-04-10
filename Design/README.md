@@ -26,37 +26,29 @@ Mana siz yuborgan eski README bo‘yicha **yangilangan versiyasi** — hozirgi h
   ![Login Page](PNG/Login.png)
 
 - **Profile Page**  
-  ![Profile Page](PNG/Profile.png)
+  ![Profile Page](PNG/profile.png)
 
 - **Shop Page**  
-  ![Shop Page](PNG/Shop.png)
+  ![Shop Page](PNG/shop.png)
 
-- **Search Page**  
-  ![Search Page](PNG/Search.png)
+- **Search Page**
+- **Search Results Page**
+- **Filter Page**  
+  ![Search Page](PNG/search.png)
 
-- **Search Results Page**  
-  ![Search Results Page](PNG/SearchResults.png)
-
-- **Product Page**  
-  ![Product Page](PNG/Product.png)
-
-- **Product Sale Page**  
+- **Product Page**
+- **Product Sale Page** 
+  ![Product Page](PNG/product.png)
   ![Product Sale Page](PNG/ProductSale.png)
 
-- **Cart Page**  
-  ![Cart Page](PNG/Cart.png)
-
+- **Cart Page**
+- **Add to Cart Options Page (Color & Size)**  
 - **Payment Page**  
-  ![Payment Page](PNG/Payment.png)
-
-- **Filter Page**  
-  ![Filter Page](PNG/Filter.png)
+  ![Cart Page](PNG/cart.png)
+  ![Payment Page](PNG/payment.png)
 
 - **Reviews Page**  
-  ![Reviews Page](PNG/Reviews.png)
-
-- **Add to Cart Options Page (Color & Size)**  
-  ![Options Page](PNG/Options.png)
+  ![Reviews Page](PNG/review.png)
 
 ---
 
