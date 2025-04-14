@@ -1,78 +1,135 @@
-from fastapi import FastAPI, Query, HTTPException
-from pydantic import BaseModel
-from motor.motor_asyncio import AsyncIOMotorClient
-from bson import ObjectId
-from datetime import datetime
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, HTTPException, Body
+from sqlalchemy import create_engine, Column, Integer, String, Float
+from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import sessionmaker
+from passlib.hash import bcrypt
+
+# PostgreSQL 
+DATABASE_URL = "postgresql://postgres:your_password@localhost:5432/postgres"
+
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(bind=engine)
+Base = declarative_base()
 
 app = FastAPI()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-# MongoDB-тэй холбох
-MONGO_URL = "mongodb://localhost:27017"
-client = AsyncIOMotorClient(MONGO_URL)
-db = client["ai_project_db"]
-collection = db["products"]
+# ---------------------- #
+# 🧱 Models
+# ---------------------- #
+class Product(Base):
+    __tablename__ = "products"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String)
+    description = Column(String)
+    price = Column(Float)
 
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, nullable=False)
+    password = Column(String, nullable=False)
+    username = Column(String, nullable=True)
 
-# Pydantic загвар
-class Product(BaseModel):
-    name: str
-    price: float
+Base.metadata.create_all(bind=engine)
 
-
-# 🔹 1. Бүх бүтээгдэхүүн авах (pagination нэмсэн)
-@app.get("/products/")
-async def get_products(skip: int = 0, limit: int = 10):
-    products_cursor = collection.find().skip(skip).limit(limit)
-    products = await products_cursor.to_list(length=limit)
-    
-    for product in products:
-        product["_id"] = str(product["_id"])
-    
-    return {"products": products}
-
-
-# 🔹 2. ID-аар бүтээгдэхүүн авах
-@app.get("/products/{product_id}")
-async def get_product_by_id(product_id: str):
-    product = await collection.find_one({"_id": ObjectId(product_id)})
-    if not product:
-        raise HTTPException(status_code=404, detail="Бүтээгдэхүүн олдсонгүй")
-    
-    product["_id"] = str(product["_id"])
+# ---------------------- #
+# 📦 Product CRUD API
+# ---------------------- #
+@app.post("/products/")
+def create_product(name: str, description: str, price: float):
+    db = SessionLocal()
+    product = Product(name=name, description=description, price=price)
+    db.add(product)
+    db.commit()
+    db.refresh(product)
+    db.close()
     return product
 
+@app.get("/products/")
+def read_products():
+    db = SessionLocal()
+    products = db.query(Product).all()
+    db.close()
+    return products
 
-# 🔹 3. Нэрээр хайлт хийх
-@app.get("/products/search/")
-async def search_products(name: str = Query(..., description="Хайх бүтээгдэхүүний нэр")):
-    products_cursor = collection.find({"name": {"$regex": name, "$options": "i"}})
-    products = await products_cursor.to_list(length=100)
-    
-    for product in products:
-        product["_id"] = str(product["_id"])
-    
-    return {"products": products}
+@app.get("/products/{product_id}")
+def read_product(product_id: int):
+    db = SessionLocal()
+    product = db.query(Product).filter(Product.id == product_id).first()
+    db.close()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return product
 
+@app.put("/products/{product_id}")
+def update_product(product_id: int, name: str, description: str, price: float):
+    db = SessionLocal()
+    product = db.query(Product).filter(Product.id == product_id).first()
+    if not product:
+        db.close()
+        raise HTTPException(status_code=404, detail="Product not found")
+    product.name = name
+    product.description = description
+    product.price = price
+    db.commit()
+    db.refresh(product)
+    db.close()
+    return product
 
-# 🔹 4. Худалдан авалтыг бүртгэх
-@app.post("/purchase/")
-async def record_purchase(user_id: str, product_id: str):
-    purchase = {
-        "user_id": user_id,
-        "product_id": product_id,
-        "timestamp": datetime.utcnow()
-    }
-    result = await db["purchases"].insert_one(purchase)
-    
-    return {
-        "message": "Худалдан авалт бүртгэгдлээ!",
-        "purchase_id": str(result.inserted_id)
-    }
+@app.delete("/products/{product_id}")
+def delete_product(product_id: int):
+    db = SessionLocal()
+    product = db.query(Product).filter(Product.id == product_id).first()
+    if not product:
+        db.close()
+        raise HTTPException(status_code=404, detail="Product not found")
+    db.delete(product)
+    db.commit()
+    db.close()
+    return {"message": "Product deleted successfully"}
+
+# ---------------------- #
+# 👤 User API
+# ---------------------- #
+
+# signup API
+@app.post("/signup")
+def signup(email: str = Body(...), password: str = Body(...)):
+    db = SessionLocal()
+    if db.query(User).filter(User.email == email).first():
+        db.close()
+        raise HTTPException(status_code=400, detail="Email already registered")
+    hashed_pw = bcrypt.hash(password)
+    user = User(email=email, password=hashed_pw)
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    db.close()
+    return {"message": "Signup successful!"}
+
+# Login API
+@app.post("/login")
+def login(email: str = Body(...), password: str = Body(...)):
+    db = SessionLocal()
+    user = db.query(User).filter(User.email == email).first()
+    db.close()
+    if not user or not bcrypt.verify(password, user.password):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    return {"message": "Login successful!"}
+
+# set-username API
+@app.post("/set-username")
+def set_username(email: str = Body(...), username: str = Body(...)):
+    db = SessionLocal()
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        db.close()
+        raise HTTPException(status_code=404, detail="User not found")
+    user.username = username
+    db.commit()
+    db.refresh(user)
+    db.close()
+    return {"message": "Username updated successfully!"}
+@app.get("/")
+def read_root():
+    return {"message": "Server is running!"}
