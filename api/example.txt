@@ -1,0 +1,70 @@
+1. Check Finished Front Design
+2. Think what kind of things need in that page(reference Front Design)
+3. Make Document for Backend
+4. Connect Front and Backend
+
+
+ex)
+
+method : GET
+url : https://fluent-marmoset-immensely.ngrok-free.app
+
+[
+    {
+        "img": String(URL),
+        "rank": String,
+        "name": String,
+        "price": String,
+        "discount": String
+    },
+    {
+        "img": String(URL),
+        "rank": String,
+        "name": String,
+        "price": String,
+        "discount": String
+    },
+    {
+        "img": String(URL),
+        "rank": String,
+        "name": String,
+        "price": String,
+        "discount": String
+    },
+    {
+        "img": String(URL),
+        "rank": String,
+        "name": String,
+        "price": String,
+        "discount": String
+    },
+    {
+        "img": String(URL),
+        "rank": String,
+        "name": String,
+        "price": String,
+        "discount": String
+    },
+    {
+        "img": String(URL),
+        "rank": String,
+        "name": String,
+        "price": String,
+        "discount": String
+    },
+]
+
+
+method : Post
+url : "https://fluent-marmoset-immensely.ngrok-free.app//login"
+{
+    id : String
+    pw : String
+}
+
+
+method : Post
+url "https://fluent-marmoset-immensely.ngrok-free.app/username"
+{
+    un : String
+}
