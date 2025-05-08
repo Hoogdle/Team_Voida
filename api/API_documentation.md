@@ -1,178 +1,173 @@
-## 📄 API Documentation: Shopping App
+Backend API Documentation
+1. Get Products
 
-### 1. 🔍 Get All Categories
-
-**Method:** `GET`
-**URL:** `/categories`
-**Response:**
-
-```json
-[
-  { "id": 1, "name": "Clothing", "icon": "url" },
-  { "id": 2, "name": "Shoes", "icon": "url" },
-  { "id": 3, "name": "Drinks", "icon": "url" },
-  { "id": 4, "name": "Fruits", "icon": "url" }
-]
-```
-
-### 2. 🔍 Get Products (Shop page, Flash Sale, New Items)
-
-**Method:** `GET`
-**URL:** `/products`
-**Query Params (optional):**
-
-* `category` (string)
-* `flashSale` (boolean)
-* `newItems` (boolean)
-
-**Response:**
-
-```json
-[
+Method: GET
+URL: https://fluent-marmoset-immensely.ngrok-free.app
+Description: Retrieves a list of products with their details.
+Response:
+Status: 200 OK
+Content-Type: application/json
+Body:[
   {
-    "id": 101,
-    "name": "Coca Cola",
-    "price": "24.00",
-    "discount": "10%",
-    "img": "url",
-    "category": "Drinks"
-  }
-]
-```
-
-### 3. 🔍 Product Detail
-
-**Method:** `GET`
-**URL:** `/products/:id`
-**Response:**
-
-```json
-{
-  "id": 101,
-  "name": "Coca Cola",
-  "description": "Lorem ipsum...",
-  "price": "24.00",
-  "discount": "10%",
-  "colors": ["Red", "Green"],
-  "sizes": ["S", "M", "L"],
-  "images": ["url1", "url2"],
-  "specs": {
-    "material": "Cotton",
-    "origin": "Korea"
+    "img": "String (URL)",
+    "rank": "String",
+    "name": "String",
+    "price": "String",
+    "discount": "String"
   },
-  "delivery": [
-    { "type": "Standard", "price": "3.00", "time": "5 day" },
-    { "type": "Express", "price": "5.00", "time": "1 day" }
-  ],
-  "rating": 4.5,
-  "reviews": [
-    { "user": "Veronika", "rating": 5, "comment": "Very good!" }
-  ]
-}
-```
-
-### 4. 🔍 Search Products
-
-**Method:** `GET`
-**URL:** `/search`
-**Query Params:** `q=banana`
-**Response:** same as `/products`
-
-### 5. 🧾 Filter Products
-
-**Method:** `POST`
-**URL:** `/products/filter`
-**Body:**
-
-```json
-{
-  "size": "M",
-  "color": "Red",
-  "priceRange": [10, 50],
-  "sort": "priceLowToHigh"
-}
-```
-
-**Response:** same as `/products`
-
-### 6. 🛒 View Cart
-
-**Method:** `GET`
-**URL:** `/cart`
-**Response:**
-
-```json
-[
-  { "productId": 101, "name": "Red Dress", "qty": 2, "price": "17.00", "img": "url" }
+  ...
 ]
-```
 
-### 7. ➕ Add to Cart
 
-**Method:** `POST`
-**URL:** `/cart`
-**Body:**
 
-```json
-{ "productId": 101, "qty": 2 }
-```
 
-### 8. ❌ Remove from Cart
+Error Handling:
+404 Not Found: If no products are available.
+500 Internal Server Error: If there is a server-side issue.
 
-**Method:** `DELETE`
-**URL:** `/cart/:productId`
 
-### 9. 💳 Checkout
 
-**Method:** `POST`
-**URL:** `/checkout`
-**Body:**
+2. User Login
 
-```json
-{
-  "shippingAddress": "Somewhere in Korea",
-  "contactInfo": { "name": "User", "phone": "010-xxxx" },
-  "items": [
-    { "productId": 101, "qty": 2 }
-  ],
-  "paymentMethod": "Card"
+Method: POST
+URL: https://fluent-marmoset-immensely.ngrok-free.app/login
+Description: Authenticates a user with their credentials.
+Request:
+Content-Type: application/json
+Body:{
+  "id": "String",
+  "pw": "String"
 }
-```
 
-**Response:**
 
-```json
-{ "status": "success", "message": "Order placed successfully" }
-```
 
-### 10. ⭐ Submit Review
 
-**Method:** `POST`
-**URL:** `/reviews`
-**Body:**
+Response:
+Status: 200 OK (on success)
+Content-Type: application/json
+Body: {
+  "message": "Login successful",
+  "token": "String (JWT token)"
+}
 
-```json
-{ "productId": 101, "rating": 5, "comment": "Excellent!" }
-```
 
-### 11. 👤 Login
+Status: 401 Unauthorized (on failure)
+Body: {
+  "message": "Invalid credentials"
+}
 
-**Method:** `POST`
-**URL:** `/login`
-**Body:**
 
-```json
-{ "id": "user123", "pw": "password" }
-```
 
-### 12. 🔄 Set Username
 
-**Method:** `POST`
-**URL:** `/username`
-**Body:**
+Error Handling:
+400 Bad Request: If request body is malformed.
+500 Internal Server Error: If there is a server-side issue.
 
-```json
-{ "un": "NewUsername" }
-```
 
----
+
+3. Update Username
+
+Method: POST
+URL: https://fluent-marmoset-immensely.ngrok-free.app/username
+Description: Updates the username of the authenticated user.
+Request:
+Content-Type: application/json
+Body:{
+  "un": "String"
+}
+
+
+
+
+Response:
+Status: 200 OK (on success)
+Content-Type: application/json
+Body: {
+  "message": "Username updated successfully"
+}
+
+
+Status: 400 Bad Request (on failure)
+Body: {
+  "message": "Invalid username"
+}
+
+
+
+
+Error Handling:
+401 Unauthorized: If authentication token is missing or invalid.
+500 Internal Server Error: If there is a server-side issue.
+
+
+
+4. Add to Cart
+
+Method: POST
+URL: https://fluent-marmoset-immensely.ngrok-free.app/cart
+Description: Adds a product to the user's cart.
+Request:
+Content-Type: application/json
+Body:{
+  "productId": "String",
+  "quantity": "Number"
+}
+
+
+
+
+Response:
+Status: 200 OK (on success)
+Content-Type: application/json
+Body: {
+  "message": "Product added to cart",
+  "cartId": "String"
+}
+
+
+
+
+Error Handling:
+400 Bad Request: If productId or quantity is invalid.
+401 Unauthorized: If user is not authenticated.
+500 Internal Server Error: If there is a server-side issue.
+
+
+
+5. Apply Voucher
+
+Method: POST
+URL: https://fluent-marmoset-immensely.ngrok-free.app/voucher
+Description: Applies a voucher code to the user's cart.
+Request:
+Content-Type: application/json
+Body:{
+  "voucherCode": "String"
+}
+
+
+
+
+Response:
+Status: 200 OK (on success)
+Content-Type: application/json
+Body: {
+  "message": "Voucher applied",
+  "discount": "String"
+}
+
+
+Status: 400 Bad Request (on failure)
+Body: {
+  "message": "Invalid voucher code"
+}
+
+
+
+
+Error Handling:
+401 Unauthorized: If user is not authenticated.
+500 Internal Server Error: If there is a server-side issue.
+
+
+
