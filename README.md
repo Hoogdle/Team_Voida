@@ -1,70 +1,65 @@
-# 🛒 AI Market Backend API
+# 🛍️ AI-Powered Market App for Visually Impaired
 
-This is the backend API for an assistive e-commerce application designed for **visually impaired users**.  
-Built with **FastAPI** + **PostgreSQL**.
+This is the **backend API** for a market-style application designed to help people with **visual disabilities** easily browse and purchase products.
 
-## 📦 Features
+The application provides **product information with image descriptions**, **shopping basket management**, and **simple payments**.
 
-- 🧾 **Signup/Login** (JWT-based auth)
-- 🙋‍♂️ Set username
-- 📦 Create and list products
-- 🔍 Search product by keyword
-- 🛍️ Purchase product
-- 🛒 Add to cart
-- 📦 Create order
-- 📑 View order history
-- ⭐ Leave product reviews
+---
 
-## 🛠️ Tech Stack
+## 🔧 Tech Stack
 
-- Python 3.10
-- FastAPI
-- SQLAlchemy
-- PostgreSQL
-- JWT (python-jose)
-- Pydantic
-- Uvicorn
+- **FastAPI** (Python 3.10)
+- **PostgreSQL** for relational database
+- **SQLAlchemy** as ORM
+- **Pydantic v2** for data validation
+- **Docker** (optional)
+- **Postman** for API testing
 
-## 📂 API Endpoints
+---
 
-| Method | Endpoint             | Description               |
-|--------|----------------------|---------------------------|
-| POST   | `/signup`            | Register a new user       |
-| POST   | `/login`             | User login, returns token |
-| POST   | `/set-username`      | Set or update username    |
-| GET    | `/products/`         | List all products         |
-| GET    | `/products/search`   | Search by keyword         |
-| GET    | `/products/{id}`     | Get product by ID         |
-| POST   | `/products/`         | Add a new product         |
-| POST   | `/purchase`          | Purchase product          |
-| POST   | `/order`             | Create order              |
-| GET    | `/order-history`     | View order history        |
-| POST   | `/review`            | Leave a review            |
-| POST   | `/cart/add`          | Add item to cart          |
+## 🚀 API Endpoints
 
-## 🔐 Authentication
+### 📦 Product
 
-All secure endpoints require **JWT token** in request body or header.
+- `POST /ProductInfo` — Get full detail of a product
+- `POST /CategoriesItems/{category}` — Get items by category
+- `POST /SearchItems` — Search products by keyword
 
-```json
-{
-  "token": "your_jwt_token"
-}
+### 🛒 Basket
 
+- `POST /Basket?session_id=xxx` — Get current session's basket
+- `POST /BasketAdd?session_id=xxx` — Add item to basket
+- `POST /BasketSub?session_id=xxx` — Decrease item quantity
+- `POST /BasketDel?session_id=xxx` — Remove item
+- `POST /BasketInsert?session_id=xxx` — Add item with specified count
 
+### 💳 Payment
 
-🚀 How to Run Locally
-# 1. Clone repository
-git clone https://github.com/your/repo.git
+- `POST /BasketPayment?session_id=xxx` — Checkout all items
+- `POST /OneItemPayment?session_id=xxx` — Checkout a single item
+
+### 🏠 Home Page APIs
+
+- `POST /Home` — Get all homepage items
+- `POST /PopularItems`, `/BigSaleItems`, `/TodaySaleItems`, `/NewItems` — Get curated sets of products
+
+---
+
+## ⚙️ How to Run Locally
+
+```bash
+# 1. Clone the repo
+git clone https://github.com/your-username/ai_project.git
 cd ai_project
 
-# 2. Install dependencies
+# 2. Create virtual environment and install dependencies
+python3 -m venv env
+source env/bin/activate
 pip install -r requirements.txt
 
-# 3. Setup PostgreSQL and .env
-# Edit `.env` file
-DATABASE_URL=postgresql://postgres:yourpassword@localhost:5432/postgres
-JWT_SECRET=your_jwt_secret_key
+# 3. Set up PostgreSQL & .env file
+# Example .env:
+# DATABASE_URL=postgresql://postgres:your_password@localhost:5432/postgres
 
 # 4. Run server
 uvicorn main:app --reload
