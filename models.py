@@ -1,74 +1,54 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Text, Boolean
-from sqlalchemy.orm import relationship, declarative_base
-from datetime import datetime
+from sqlalchemy import Column, Integer, String, Float, ForeignKey
+from sqlalchemy.orm import relationship
+from database import Base
 
-Base = declarative_base()
-
-class User(Base):
-    __tablename__ = "users"
-    id = Column(Integer, primary_key=True)
-    email = Column(String, unique=True, nullable=False)
-    password = Column(String, nullable=False)
-    username = Column(String, nullable=True)
-    addresses = relationship("Address", back_populates="user")
-
+# Product Table
 class Product(Base):
     __tablename__ = "products"
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    description = Column(Text)
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    image_url = Column(String)
+    price = Column(String)
+    description = Column(String)
     category = Column(String)
-    price = Column(Float)
-    product_image = Column(String)
-    product_review = Column(String)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow)
 
-class Purchase(Base):
-    __tablename__ = "purchases"
+# 4 Home tab tables
+class PopularItem(Product):
+    __tablename__ = "popular_items"
+    id = Column(Integer, ForeignKey("products.id"), primary_key=True)
+
+class BigSaleItem(Product):
+    __tablename__ = "big_sale_items"
+    id = Column(Integer, ForeignKey("products.id"), primary_key=True)
+
+class TodaySaleItem(Product):
+    __tablename__ = "today_sale_items"
+    id = Column(Integer, ForeignKey("products.id"), primary_key=True)
+
+class NewItem(Product):
+    __tablename__ = "new_items"
+    id = Column(Integer, ForeignKey("products.id"), primary_key=True)
+
+# User Profile
+class UserProfile(Base):
+    __tablename__ = "user_profiles"
+
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    username = Column(String, unique=True)
+    email = Column(String, unique=True)
+    phone = Column(String)
+    address = Column(String)
+    password = Column(String)
+    session_id = Column(String, unique=True)
+
+# Basket Table
+class Basket(Base):
+    __tablename__ = "baskets"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("user_profiles.id"))
     product_id = Column(Integer, ForeignKey("products.id"))
-    timestamp = Column(DateTime, default=datetime.utcnow)
+    quantity = Column(Integer, default=1)
 
-class Review(Base):
-    __tablename__ = "reviews"
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    product_id = Column(Integer, ForeignKey("products.id"))
-    rating = Column(Integer)
-    comment = Column(Text)
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-class CartItem(Base):
-    __tablename__ = "cart_items"
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    product_id = Column(Integer, ForeignKey("products.id"))
-    quantity = Column(Integer)
-
-class Order(Base):
-    __tablename__ = "orders"
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    status = Column(String, default="pending")
-    total_price = Column(Float)
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-class OrderItem(Base):
-    __tablename__ = "order_items"
-    id = Column(Integer, primary_key=True)
-    order_id = Column(Integer, ForeignKey("orders.id"))
-    product_id = Column(Integer, ForeignKey("products.id"))
-    quantity = Column(Integer)
-    price = Column(Float)
-
-class Address(Base):
-    __tablename__ = "addresses"
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    address_line = Column(String)
-    city = Column(String)
-    postal_code = Column(String)
-    default = Column(Boolean, default=False)
-    user = relationship("User", back_populates="addresses")
+    product = relationship("Product")

@@ -1,33 +1,27 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from database import Base, engine
+from routers import (
+    home_routes,
+    search_routes,
+    product_routes,
+    basket_routes,
+    payment_routes,
+)
+from database import engine
 import models
 
+# DB table-уудыг автоматаар үүсгэнэ
+models.Base.metadata.create_all(bind=engine)
 
-from routers.user_routes import router as user_router
-from routers.product_routes import router as product_router
-from routers.order_routes import router as order_router
-from routers.review_routes import router as review_router
-from routers.cart_routes import router as cart_router
-
-
-
+# App
 app = FastAPI()
 
+# Routes
+app.include_router(home_routes.router)
+app.include_router(search_routes.router)
+app.include_router(product_routes.router)
+app.include_router(basket_routes.router)
+app.include_router(payment_routes.router)
 
-Base.metadata.create_all(bind=engine)
-
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-app.include_router(user_router)
-app.include_router(product_router)
-app.include_router(order_router)
-app.include_router(review_router)  
-app.include_router(cart_router)
+@app.get("/")
+def read_root():
+    return {"message": "Hello, this is the AI Market API for visually impaired users."}
