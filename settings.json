@@ -1,9 +1,0 @@
-{
-  "python.analysis.extraPaths": [
-    "/Users/bilguun/.asdf/installs/python/3.10.12/lib/python3.10/site-packages"
-  ],
-  "python.defaultInterpreterPath": "/Users/bilguun/.asdf/installs/python/3.10.12/bin/python3.10",
-  "python.venvPath": "${workspaceFolder}",
-  "python.envFile": "${workspaceFolder}/.env"
-  
-}
