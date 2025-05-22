@@ -1,0 +1,683 @@
+###########################################################################
+                               Note        
+###########################################################################
+(1) It has good readability in VSCode, plz use VSCODE when reading it
+(2) Please finish the task before the Due date
+(3) Check your name to recognize which API you have to make
+(4) Some API has 2 step, it just means Mobile -> Server, Server -> Mobile
+(5) Plz edit database table according to provided API. 
+(6) *** Do not chanage 'variable(key) name' or 'Method' or 'Url' ***
+###########################################################################
+
+
+==================================================================
+1. Sign up(호정)
+Due : 5/17
+
+Path : Mobil -> Server
+Method : Post
+Url : /SignUp
+
+{
+    email : String
+    pw : String
+    cell : String
+}
+
+Note:
+(1) just save data into database
+==================================================================
+
+==================================================================
+2. Login(호정)
+Due : 5/17
+
+Path : Mobil <-> Server
+Method : Post
+Url : /SignIn
+
+""" Has 2 step """
+
+step1. Mobile -> Server
+{
+    email : String,
+    pw : String
+}
+
+
+step2. Server -> Mobile
+{
+    sesseion_id: String
+}
+Note:
+*** we use 'session' to make our application more securly.
+    when user has successed in Sign In, then back-end return the sesseion id to user
+    and that session Id is unique to per each user and has little long key pattern.
+    we will use this session id to identify user not by user id 
+***
+(1) check ID and PW
+(2) if its correct return session id
+(3) if its not correct return false
+==================================================================
+
+
+==================================================================
+3. UserName(호정)
+Due : 5/17
+
+Path : Mobil -> Server
+Method : Post
+Url : /UserName
+
+{
+    un : String
+}
+
+Note:
+(1) save username into database
+(2) if username already exist in database, return false, else return true
+==================================================================
+
+==================================================================
+4. Home(빌궁)
+Due : 5/18
+
+Path : Server -> Mobile
+Method : Get
+Url : /Home
+
+[
+    {
+        product_id : Int,
+        img : String(URL),
+        name : String,
+        price : String
+    }  
+    .
+    .
+    . x 80
+]
+Note:
+
+***
+    please make 4 tables, each has 20 items. it will make more easier to make API
+    table1 : PopluarItems
+    table2 : BigSaleItems
+    table3 : TodaySaleItems
+    table4 : NewItems
+***
+(1) provide 80 of items which has form of above
+(2) product_id must be unique per product.
+(3) 실시간 인기(20), 많이 담는 특가(20), 하루 특가(20), 인기 신상품(20)
+==================================================================
+
+==================================================================
+5. PopluarItems(빌궁)
+Due : 5/18
+
+Path : Server -> Mobile
+Method : Get
+Url : /PopluarItems
+
+[
+    {
+        product_id : Int,
+        img : String(URL),
+        name : String,
+        price : String
+    }  
+    .
+    .
+    . x 20
+]
+Note:
+(1) provide 20 of items which has form of above
+(2) product_id must be unique per product.
+(3) provide 20 of items which belong to PopluarItems.
+==================================================================
+
+==================================================================
+6. BigSaleItems(빌궁)
+Due : 5/18
+
+Path : Server -> Mobile
+Method : Get
+Url : /BigSaleItems
+
+[
+    {
+        product_id : Int,
+        img : String(URL),
+        name : String,
+        price : String
+    }  
+    .
+    .
+    . x 20
+]
+Note:
+(1) provide 20 of items which has form of above
+(2) product_id must be unique per product.
+(3) provide 20 of items which belong to BigSaleItems.
+==================================================================
+
+==================================================================
+7. TodaySaleItems(빌궁)
+Due : 5/18
+
+Path : Server -> Mobile
+Method : Get
+Url : /TodaySaleItems
+
+[
+    {
+        product_id : Int,
+        img : String(URL),
+        name : String,
+        price : String
+    }  
+    .
+    .
+    . x 20
+]
+Note:
+(1) provide 20 of items which has form of above
+(2) product_id must be unique per product.
+(3) provide 20 of items which belong to TodaySaleItems.
+==================================================================
+
+==================================================================
+8. NewItems(빌궁)
+Due : 5/18
+
+Path : Server -> Mobile
+Method : Get
+Url : /NewItems
+
+[
+    {
+        product_id : Int,
+        img : String(URL),
+        name : String,
+        price : String
+    }  
+    .
+    .
+    . x 20
+]
+Note:
+(1) provide 20 of items which has form of above
+(2) product_id must be unique per product.
+(3) provide 20 of items which belong to NewItems.
+==================================================================
+
+==================================================================
+9. SearchItems(빌궁)
+Due : 5/18
+
+Path : Mobile <-> Server
+Method : Get
+Url : /SearchItems
+
+""" Has 2 step """
+
+step1. Mobile -> Server
+{
+    search : String
+}
+
+step2. Server -> Mobile
+[
+    {
+        product_id : Int,
+        img : String(URL),
+        name : String,
+        price : String
+    }  
+    .
+    .
+    . x 20
+]
+
+Note:
+(1) provide 20 of SearchResult Items
+(2) first, get the input from user, and prvodie infromation related user's input
+(2) implement algorithms for taking items which related to user input
+==================================================================
+
+==================================================================
+10. ProductInfo(빌궁)
+Due : 5/21
+
+Path : Mobile <-> Server
+Method : Get
+Url : /ProductInfo
+
+""" Has 2 step """
+
+step1. Mobile -> Server
+{
+    product_id : Int
+}
+
+step2. Server -> Mobile
+{
+    product_id : Int
+    product_info : String,
+    review_info : String,
+    price: String
+}
+
+Note:
+(1) Provide information of product which has that product_id
+(2) product_info will be made by AI summarization
+(3) review_info will be made by AI summarization
+==================================================================
+
+==================================================================
+11. CategoriesItems(빌궁)
+Due : 5/21
+
+Path : Server -> Mobile
+Method : Get
+Url : /CategoriesItems/{Category}
+
+[
+    {
+        product_id : Int,
+        img : String(URL),
+        name : String,
+        price : String
+    }  
+    .
+    .
+    . x 20
+]
+
+Note:
+(1) provide 20 of items which belongs to Category
+(2) We have 20 Categories, so make this API 20 times
+(3) 호정, will crawling product based in categories(all product has category column in table)
+
+Category = [
+    "Vegetable",
+    "Fruits",
+    "Fish",
+    "Meat",
+    "MainDish",
+    "Salad",
+    "Oil",
+    "HealtyFood",
+    "Beverage",
+    "Coffee",
+    "Snack",
+    "Bakery",
+    "Milk",
+    "Wine",
+    "Soju",
+    "Kitchen",
+    "Daily",
+    "HomeAppliance",
+    "Interior",
+    "Baby",
+    "Sports",
+    "Pets",
+    "Beauty",
+    "SkinCare",
+    "Hair",
+    "Fashion"
+]
+==================================================================
+
+
+==================================================================
+12. Basket(빌궁)
+Due : 5/21
+
+Path : Mobile <-> Server
+Method : Get
+Url : /Basket
+
+""" Has 2 step """
+
+step1. Mobile -> Server
+{
+    sesseion_id : String
+}
+
+step2. Server -> Mobile
+[
+    {
+        product_id : Int,
+        img : String(URL),
+        name : String,
+        price : String,
+        number : Int
+    }  
+    .
+    .
+    . x (products number in the basket)
+]
+
+Note:
+(1) first, get the sesseion_id to know which user call this API
+(2) provide information of products in basket
+==================================================================
+
+
+==================================================================
+13. BasketAdd(빌궁)
+Due : 5/21
+
+Path : Mobile <-> Server  
+Method : Get
+Url : /BasektAdd
+
+""" Has 2 step """
+
+step1. Mobile -> Server
+{
+    sesseion_id : String,
+    product_id: Int
+}
+
+step2. Server -> Mobile
+[
+    {
+        product_id : Int,
+        img : String(URL),
+        name : String,
+        price : String,
+        number : Int
+    }  
+    .
+    .
+    . x (products number in the basket)
+]
+
+Note:
+(1) check session id to identify which user called this API
+(2) do "number += 1" to product's number and return edited information
+==================================================================
+
+==================================================================
+14. BasketSub(빌궁)
+Due : 5/21
+
+Path : Mobile <-> Server  
+Method : Get
+Url : /BasektSub
+
+""" Has 2 step """
+
+step1. Mobile -> Server
+{
+    sesseion_id : String,
+    product_id: Int
+}
+
+step2. Server -> Mobile
+[
+    {
+        product_id : Int,
+        img : String(URL),
+        name : String,
+        price : String,
+        number : Int
+    }  
+    .
+    .
+    . x (products number in the basket)
+]
+
+Note:
+(1) check session id to identify which user called this API
+(2) do "number -= 1" to product's number and return edited information
+==================================================================
+
+
+==================================================================
+15. BasketDel(빌궁)
+Due : 5/21
+
+Path : Mobile <-> Server  
+Method : Get
+Url : /BasektDel
+
+""" Has 2 step """
+
+step1. Mobile -> Server
+{
+    sesseion_id : String,
+    product_id: Int
+}
+
+step2. Server -> Mobile
+[
+    {
+        product_id : Int,
+        img : String(URL),
+        name : String,
+        price : String,
+        number : Int
+    }  
+    .
+    .
+    . x (products number in the basket)
+]
+
+Note:
+(1) check session id to identify which user called this API
+(2) do delete and return edited information
+==================================================================
+
+
+==================================================================
+16. BasketInsert(빌궁)
+Due : 5/21
+
+Path : Mobile -> Server  
+Method : Get
+Url : /BasektInsert
+
+{
+    sesseion_id : String,
+    product_id: Int
+}
+
+Note:
+(1) check session id to identify which user called this API
+(2) Insert Product into user's basket
+==================================================================
+
+
+==================================================================
+17. BasketPayment(빌궁)
+Due : 5/21
+
+Path : Mobile <-> Server  
+Method : Get
+Url : /BasketPayment
+
+""" Has 2 step """
+
+step1. Mobile -> Server
+{
+    sesseion_id : String,
+}
+
+step2. Server -> Mobile
+{
+    address : String,
+    phone : String,
+    email : String,
+    [
+        {
+            product_id : Int,
+            img : String(URL),
+            name : String,
+            price : String,
+            number : Int
+        }
+        .
+        .
+        . x (number of products in basket)
+    ]
+}
+
+Note:
+(1) check sesseion_id to recognize which user has request API
+(2) provide address, contact and basket infromation 
+==================================================================
+
+==================================================================
+18. OneItemPayment(빌궁)
+Due : 5/21
+
+Path : Mobile <-> Server  
+Method : Get
+Url : /OneItemPayment
+
+""" Has 2 step """
+
+step1. Mobile -> Server
+{
+    sesseion_id : String,
+    product_id : Int
+}
+
+step2. Server -> Mobile
+{
+    address : String,
+    phone : String,
+    email : String,
+    {
+        product_id : Int,
+        img : String(URL),
+        name : String,
+        price : String,
+        number : Int
+    }
+}
+
+Note:
+(1) check sesseion_id to recognize which user has request API
+(2) provide address, contact and product(only one) infromation
+==================================================================
+
+
+==================================================================
+19. PaymentEditAddress(호정)
+Due : 5/21
+
+Path : Mobile <-> Server  
+Method : Post
+Url : /Payment
+
+""" Has 2 step """
+
+step1. Mobile -> Server
+{
+    sesseion_id : String,
+    address : String
+}
+
+step2. Server -> Mobile
+{
+    address : String
+}
+
+Note:
+(1) check sesseion_id to recognize which user has request API
+(2) change origin address to new address(update database)
+(2) provide edited address.
+==================================================================
+
+
+==================================================================
+20. PaymentEditContact(호정)
+Due : 5/21
+
+Path : Mobile <-> Server  
+Method : Post
+Url : /Payment
+
+""" Has 2 step """
+
+step1. Mobile -> Server
+{
+    sesseion_id : String,
+    phone : String
+    email : String
+}
+
+step2. Server -> Mobile
+{
+    phone : String,
+    email : String,
+}
+
+Note:
+(1) check sesseion_id to recognize which user has request API
+(2) change origin phone and email to new phone and email
+(2) provide\ edited contact 
+==================================================================
+
+==================================================================
+21. Account(호정)
+Due : 5/21
+
+Path : Mobile <-> Server  
+Method : Post
+Url : /Payment
+
+""" Has 2 step """
+
+step1. Mobile -> Server
+{
+    sesseion_id : String,
+}
+
+step2. Server -> Mobile
+{
+    username : String,
+    email : String,
+    pw : String
+}
+
+Note:
+(1) check sesseion_id to recognize which user has request API
+==================================================================
+
+==================================================================
+22. AccountEditPw(호정)
+Due : 5/21
+
+Path : Mobile <-> Server  
+Method : Post
+Url : /AccountEditPw
+
+""" Has 2 step """
+
+step1. Mobile -> Server
+{
+    sesseion_id : String,
+    pw : String
+}
+
+step2. Server -> Mobile
+{
+    pw : String
+}
+
+Note:
+(1) check sesseion_id to recognize which user has request API
+(2) change origin pw to new pw
+(3) provide edited pw
+==================================================================
+
+
+
+
+
+
