@@ -9,7 +9,7 @@ Our goal is to create a clean, accessible, and user-friendly interface that enab
 
 ---
 
-![Login Page](PNG/Login.png)
+![Login Page](Design/PNG/Login.png)
 
 Mana siz yuborgan eski README bo‘yicha **yangilangan versiyasi** — hozirgi holatga moslab yozilgan. Unda barcha tugagan sahifalar ko‘rsatilgan, faqat **delivery** va **history** sahifalari qolgan, shuningdek yangi sahifalarning skrinshotlari ham qo‘shilgan:
 
@@ -23,38 +23,38 @@ Mana siz yuborgan eski README bo‘yicha **yangilangan versiyasi** — hozirgi h
 
 - **Login Page**
 - **Create Account Page**   
-  ![Login Page](PNG/Login.png)
+  ![Login Page](Design/PNG/Login.png)
 
 
 - **Profile Page**  
-  ![Profile Page](PNG/profile.png)
+  ![Profile Page](Design/PNG/profile.png)
 
 
 - **Shop Page**  
-  ![Shop Page](PNG/shop.png)
+  ![Shop Page](Design/PNG/shop.png)
 
 
 - **Search Page**
 - **Search Results Page**
 - **Filter Page**  
-  ![Search Page](PNG/search.png)
+  ![Search Page](Design/PNG/search.png)
 
 
 - **Product Page**
 - **Product Sale Page** 
-  ![Product Page](PNG/products.png)
+  ![Product Page](Design/PNG/products.png)
   <br/>
 
 
 - **Cart Page**
 - **Add to Cart Options Page (Color & Size)**  
 - **Payment Page**  
-  ![Cart Page](PNG/cart.png)
-  ![Payment Page](PNG/payment.png)
+  ![Cart Page](Design/PNG/cart.png)
+  ![Payment Page](Design/PNG/payment.png)
 
 
 - **Reviews Page**  
-  ![Reviews Page](PNG/review.png)
+  ![Reviews Page](Design/PNG/review.png)
 
 
 ---
