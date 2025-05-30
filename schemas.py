@@ -1,21 +1,22 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 from datetime import datetime
-from typing import Optional
+
 # -------------------- Product --------------------
-
-from pydantic import BaseModel
-
 class ProductSummary(BaseModel):
     id: int
-    name: str
-    description: str
-    price: float
-    image: Optional[str]  
+    name: Optional[str]
+    description: Optional[str]
+    price: Optional[float]
+    image_url: Optional[str] = None
+    category: Optional[str] = None
 
     class Config:
         from_attributes = True
+        orm_mode = True
 
+class EmailRequest(BaseModel):
+	email: Optional[str]
 
 class ProductIDRequest(BaseModel):
     product_id: int
@@ -24,23 +25,21 @@ class ProductIDRequest(BaseModel):
 class ProductDetail(BaseModel):
     product_id: int
     name: str
-    image: Optional[str]  
-    description: str
-    category: str
+    image_url: Optional[str]
     price: float
+    ai_info: str
+    ai_review: str
 
     class Config:
         from_attributes = True
 
 
 # -------------------- Search --------------------
-
 class SearchRequest(BaseModel):
     search: str
 
 
 # -------------------- Basket --------------------
-
 class BasketItem(BaseModel):
     product_id: int
     img: str
@@ -51,10 +50,12 @@ class BasketItem(BaseModel):
     class Config:
         from_attributes = True
 
+class BasketRequest(BaseModel):
+    session_id: str
 
 class BasketModifyRequest(BaseModel):
-    session_id: str
-    product_id: int
+	session_id: str
+	product_id: int
 
 
 class BasketInsertRequest(BaseModel):
@@ -68,23 +69,27 @@ class OneItemRequest(BaseModel):
 
 
 # -------------------- Payment --------------------
-
 class PaymentResponse(BaseModel):
-    address: str
-    phone: str
+    address: Optional[str] = None
+    phone: Optional[str] = None
     email: str
-    items: List[BasketItem]
+    item: List[BasketItem]
 
 
 class OneItemPaymentResponse(BaseModel):
     address: str
     phone: str
     email: str
-    item: BasketItem
+    item: List[BasketItem]
+
+class BasketPayment(BaseModel):
+	session_id: str
+# -------------------- Order --------------------
 class OrderItemCreate(BaseModel):
     product_id: int
     quantity: int
     price: float
+
 
 class OrderCreate(BaseModel):
     user_id: int
@@ -92,11 +97,46 @@ class OrderCreate(BaseModel):
     created_at: datetime
     items: List[OrderItemCreate]
 
+
 class OrderResponse(BaseModel):
     id: int
     user_id: int
     total_price: float
     created_at: datetime
 
+    model_config = {
+        "from_attributes": True
+    }
+
+
+class TodaySaleItemResponse(BaseModel):
+    id: int
+    name: str
+    description: str
+    price: float
+    image_url: Optional[str] = None
+    category: Optional[str] = None
+
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+
+# -------------------- User --------------------
+class SignUpRequest(BaseModel):
+    email: str
+    pw: str
+    cell: str
+    un: str
+
+
+class LoginRequest(BaseModel):
+    email: str
+    pw: str
+
+
+class LoginResponse(BaseModel):
+    session_id: str
+
+
+class UserNameRequest(BaseModel):
+    un: str
