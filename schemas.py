@@ -140,3 +140,10 @@ class LoginResponse(BaseModel):
 
 class UserNameRequest(BaseModel):
     un: str
+
+class ReviewRequest(BaseModel):
+	product_id: int
+
+class ReviewProvide(BaseModel):
+	ai_review: str
+

@@ -16,6 +16,12 @@ from llava.mm_utils import tokenizer_image_token, process_images
 import requests
 from PIL import Image
 
+
+# LLM Model 라이브러리
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
+
+
 router = APIRouter(prefix="", tags=["Product"])
 
 
@@ -37,12 +43,127 @@ vlm_model = torch.compile(vlm_model)
 IMAGE_TOKEN_INDEX = -200
 EOS_TOKEN = "<|im_end|>"
 
+# LLM 세팅
+start_token = "<|end_header_id|>"
+end_token = "<|eot_id|>"
+
+
+llm_model = AutoModelForCausalLM.from_pretrained(
+      "NCSOFT/Llama-VARCO-8B-Instruct",
+      torch_dtype=torch.bfloat16,
+      device_map="auto"
+  )
+llm_tokenizer = AutoTokenizer.from_pretrained("NCSOFT/Llama-VARCO-8B-Instruct")
+
+llm_model = torch.compile(llm_model)
+
+def call_llm(review):
+	messages = [
+      {"role": "system", "content": "너는 상품 요약을 수행하는 언어 모델이야"},
+      {"role": "user", "content": "아래에 상품에 대한 리뷰 정보가 주어져있어. 주어진 리뷰 정보를 50자 이내의 문장으로, 리뷰를 요약해서 친절하게 존댓말과 함께  설명하는 형태로 요약문을 만들어줘. 최대한 간결하고 빠르게 핵심 정보만을 전달해줘." + review}
+  ]
+
+	inputs = llm_tokenizer.apply_chat_template(messages, return_tensors="pt").to(llm_model.device)
+	
+
+	eos_token_id = [
+        llm_tokenizer.eos_token_id,
+        llm_tokenizer.convert_tokens_to_ids("<|eot_id|>")
+  ]
+
+	outputs = llm_model.generate(
+		inputs,
+		eos_token_id=eos_token_id,
+		max_length=8192
+  )
+	
+	# AI output 전처리
+
+	result = (llm_tokenizer.decode(outputs[0]))
+
+	start_index = result.find(start_token) + len(start_token)
+	start_index = result.find(start_token, start_index) + len(start_token)
+	start_index = result.find(start_token ,start_index)+ len(start_token)
+
+	end_index = result.find(end_token) + len(end_token)
+	end_index = result.find(end_token,end_index) + len(end_token)
+	end_index = result.find(end_token, end_index)
+
+	result = result[start_index+2:end_index]
+	result.replace('\n','')
+
+	return result
+
+@router.post("/Review", response_model = schemas.ReviewProvide)
+def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
+	prod = db.query(models.Product).filter(models.Product.id == payload.product_id).first()
+	if not prod:
+		raise HTTPException(status_code=404, detail="Product not found")
+	review = call_llm(prod.product_review)
+
+	
+	return schemas.ReviewProvide(
+			ai_review = review)
+
+@router.post("/Review/Popular", response_model = schemas.ReviewProvide)
+def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
+
+	prod = db.query(models.PopularItem).filter(models.PopularItem.id == payload.product_id).first()
+	re_prod = db.query(models.Product).filter(models.Product.name == prod.name).first()
+	if not prod:
+		raise HTTPException(status_code=404, detail="Product not found")
+	review = call_llm(re_prod.product_review)
+
+	
+	return schemas.ReviewProvide(
+			ai_review = review)
+
+@router.post("/Review/BigSale", response_model = schemas.ReviewProvide)
+def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
+
+	prod = db.query(models.BigSaleItem).filter(models.BigSaleItem.id == payload.product_id).first()
+	re_prod = db.query(models.Product).filter(models.Product.name == prod.name).first()
+	if not prod:
+		raise HTTPException(status_code=404, detail="Product not found")
+	review = call_llm(re_prod.product_review)
+
+	
+	return schemas.ReviewProvide(
+			ai_review = review)
+
+@router.post("/Review/TodaySale", response_model = schemas.ReviewProvide)
+def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
+
+	prod = db.query(models.TodaySaleItem).filter(models.TodaySaleItem.id == payload.product_id).first()
+	re_prod = db.query(models.Product).filter(models.Product.name == prod.name).first()
+	if not prod:
+		raise HTTPException(status_code=404, detail="Product not found")
+	review = call_llm(re_prod.product_review)
+
+	
+	return schemas.ReviewProvide(
+			ai_review = review)
+
+@router.post("/Review/New", response_model = schemas.ReviewProvide)
+def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
+
+	prod = db.query(models.NewItem).filter(models.NewItem.id == payload.product_id).first()
+	re_prod = db.query(models.Product).filter(models.Product.name == prod.name).first()
+	if not prod:
+		raise HTTPException(status_code=404, detail="Product not found")
+	review = call_llm(re_prod.product_review)
+
+	
+	return schemas.ReviewProvide(
+			ai_review = review)
+
+
 def call_ai(info, img):
 	conversation = [
     {
         "role": "user",
         "content": [
-            {"type": "text", "text": "주어진 이미지는 상품 설명 이미지야. 이미지 내에 존재하는 모든 정보를 간략하게 50자 이내의 문장으로 요약해줘. 최대한 시간을 적게 사용해서 요약해줘. 요약문은 상품 정보를 소개하는, 말하는 형태로 만들어줘. 아래에 상품의 정보를 추가로 기재할게 이를 참고해서 요약해줘" + info},
+            {"type": "text", "text": "주어진 이미지는 상품 설명 이미지야. 이미지 내에 존재하는 모든 정보를 간략하게 100자 이내의 문장으로 요약해줘. 최대한 시간을 적게 사용해서 요약해줘. 요약문은 상품 정보를 친절하게 존댓말과 함께 소개하는 형태로 만들어줘. 아래에 상품의 정보를 추가로 기재할게 이를 참고해서 요약해줘" + info},
             {"type": "image"},
         ],
     },
@@ -84,6 +205,7 @@ def call_ai(info, img):
 	outputs = outputs.strip()
 	return outputs
 
+
 # ✅ Product Info by ID
 @router.post("/ProductInfo", response_model=schemas.ProductDetail)
 def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db)):
@@ -91,7 +213,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
 	
-    ai_info = call_ai(prod.description, prod.image_url)
+    ai_info = call_ai(prod.description, prod.img_info)
     
 
     return schemas.ProductDetail(
