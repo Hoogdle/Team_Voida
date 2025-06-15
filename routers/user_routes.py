@@ -27,7 +27,7 @@ def sign_up(payload: schemas.SignUpRequest, db: Session = Depends(get_db)):
     hashed_pw = bcrypt.hashpw(payload.pw.encode("utf-8"), bcrypt.gensalt())
     new_user = models.UserProfile(
         email=payload.email,
-        password=hashed_pw.encode("utf-8").decode("utf-8"),
+        password=hashed_pw.decode("utf-8"),
         phone=payload.cell,
 		username=payload.un,
         session_id=session_id
@@ -51,7 +51,7 @@ def sign_in(payload: schemas.LoginRequest, db: Session = Depends(get_db)):
 
 
 # Set username API
-@router.post("/UserName", response_model=bool)
+@router.post("/UserName", response_model=schemas.LoginResponse)
 def set_user_name(
         payload: schemas.UserNameRequest,
         user: models.UserProfile = Depends(get_current_user),
@@ -60,6 +60,8 @@ def set_user_name(
     if db.query(models.UserProfile).filter(models.UserProfile.username == payload.un).first():
         return False
 
+    usession_id = str(uuid.uuid4())
+    user.session_id = session_id
     user.username = payload.un
     db.commit()
-    return True
+    return schemas.LoginResponse(session_id=session_id)
