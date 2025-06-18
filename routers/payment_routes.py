@@ -6,15 +6,17 @@ from utils.session_check import *
 
 router = APIRouter(prefix="", tags=["Payment"])
 
+# 장바구니에 결제 시도시 상품 정보를 제공하는 함수
 @router.post("/BasketPayment", response_model=schemas.PaymentResponse)
 def basket_payment(payload: schemas.BasketPayment, db: Session = Depends(get_db)):
 
+	# 세션 아이디를 통해 유저 정보확인
 	user = check_session(db,payload.session_id)
 	basket_items = db.query(models.Basket).filter(models.Basket.user_id == user.id).all()
 
 	if not basket_items:
 		raise HTTPException(status_code=404, detail="No items in basket")
-
+	
 	items = [
         schemas.BasketItem(
             product_id=item.product.id,
@@ -26,6 +28,8 @@ def basket_payment(payload: schemas.BasketPayment, db: Session = Depends(get_db)
         for item in basket_items
     ]
 
+	# 배송지 정보와 추출된 상품 정보 제공
+	# 배송지 정보 및 연락처 정보는 추후 구현 필요
 	return schemas.PaymentResponse(
         address= "서울특별시 서대문구 북아현로 12",
         phone= "010-1234-5678",
@@ -33,6 +37,7 @@ def basket_payment(payload: schemas.BasketPayment, db: Session = Depends(get_db)
         item=items
     )
 
+# 상품 정보 페이지에서 결제요청시 사용되는 함수
 @router.post("/OneItemPayment", response_model=schemas.OneItemPaymentResponse)
 def one_item_payment(payload: schemas.OneItemRequest, db: Session = Depends(get_db)):
 
@@ -60,6 +65,7 @@ def one_item_payment(payload: schemas.OneItemRequest, db: Session = Depends(get_
     )
 
 
+
 @router.post("/OneItemPayment", response_model=schemas.OneItemPaymentResponse)
 def one_item_payment(payload: schemas.OneItemRequest, db: Session = Depends(get_db)):
 
@@ -87,6 +93,9 @@ def one_item_payment(payload: schemas.OneItemRequest, db: Session = Depends(get_
     )
 
 
+# 단일 상품 중 인기상품 결제시 사용되는 함수
+# BigSale, New... 모두 같은 로직 사용
+# DB를 초기 다소 복잡하게 설계하여 로직 또한 약간 꼬이는 문제발생
 @router.post("/OneItemPayment/Popular", response_model=schemas.OneItemPaymentResponse)
 def one_item_payment(payload: schemas.OneItemRequest, db: Session = Depends(get_db)):
 
