@@ -8,7 +8,7 @@ from utils.session_check import *
 
 router = APIRouter(prefix="", tags=["Basket"])
 
-# 🔁 Helper function to serialize basket items
+# 바스켓 아이템을 갖고오는 헬퍼 함수
 def serialize_basket_items(user_id: int, db: Session) -> List[schemas.BasketItem]:
     items = db.query(models.Basket).filter(models.Basket.user_id == user_id).all()
     return [
@@ -22,14 +22,14 @@ def serialize_basket_items(user_id: int, db: Session) -> List[schemas.BasketItem
         for item in items
     ]
 
-# 🧺 Get Basket
+# 장바구니 아이템 Get 함수
 @router.post("/Basket", response_model=List[schemas.BasketItem])
 def get_basket(payload: schemas.BasketRequest,db: Session = Depends(get_db)):
 	
 	user = check_session(db,payload.session_id)
 	return serialize_basket_items(user.id, db)
 
-# ➕ Add to Basket
+# 장바구니 추가 함수
 @router.post("/BasketAdd", response_model=List[schemas.BasketItem])
 def add_to_basket(payload: schemas.BasketModifyRequest,db: Session = Depends(get_db)):
 
@@ -43,7 +43,7 @@ def add_to_basket(payload: schemas.BasketModifyRequest,db: Session = Depends(get
 	db.commit()
 	return serialize_basket_items(user.id, db)
 
-# ➖ Subtract from Basket
+# 장바구니 개수 감소 함수
 @router.post("/BasketSub", response_model=List[schemas.BasketItem])
 def subtract_from_basket(payload: schemas.BasketModifyRequest,db: Session = Depends(get_db)):
 
@@ -57,7 +57,7 @@ def subtract_from_basket(payload: schemas.BasketModifyRequest,db: Session = Depe
 	db.commit()
 	return serialize_basket_items(user.id, db)
 
-# ❌ Delete from Basket
+# 장바구니 아이템 삭제 함수
 @router.post("/BasketDel", response_model=List[schemas.BasketItem])
 def delete_from_basket(payload: schemas.BasketModifyRequest, db: Session = Depends(get_db)):
 
@@ -68,7 +68,7 @@ def delete_from_basket(payload: schemas.BasketModifyRequest, db: Session = Depen
 		db.commit()
 	return serialize_basket_items(user.id, db)
 
-# 🔽 Insert one item directly
+# 상품 페이지에서 아이템 단 하나 추가하는 함수
 @router.post("/BasketInsert", response_model=dict)
 def insert_to_basket(payload: schemas.BasketInsertRequest, db: Session = Depends(get_db)):
 
@@ -78,7 +78,7 @@ def insert_to_basket(payload: schemas.BasketInsertRequest, db: Session = Depends
 	db.commit()
 	return {"detail": "Inserted successfully"}
 
-
+# 인기 카테고리에 속하는 아이템을 장바구니에 추가하는 함수
 @router.post("/BasketInsert/Popular", response_model=dict)
 def insert_to_basket(payload: schemas.BasketInsertRequest, db: Session = Depends(get_db)):
 
@@ -91,6 +91,7 @@ def insert_to_basket(payload: schemas.BasketInsertRequest, db: Session = Depends
 	db.commit()
 	return {"detail": "Inserted successfully"}
 
+# BigSale 카테고리에 속하는 아이템을 장바구니에 추가하는 함수
 @router.post("/BasketInsert/BigSale", response_model=dict)
 def insert_to_basket(payload: schemas.BasketInsertRequest, db: Session = Depends(get_db)):
 
@@ -103,6 +104,7 @@ def insert_to_basket(payload: schemas.BasketInsertRequest, db: Session = Depends
 	db.commit()
 	return {"detail": "Inserted successfully"}
 
+# Today Sale 카테고리에 속하는 아이템을 장바구니에 추가하는 함수
 @router.post("/BasketInsert/TodaySale", response_model=dict)
 def insert_to_basket(payload: schemas.BasketInsertRequest, db: Session = Depends(get_db)):
 
@@ -115,6 +117,7 @@ def insert_to_basket(payload: schemas.BasketInsertRequest, db: Session = Depends
 	db.commit()
 	return {"detail": "Inserted successfully"}
 
+# 신상품 카테고리에 속하는 상품을 장바구니에 추가하는 함수
 @router.post("/BasketInsert/New", response_model=dict)
 def insert_to_basket(payload: schemas.BasketInsertRequest, db: Session = Depends(get_db)):
 
