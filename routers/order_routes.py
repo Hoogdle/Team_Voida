@@ -9,7 +9,7 @@ router = APIRouter(
     tags=["Orders"]
 )
 
-# 🧾 Захиалга үүсгэх
+# 주문 페이지 정보제공 
 @router.post("/", response_model=schemas.OrderResponse)
 def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
     db_order = models.Order(
@@ -35,14 +35,14 @@ def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
     return db_order
 
 
-# 📜 Захиалгын жагсаалт
+
 @router.get("/", response_model=List[schemas.OrderResponse])
 def get_orders(db: Session = Depends(get_db)):
     orders = db.query(models.Order).all()
     return orders
 
 
-# 🔍 Захиалгыг ID-р авах
+#
 @router.get("/{order_id}", response_model=schemas.OrderResponse)
 def get_order(order_id: int, db: Session = Depends(get_db)):
     order = db.query(models.Order).filter(models.Order.id == order_id).first()
