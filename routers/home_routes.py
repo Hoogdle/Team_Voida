@@ -9,10 +9,13 @@ from schemas import ProductSummary, SearchRequest
 
 router = APIRouter(prefix="", tags=["Home"])
 
+# 홈 화면의 상품 정보 전달
 @router.get("/Home", response_model=List[schemas.ProductSummary])
 def read_home(db: Session = Depends(get_db)):
+    # 모든 상품 정보를 담을 리스트
     product_ids = []
 
+    # DB 쿼리를 활용해 각 카테고리별 상품을 리스트에 저장
     product_ids += [item for item in db.query(models.PopularItem).limit(10)]
     product_ids += [item for item in db.query(models.BigSaleItem).limit(10)]
     product_ids += [item for item in db.query(models.TodaySaleItem).limit(10)]
@@ -24,6 +27,7 @@ def read_home(db: Session = Depends(get_db)):
 #products = db.query(models.Product).filter(models.Product.id.in_(product_ids)).all()
     return product_ids
 
+#  인기 상품 카테고리에 속하는 상품 20개 제공
 @router.get("/PopluarItems", response_model=List[schemas.ProductSummary])
 def read_popular(db: Session = Depends(get_db)):
     items = db.query(models.PopularItem).limit(20).all()
@@ -32,7 +36,7 @@ def read_popular(db: Session = Depends(get_db)):
       
     return items
 
-
+#  할인 카테고리에 속하는 상품 20개 제공
 @router.get("/BigSaleItems", response_model=List[schemas.ProductSummary])
 def read_bigsale(db: Session = Depends(get_db)):
     items = db.query(models.BigSaleItem).limit(20).all()
@@ -48,13 +52,14 @@ def read_today_sale(db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Today's sale items not found")
     return items
 
-
+#  신상품 카테고리에 속하는 상품 20개 제공
 @router.get("/NewItems", response_model=List[schemas.ProductSummary])
 def read_new_items(db: Session = Depends(get_db)):
     items = db.query(models.NewItem).limit(20).all()
     if not items:
         raise HTTPException(status_code=404, detail="New items not found")
     return items
+# 상품 검색 요청 처리 및 상풍 제공
 @router.post("/SearchItems", response_model=list[ProductSummary])
 async def search_items(request: SearchRequest, db: Session = Depends(get_db)):
     keyword = request.search.lower()
