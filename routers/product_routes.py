@@ -57,7 +57,9 @@ llm_tokenizer = AutoTokenizer.from_pretrained("NCSOFT/Llama-VARCO-8B-Instruct")
 
 llm_model = torch.compile(llm_model)
 
+# LLM 모델 호출 함수
 def call_llm(review):
+	# LLM 모델 프롬프트 설정 
 	messages = [
       {"role": "system", "content": "너는 상품 요약을 수행하는 언어 모델이야"},
       {"role": "user", "content": "아래에 상품에 대한 리뷰 정보가 주어져있어. 주어진 리뷰 정보를 50자 이내의 문장으로, 리뷰를 요약해서 친절하게 존댓말과 함께  설명하는 형태로 요약문을 만들어줘. 최대한 간결하고 빠르게 핵심 정보만을 전달해줘." + review}
@@ -158,7 +160,9 @@ def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
 			ai_review = review)
 
 
+# vlm 모델 호출 함수
 def call_ai(info, img):
+	# 모델에 사용되는 프롬프트 설정
 	conversation = [
     {
         "role": "user",
@@ -206,7 +210,7 @@ def call_ai(info, img):
 	return outputs
 
 
-# ✅ Product Info by ID
+# 사용자가 요청 상품 정보의 아이디로 조회하여 해당 상품의 정보 제공
 @router.post("/ProductInfo", response_model=schemas.ProductDetail)
 def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db)):
     prod = db.query(models.Product).filter(models.Product.id == payload.product_id).first()
@@ -228,7 +232,8 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
 
 
 
-# ✅ CategoriesItems
+# 카테고리 상품 정보 제공
+# 현재는 '야채' 카테고리만 구현됨
 @router.get("/CategoriesItems/{category}", response_model=List[schemas.ProductSummary])
 def category_items(category: str, db: Session = Depends(get_db)):
     category = "\"" + category + "\""
@@ -240,6 +245,7 @@ def category_items(category: str, db: Session = Depends(get_db)):
     return results
 
 # Popular Items
+# 아래의 각 카테고리 로직은 모두 동일 Bigslae, New...
 @router.get("/PopularItems", response_model=List[schemas.ProductSummary])
 def get_big_sale_items(db: Session = Depends(get_db)):
     items = db.query(models.PopularItem).all()
@@ -251,7 +257,7 @@ def get_big_sale_items(db: Session = Depends(get_db)):
 
 
 
-# ✅ Big Sale Items
+# Big Sale Items
 @router.get("/BigSaleItems", response_model=List[schemas.ProductSummary])
 def get_big_sale_items(db: Session = Depends(get_db)):
     items = db.query(models.BigSaleItem).all()
@@ -261,7 +267,7 @@ def get_big_sale_items(db: Session = Depends(get_db)):
     return items
 
 
-# ✅ Today Sale Items
+# Today Sale Items
 @router.get("/TodaySaleItems", response_model=List[schemas.ProductSummary])
 def get_today_sale_items(db: Session = Depends(get_db)):
     items = db.query(models.TodaySaleItem).all()
@@ -271,7 +277,7 @@ def get_today_sale_items(db: Session = Depends(get_db)):
     return items
 
 
-# ✅ New Items
+# New Items
 @router.get("/NewItems", response_model=List[schemas.ProductSummary])
 def get_new_items(db: Session = Depends(get_db)):
     items = db.query(models.NewItem).all()
@@ -281,7 +287,7 @@ def get_new_items(db: Session = Depends(get_db)):
     return items
 
 
-# ✅ Product Info by ID
+# Product Info by ID
 @router.post("/PopularProductInfo", response_model=schemas.ProductDetail)
 def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db)):
     prod = db.query(models.PopularItem).filter(models.PopularItem.id == payload.product_id).first()
@@ -302,7 +308,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     )
 
 
-# ✅ Product Info by ID
+# Product Info by ID
 @router.post("/BigSaleProductInfo", response_model=schemas.ProductDetail)
 def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db)):
     prod = db.query(models.BigSaleItem).filter(models.BigSaleItem.id == payload.product_id).first()
@@ -322,7 +328,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
         ai_review = ""
     )
 
-# ✅ Product Info by ID
+# Product Info by ID
 @router.post("/TodaySaleProductInfo", response_model=schemas.ProductDetail)
 def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db)):
     prod = db.query(models.TodaySaleItem).filter(models.TodaySaleItem.id == payload.product_id).first()
@@ -342,7 +348,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
         ai_review = ""
     )
 
-# ✅ Product Info by ID
+# Product Info by ID
 @router.post("/NewProductInfo", response_model=schemas.ProductDetail)
 def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db)):
     prod = db.query(models.NewItem).filter(models.NewItem.id == payload.product_id).first()
