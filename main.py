@@ -7,7 +7,9 @@ from routers import (  # Import all routers from the routers package
     basket_router,
     payment_router,
     order_router,
-    user_router  # Add the new user router
+    user_router,
+	assistant_router
+  # Add the new user router
 )
 from database import engine
 import models
@@ -43,7 +45,7 @@ app.include_router(basket_router)     # Existing basket routes
 app.include_router(payment_router)    # Existing payment routes
 app.include_router(order_router)      # Existing order routes
 app.include_router(user_router)       # New: User - related routes (SignUp, SignIn, UserName)
-
+app.include_router(assistant_router)      
 # -------------------- Root Endpoint --------------------
 @app.get("/")
 def read_root():
@@ -60,6 +62,7 @@ def read_root():
             "/Order",
             "/SignUp",   # New: Added to route list
             "/SignIn",   # New: Added to route list
-            "/UserName"  # New: Added to route list
+            "/UserName",  # New: Added to route list
+			"AssistantCategory"
         ]
     }

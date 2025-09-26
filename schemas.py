@@ -147,3 +147,5 @@ class ReviewRequest(BaseModel):
 class ReviewProvide(BaseModel):
 	ai_review: str
 
+class AssistantCategory(BaseModel):
+	voiceInput: str

@@ -5,6 +5,7 @@ from .payment_routes import router as payment_router
 from .product_routes import router as product_router
 from .search_routes import router as search_router
 from .user_routes import router as user_router
+from .assistant_routes import router as assistant_router
 
 __all__ = [
     "basket_router",
@@ -13,5 +14,6 @@ __all__ = [
     "payment_router",
     "product_router",
     "search_router",
-    "user_router"
+    "user_router",
+	"assistant_router"
 ]

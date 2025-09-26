@@ -5,43 +5,39 @@ from typing import List
 from database import get_db
 import models, schemas
 
-
 import sys
 sys.path.insert(1, "/home/xodud7737/AiApp/LLaVA-NeXT")
 # vlm(ai)를 위한 라이브러리
 import torch
 from transformers import AutoTokenizer
-from llava.model.language_model.llava_qwen import LlavaQwenForCausalLM
-from llava.mm_utils import tokenizer_image_token, process_images
 import requests
 from PIL import Image
 
 
 # LLM Model 라이브러리
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM, LlavaOnevisionForConditionalGeneration, AutoProcessor
 import torch
 
 
 router = APIRouter(prefix="", tags=["Product"])
 
 
-vlm_model_name = "NCSOFT/VARCO-VISION-14B"
-tokenizer = AutoTokenizer.from_pretrained(vlm_model_name)
-vlm_model = LlavaQwenForCausalLM.from_pretrained(
+vlm_model_name = "NCSOFT/VARCO-VISION-2.0-1.7B"
+
+vlm_model = LlavaOnevisionForConditionalGeneration.from_pretrained(
     vlm_model_name,
     torch_dtype=torch.float16,
-    attn_implementation="flash_attention_2",
-    low_cpu_mem_usage=True,
+    attn_implementation="sdpa",
     device_map="auto"
 )
 
+processor = AutoProcessor.from_pretrained(vlm_model_name)
+
+'''
 vision_tower = vlm_model.get_vision_tower()
 image_processor = vision_tower.image_processor
 vlm_model = torch.compile(vlm_model)
-
-# AI의 토큰값 설정
-IMAGE_TOKEN_INDEX = -200
-EOS_TOKEN = "<|im_end|>"
+'''
 
 # LLM 세팅
 start_token = "<|end_header_id|>"
@@ -163,51 +159,39 @@ def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
 # vlm 모델 호출 함수
 def call_ai(info, img):
 	# 모델에 사용되는 프롬프트 설정
+
+	if(img[0] == '\"'): image_url = img[1:-1]
+	else: image_url = img
+
+	# For Debugging	
+	print(image_url)
+
 	conversation = [
     {
         "role": "user",
         "content": [
-            {"type": "text", "text": "주어진 이미지는 상품 설명 이미지야. 이미지 내에 존재하는 모든 정보를 간략하게 100자 이내의 문장으로 요약해줘. 최대한 시간을 적게 사용해서 요약해줘. 요약문은 상품 정보를 친절하게 존댓말과 함께 소개하는 형태로 만들어줘. 아래에 상품의 정보를 추가로 기재할게 이를 참고해서 요약해줘" + info},
-            {"type": "image"},
+			{"type" : "image", "url" : image_url},
+            {"type": "text", "text": "주어진 이미지는 상품 설명 이미지야. 이미지 내에 존재하는 모든 정보를 간략하게 100자 이내의 문장으로 요약해줘. 최대한 시간을 적게 사용해서 요약해줘. 요약문은 상품 정보를 친절하게 존댓말과 함께 소개하는 형태로 만들어줘."},
         ],
     },
     ]
 
-	prompt = tokenizer.apply_chat_template(conversation, add_generation_prompt=True, tokenize=False)
-    
-	input_ids = tokenizer_image_token(prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors="pt")
-
-	input_ids = input_ids.unsqueeze(0).to(vlm_model.device)
-
+	inputs = processor.apply_chat_template(
+		conversation,
+		add_generation_prompt = True,
+		tokenize = True,
+		return_dict = True,
+		return_tensors = "pt"
+	).to(vlm_model.device, torch.float16)
 	
-	if(img[0] == '\"'): image_url = img[1:-1]
-	else: image_url = img
+	generate_ids = vlm_model.generate(**inputs, max_new_tokens=512)
+	generate_ids_trimmed = [
+		out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generate_ids)
+	]
 
-	print(image_url)
-
-	raw_image = Image.open(requests.get(image_url, stream=True).raw)
-	image_tensors = process_images([raw_image], image_processor, vlm_model.config)
-
-	image_tensors = [image_tensor.half().to(vlm_model.device) for image_tensor in image_tensors]
-
-	image_sizes = [raw_image.size]
-
-	with torch.inference_mode():
-         output_ids = vlm_model.generate(
-         input_ids,
-         images=image_tensors,
-         image_sizes=image_sizes,
-         do_sample=False,
-         max_new_tokens=1024,
-         use_cache=True,
-         )
-
-	outputs = tokenizer.batch_decode(output_ids)[0]
-	if outputs.endswith(EOS_TOKEN):
-         outputs = outputs[: -len(EOS_TOKEN)]
-
-	outputs = outputs.strip()
-	return outputs
+	output = processor.decode(generate_ids_trimmed[0], skip_specail_tokens=True)
+	
+	return output
 
 
 # 사용자가 요청 상품 정보의 아이디로 조회하여 해당 상품의 정보 제공
