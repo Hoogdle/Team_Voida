@@ -1,5 +1,6 @@
 package com.example.team_voida.Nav
 
+import AssistantToServer
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
@@ -29,12 +30,17 @@ import androidx.core.view.ViewCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.team_voida.Basket.BasketListServer
 import com.example.team_voida.CreateAccount.CreateAccount
 import com.example.team_voida.CreateAccount.CreateAccountNaming
 import com.example.team_voida.Home.Home
 import com.example.team_voida.Login.Login
 import com.example.team_voida.Start.Guide
 import com.example.team_voida.Start.Start
+import com.example.team_voida.session
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.Locale
 
 // 시작화면에서 사용되는 Navigation
@@ -46,7 +52,7 @@ fun StartNav(){
 
     var input = remember { mutableStateOf("") }
 
-    var voiceInput = remember{ mutableStateOf("") }
+    var voiceInput = remember{ mutableStateOf("풋사과 검색해줘") }
 
     val context = LocalContext.current
     val view = LocalView.current
@@ -77,7 +83,7 @@ fun StartNav(){
     )
 
     DisposableEffect(Unit) {
-        var input = ""
+        var category: String? = null
         val listener = ViewCompat.OnUnhandledKeyEventListenerCompat { _, event ->
             val keyCode = event.keyCode
             val action = event.action
@@ -123,8 +129,19 @@ fun StartNav(){
                         100
                     )
                 }
-                Log.e("hi",voiceInput.value)
-                
+
+                if(voiceInput.value != ""){
+                    runBlocking {
+                        val job = GlobalScope.launch{
+                            category = AssistantToServer(voiceInput.value)
+                        }
+                    }
+                }
+
+                Log.e("hi", category.toString())
+
+
+
                 true  // 이벤트 소비
             } else {
                 false  // 다른 이벤트 처리 허용
