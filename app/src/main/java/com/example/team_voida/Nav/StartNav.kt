@@ -1,8 +1,16 @@
 package com.example.team_voida.Nav
 
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.speech.RecognizerIntent
 import android.util.Log
 import android.view.KeyEvent
 import android.view.ViewConfiguration
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -15,6 +23,8 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -25,6 +35,7 @@ import com.example.team_voida.Home.Home
 import com.example.team_voida.Login.Login
 import com.example.team_voida.Start.Guide
 import com.example.team_voida.Start.Start
+import java.util.Locale
 
 // 시작화면에서 사용되는 Navigation
 @Composable
@@ -34,6 +45,8 @@ fun StartNav(){
 
 
     var input = remember { mutableStateOf("") }
+
+    var voiceInput = remember{ mutableStateOf("") }
 
     val context = LocalContext.current
     val view = LocalView.current
@@ -50,7 +63,21 @@ fun StartNav(){
     val upPressed = remember { mutableStateOf(false) }
     val downPressed = remember { mutableStateOf(false) }
 
+    val speechRecognizerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+        onResult = { result ->
+            val spokenText =
+                result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.firstOrNull()
+            if (spokenText != null) {
+                voiceInput.value = spokenText  // Update prompt with recognized text
+            } else {
+                Toast.makeText(context, "음성인식에 실패하였습니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    )
+
     DisposableEffect(Unit) {
+        var input = ""
         val listener = ViewCompat.OnUnhandledKeyEventListenerCompat { _, event ->
             val keyCode = event.keyCode
             val action = event.action
@@ -75,6 +102,29 @@ fun StartNav(){
 
             if (upPressed.value && downPressed.value) {
                 Log.e("hi","hello")
+
+                if (ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.RECORD_AUDIO
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+                    intent.putExtra(
+                        RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                    )
+                    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                    intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Voida Assistance가 음성을 인식합니다.")
+                    speechRecognizerLauncher.launch(intent)
+                } else {
+                    ActivityCompat.requestPermissions(
+                        context as Activity,
+                        arrayOf(Manifest.permission.RECORD_AUDIO),
+                        100
+                    )
+                }
+                Log.e("hi",voiceInput.value)
+                
                 true  // 이벤트 소비
             } else {
                 false  // 다른 이벤트 처리 허용
@@ -87,6 +137,7 @@ fun StartNav(){
             ViewCompat.removeOnUnhandledKeyEventListener(view, listener)
         }
     }
+
 
     // StartNav와 관련된 페이지, (로그인,회원가입, 안내...) 에 대한 네비 등록
     NavHost(navController = navController, startDestination = "start") {
