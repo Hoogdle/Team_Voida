@@ -74,6 +74,7 @@ import com.example.team_voida.ProductInfo.ProductInfoBottomBar
 import com.example.team_voida.ProductInfo.ProductInfoInfo
 import com.example.team_voida.ProductInfo.sampleProductInfoData
 import com.example.team_voida.Profile.Account
+import com.example.team_voida.Profile.PaymentSetting
 import com.example.team_voida.Profile.Profile
 import com.example.team_voida.R
 import com.example.team_voida.SearchResult.SearchResult
@@ -447,7 +448,7 @@ fun HomeNav(){
                 }
             ,
             navController = navController,
-            startDestination = "home"
+            startDestination = "paymentSetting"
         ) {
             // HomeNav에서 갈 수 있는 모든 페이지의 네비게이션 등록
             composable("home") {
@@ -573,6 +574,16 @@ fun HomeNav(){
                     categoryCode = categoryCode.value,
                     productID = productID,
                     isItemWhichPart = isItemWhichPart
+                )
+            }
+
+            composable("paymentSetting") {
+                PaymentSetting(
+                    navController = navController,
+                    basketFlag = basketFlag,
+                    homeNavFlag = homeNavFlag,
+                    productFlag = productFlag,
+                    selectedIndex = selectedIndex
                 )
             }
         }

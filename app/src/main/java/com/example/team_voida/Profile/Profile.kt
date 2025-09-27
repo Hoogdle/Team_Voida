@@ -131,7 +131,17 @@ fun Profile(
                 ),
             color = SearchBarColor
         )
-        ProfileButton("결제수단",{})
+        ProfileButton("결제내역",{})
+        HorizontalDivider(
+            modifier = Modifier
+                .padding(
+                    start = 10.dp,
+                    end = 10.dp
+                ),
+            color = SearchBarColor
+        )
+        
+        ProfileButton("결제수단",{navController.navigate("paymentSetting")})
         HorizontalDivider(
             modifier = Modifier
                 .padding(
