@@ -26,6 +26,8 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.focusModifier
@@ -45,6 +47,7 @@ import com.example.team_voida.R
 import com.example.team_voida.ui.theme.ButtonBlue
 import com.example.team_voida.ui.theme.Selected
 import com.example.team_voida.ui.theme.SkyBlue
+import com.example.team_voida.ui.theme.TextColor
 import com.example.team_voida.ui.theme.TextLittleDark
 import com.example.team_voida.ui.theme.TextWhite
 import kotlin.math.log
@@ -59,6 +62,7 @@ fun PaymentSetting(
 ){
 
     val scrollState = rememberScrollState()
+    val isAdding = remember { mutableStateOf(false) }
 
     // 유저 정보 페이지에 해당하는 하단 네비 Flag Bit 활성화
     ComposableLifecycle { source, event ->
@@ -124,7 +128,13 @@ fun PaymentSetting(
 
         Spacer(Modifier.height(15.dp))
 
-        PaymentAdd()
+        PaymentAddButton(
+            isAdding = isAdding
+        )
+
+        if(isAdding.value){
+            PaymentAdd()
+        }
 
         Spacer(Modifier.height(15.dp))
 
@@ -140,7 +150,9 @@ fun PaymentSetting(
 }
 
 @Composable
-fun PaymentAdd(){
+fun PaymentAddButton(
+    isAdding: MutableState<Boolean>
+){
     Button(
         shape = RoundedCornerShape(10.dp),
         colors = ButtonColors(
@@ -154,7 +166,9 @@ fun PaymentAdd(){
             .height(80.dp)
             .padding(10.dp)
         ,
-        onClick = {}
+        onClick = {
+            isAdding.value = !isAdding.value
+        }
     ) {
         Text(
             modifier = Modifier
@@ -170,6 +184,12 @@ fun PaymentAdd(){
             )
         )
     }
+}
+
+@Composable
+fun PaymentAdd(){
+    Notification("아래에 정보를 입력하여 결제수단을 등록해주세요.", top = 5.dp, bottom = 5.dp)
+
 }
 
 @Composable
@@ -247,14 +267,66 @@ fun PaymentCard(
 
             }
 
-            // Card Number
-            Row {
+            Spacer(Modifier.height(40.dp))
 
+            // Card Number
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround
+            ){
+                val lastNumber = paymentNumber.substring(12,16)
+
+                for(i in 1..3){
+                    Text(
+                        text = "* * * *",
+                        style = TextStyle(
+                            color = TextColor,
+                            fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                            fontSize = 20.sp
+                        )
+                    )
+                }
+
+                Text(
+                    text = lastNumber,
+                    style = TextStyle(
+                        color = TextColor,
+                        fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                        fontSize = 20.sp
+                    )
+                )
             }
 
-            // Name and Expired
-            Row {
+            Spacer(Modifier.height(10.dp))
 
+            // Name and Expired
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ){
+                Text(
+                    modifier = Modifier
+                        .padding(horizontal = 23.dp),
+                    text = name,
+                    style = TextStyle(
+                        color = TextColor,
+                        fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                        fontSize = 15.sp
+                    )
+                )
+
+                Text(
+                    modifier = Modifier
+                        .padding(horizontal = 23.dp),
+                    text = expiredMonth + "/" + expiredDate,
+                    style = TextStyle(
+                        color = TextColor,
+                        fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                        fontSize = 15.sp
+                    )
+                )
             }
         }
     }
