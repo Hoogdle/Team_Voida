@@ -595,7 +595,8 @@ fun PaymentMethod(){
 
 @Composable
 fun PaymentMethodList(
-    tmpRegisteredPayMethod: MutableList<String>
+    tmpRegisteredPayMethod: MutableList<String>,
+    whichMethod: MutableState<Int> = mutableStateOf(0)
 ){
     val scrollState = rememberScrollState()
     val selected = remember{ mutableStateOf(0) }
@@ -614,6 +615,7 @@ fun PaymentMethodList(
                     },
                 onClick = {
                     selected.value = index
+                    whichMethod.value = index
                 },
                 colors = if(selected.value == index){
                     ButtonColors(

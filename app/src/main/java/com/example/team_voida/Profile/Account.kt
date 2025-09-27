@@ -42,6 +42,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
@@ -284,9 +285,11 @@ fun AccountProfileImg(){
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountTextField(
-    placeholder: String
+    placeholder: String,
+    height: Dp = 70.dp,
+    input: MutableState<String> = mutableStateOf(""),
+    isFull: Boolean = true
 ){
-    val input = remember{ mutableStateOf("") }
     val interactionSource = remember{ MutableInteractionSource() }
 
     BasicTextField(
@@ -303,6 +306,7 @@ fun AccountTextField(
         onValueChange = {
             input.value = it
         },
+
         modifier = Modifier
             .fillMaxWidth()
             .padding(
@@ -316,7 +320,7 @@ fun AccountTextField(
             .padding(
                 start = 10.dp
             )
-            .height(70.dp)
+            .height(height)
 
         ,
         singleLine = true,
