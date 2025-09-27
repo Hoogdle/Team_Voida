@@ -149,3 +149,6 @@ class ReviewProvide(BaseModel):
 
 class AssistantCategory(BaseModel):
 	voiceInput: str
+
+class AssistantSearch(BaseModel):
+	voiceInput: str

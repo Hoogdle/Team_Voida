@@ -40,16 +40,18 @@ vlm_model = torch.compile(vlm_model)
 '''
 
 # LLM 세팅
-start_token = "<|end_header_id|>"
-end_token = "<|eot_id|>"
+start_token = "[|assistant|]"
+end_token = "[|endofturn|]"
 
+llm_model_name = "LGAI-EXAONE/EXAONE-3.5-2.4B-Instruct"
 
 llm_model = AutoModelForCausalLM.from_pretrained(
-      "NCSOFT/Llama-VARCO-8B-Instruct",
-      torch_dtype=torch.bfloat16,
-      device_map="auto"
-  )
-llm_tokenizer = AutoTokenizer.from_pretrained("NCSOFT/Llama-VARCO-8B-Instruct")
+    llm_model_name,
+    torch_dtype=torch.bfloat16,
+    trust_remote_code=True,
+    device_map="auto"
+)
+llm_tokenizer = AutoTokenizer.from_pretrained(llm_model_name)
 
 llm_model = torch.compile(llm_model)
 
@@ -64,30 +66,29 @@ def call_llm(review):
 	inputs = llm_tokenizer.apply_chat_template(messages, return_tensors="pt").to(llm_model.device)
 	
 
-	eos_token_id = [
-        llm_tokenizer.eos_token_id,
-        llm_tokenizer.convert_tokens_to_ids("<|eot_id|>")
-  ]
+	input_ids = llm_tokenizer.apply_chat_template(
+    messages,
+    tokenize=True,
+    add_generation_prompt=True,
+    return_tensors="pt"
+	)
 
-	outputs = llm_model.generate(
-		inputs,
-		eos_token_id=eos_token_id,
-		max_length=8192
-  )
-	
+	output = llm_model.generate(
+		input_ids.to("cuda"),
+		eos_token_id=llm_tokenizer.eos_token_id,
+		max_new_tokens=128,
+		do_sample=False,
+	)	
+
 	# AI output 전처리
-
-	result = (llm_tokenizer.decode(outputs[0]))
+	result = (llm_tokenizer.decode(output[0]))
 
 	start_index = result.find(start_token) + len(start_token)
-	start_index = result.find(start_token, start_index) + len(start_token)
-	start_index = result.find(start_token ,start_index)+ len(start_token)
 
 	end_index = result.find(end_token) + len(end_token)
-	end_index = result.find(end_token,end_index) + len(end_token)
 	end_index = result.find(end_token, end_index)
 
-	result = result[start_index+2:end_index]
+	result = result[start_index:end_index]
 	result.replace('\n','')
 
 	return result
