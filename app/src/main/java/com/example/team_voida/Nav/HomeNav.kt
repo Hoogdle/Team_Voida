@@ -167,7 +167,7 @@ fun HomeNav(){
     val isPressed by interactionSource.collectIsPressedAsState()
     val result: MutableState<List<Popular>?> = remember { mutableStateOf<List<Popular>?>(null) }
 
-    var voiceInput = remember{ mutableStateOf("인기상품으로 이동해줘") }
+    val voiceInput = remember{ mutableStateOf("양파 검색해줘.") }
 
 
     val speechRecognizerLauncher = rememberLauncherForActivityResult(
@@ -250,16 +250,20 @@ fun HomeNav(){
                     }
                 }
 
-                Log.e("debug",category.toString())
+                while(category == null){
+                    Thread.sleep(1000L)
+                }
+
+                Log.e("debug","category" + category.toString())
 
                 AssistantSelector(
                     isWhichPart = isWhichPart,
                     isItemWhichPart = isItemWhichPart,
                     llmCategory = category.toString(),
-                    navController = navController
+                    navController = navController,
+                    voiceInput = voiceInput.value,
+                    input = input
                 )
-
-
 
                 true  // 이벤트 소비
             } else {
