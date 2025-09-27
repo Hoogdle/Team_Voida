@@ -1,5 +1,6 @@
 package com.example.team_voida.Nav
 
+import AssistantSelector
 import AssistantToServer
 import android.Manifest
 import android.app.Activity
@@ -52,10 +53,8 @@ fun StartNav(){
 
     var input = remember { mutableStateOf("") }
 
-    var voiceInput = remember{ mutableStateOf("풋사과 검색해줘") }
 
-    val context = LocalContext.current
-    val view = LocalView.current
+
 
     // 각각 회원가입 또는 로그인에서 사용되는 입력 정보 저장
     val email = remember { mutableStateOf("") }
@@ -66,94 +65,11 @@ fun StartNav(){
     // check git hub
 
 
-    val upPressed = remember { mutableStateOf(false) }
-    val downPressed = remember { mutableStateOf(false) }
-
-    val speechRecognizerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult(),
-        onResult = { result ->
-            val spokenText =
-                result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.firstOrNull()
-            if (spokenText != null) {
-                voiceInput.value = spokenText  // Update prompt with recognized text
-            } else {
-                Toast.makeText(context, "음성인식에 실패하였습니다.", Toast.LENGTH_SHORT).show()
-            }
-        }
-    )
-
-    DisposableEffect(Unit) {
-        var category: String? = null
-        val listener = ViewCompat.OnUnhandledKeyEventListenerCompat { _, event ->
-            val keyCode = event.keyCode
-            val action = event.action
-
-            when (keyCode) {
-                KeyEvent.KEYCODE_VOLUME_UP -> {
-                    if (action == KeyEvent.ACTION_DOWN) {
-                        upPressed.value = true
-                    } else if (action == KeyEvent.ACTION_UP) {
-                        upPressed.value = false
-                    }
-                }
-
-                KeyEvent.KEYCODE_VOLUME_DOWN -> {
-                    if (action == KeyEvent.ACTION_DOWN) {
-                        downPressed.value = true
-                    } else if (action == KeyEvent.ACTION_UP) {
-                        downPressed.value = false
-                    }
-                }
-            }
-
-            if (upPressed.value && downPressed.value) {
-                Log.e("hi","hello")
-
-                if (ContextCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.RECORD_AUDIO
-                    ) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-                    intent.putExtra(
-                        RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-                    )
-                    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
-                    intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Voida Assistance가 음성을 인식합니다.")
-                    speechRecognizerLauncher.launch(intent)
-                } else {
-                    ActivityCompat.requestPermissions(
-                        context as Activity,
-                        arrayOf(Manifest.permission.RECORD_AUDIO),
-                        100
-                    )
-                }
-
-                if(voiceInput.value != ""){
-                    runBlocking {
-                        val job = GlobalScope.launch{
-                            category = AssistantToServer(voiceInput.value)
-                        }
-                    }
-                }
-
-                Log.e("hi", category.toString())
 
 
 
-                true  // 이벤트 소비
-            } else {
-                false  // 다른 이벤트 처리 허용
-            }
-        }
 
-        ViewCompat.addOnUnhandledKeyEventListener(view, listener)
 
-        onDispose {
-            ViewCompat.removeOnUnhandledKeyEventListener(view, listener)
-        }
-    }
 
 
     // StartNav와 관련된 페이지, (로그인,회원가입, 안내...) 에 대한 네비 등록

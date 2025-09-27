@@ -389,7 +389,6 @@ fun SearchCard(
             .clickable {
                 barPrice.value = price
                 productID.value = id
-                isItemWhichPart.value = 0
                 navController.navigate("productInfo")
             }
     ){

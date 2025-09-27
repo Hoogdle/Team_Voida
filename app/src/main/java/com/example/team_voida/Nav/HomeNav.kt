@@ -1,6 +1,18 @@
 package com.example.team_voida.Nav
 
+import AssistantSelector
+import AssistantToServer
+import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.speech.RecognizerIntent
+import android.util.Log
+import android.view.KeyEvent
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -23,6 +35,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,8 +46,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -124,6 +142,14 @@ fun HomeNav(){
     var offsetX by remember { mutableStateOf(0f) }
     var offsetY by remember { mutableStateOf(0f) }
 
+
+    val context = LocalContext.current
+    val view = LocalView.current
+
+    val upPressed = remember { mutableStateOf(false) }
+    val downPressed = remember { mutableStateOf(false) }
+
+
     // 화면 최소/최대 확대 비율 설정
     val minScale = 1f
     val maxScale = 4f
@@ -141,6 +167,23 @@ fun HomeNav(){
     val isPressed by interactionSource.collectIsPressedAsState()
     val result: MutableState<List<Popular>?> = remember { mutableStateOf<List<Popular>?>(null) }
 
+    var voiceInput = remember{ mutableStateOf("인기상품으로 이동해줘") }
+
+
+    val speechRecognizerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+        onResult = { result ->
+            val spokenText =
+                result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.firstOrNull()
+            if (spokenText != null) {
+                voiceInput.value = spokenText  // Update prompt with recognized text
+            } else {
+                Toast.makeText(context, "음성인식에 실패하였습니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    )
+
+
     // 홈 화면에 제공할 데이터를 서버에 요청
     runBlocking {
         val job = GlobalScope.launch {
@@ -150,6 +193,86 @@ fun HomeNav(){
 
     // 검색 입력 데이터 저장
     val input = remember{ mutableStateOf("") }
+
+
+    DisposableEffect(Unit) {
+        var category: String? = null
+        val listener = ViewCompat.OnUnhandledKeyEventListenerCompat { _, event ->
+            val keyCode = event.keyCode
+            val action = event.action
+
+            when (keyCode) {
+                KeyEvent.KEYCODE_VOLUME_UP -> {
+                    if (action == KeyEvent.ACTION_DOWN) {
+                        upPressed.value = true
+                    } else if (action == KeyEvent.ACTION_UP) {
+                        upPressed.value = false
+                    }
+                }
+
+                KeyEvent.KEYCODE_VOLUME_DOWN -> {
+                    if (action == KeyEvent.ACTION_DOWN) {
+                        downPressed.value = true
+                    } else if (action == KeyEvent.ACTION_UP) {
+                        downPressed.value = false
+                    }
+                }
+            }
+
+            if (upPressed.value && downPressed.value) {
+
+                if (ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.RECORD_AUDIO
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+                    intent.putExtra(
+                        RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                    )
+                    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                    intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Voida Assistance가 음성을 인식합니다.")
+                    speechRecognizerLauncher.launch(intent)
+                } else {
+                    ActivityCompat.requestPermissions(
+                        context as Activity,
+                        arrayOf(Manifest.permission.RECORD_AUDIO),
+                        100
+                    )
+                }
+
+                if(voiceInput.value != ""){
+                    runBlocking {
+                        val job = GlobalScope.launch{
+                            category = AssistantToServer(voiceInput.value)
+                        }
+                    }
+                }
+
+                Log.e("debug",category.toString())
+
+                AssistantSelector(
+                    isWhichPart = isWhichPart,
+                    isItemWhichPart = isItemWhichPart,
+                    llmCategory = category.toString(),
+                    navController = navController
+                )
+
+
+
+                true  // 이벤트 소비
+            } else {
+                false  // 다른 이벤트 처리 허용
+            }
+        }
+
+        ViewCompat.addOnUnhandledKeyEventListener(view, listener)
+
+        onDispose {
+            ViewCompat.removeOnUnhandledKeyEventListener(view, listener)
+        }
+    }
 
     Scaffold(
         // 모든 하단 네비게이션 등록
