@@ -74,6 +74,7 @@ import com.example.team_voida.ProductInfo.ProductInfoBottomBar
 import com.example.team_voida.ProductInfo.ProductInfoInfo
 import com.example.team_voida.ProductInfo.sampleProductInfoData
 import com.example.team_voida.Profile.Account
+import com.example.team_voida.Profile.PaymentHistory
 import com.example.team_voida.Profile.PaymentSetting
 import com.example.team_voida.Profile.Profile
 import com.example.team_voida.R
@@ -448,7 +449,7 @@ fun HomeNav(){
                 }
             ,
             navController = navController,
-            startDestination = "paymentSetting"
+            startDestination = "paymentHistory"
         ) {
             // HomeNav에서 갈 수 있는 모든 페이지의 네비게이션 등록
             composable("home") {
@@ -579,6 +580,16 @@ fun HomeNav(){
 
             composable("paymentSetting") {
                 PaymentSetting(
+                    navController = navController,
+                    basketFlag = basketFlag,
+                    homeNavFlag = homeNavFlag,
+                    productFlag = productFlag,
+                    selectedIndex = selectedIndex
+                )
+            }
+
+            composable("paymentHistory") {
+                PaymentHistory(
                     navController = navController,
                     basketFlag = basketFlag,
                     homeNavFlag = homeNavFlag,
