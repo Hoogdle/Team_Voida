@@ -46,10 +46,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -106,9 +108,9 @@ val navItemList = listOf(
         notify = "카테고리 화면 이동 버튼"
     ),
     BottomNav(
-        unSelected = R.drawable.bottom_zoom,
-        selected = R.drawable.bottom_zoom,
-        notify = "화면 확대 기능"
+        unSelected = R.drawable.logo,
+        selected = R.drawable.logo,
+        notify = "Ai Assitant 활성화"
     ),
     BottomNav(
         unSelected = R.drawable.bottom_cart,
@@ -197,87 +199,51 @@ fun HomeNav(){
     val input = remember{ mutableStateOf("") }
 
 
-    DisposableEffect(Unit) {
+    fun aiAssitant(){
         var category: String? = null
-        val listener = ViewCompat.OnUnhandledKeyEventListenerCompat { _, event ->
-            val keyCode = event.keyCode
-            val action = event.action
-
-            when (keyCode) {
-                KeyEvent.KEYCODE_VOLUME_UP -> {
-                    if (action == KeyEvent.ACTION_DOWN) {
-                        upPressed.value = true
-                    } else if (action == KeyEvent.ACTION_UP) {
-                        upPressed.value = false
-                    }
-                }
-
-                KeyEvent.KEYCODE_VOLUME_DOWN -> {
-                    if (action == KeyEvent.ACTION_DOWN) {
-                        downPressed.value = true
-                    } else if (action == KeyEvent.ACTION_UP) {
-                        downPressed.value = false
-                    }
-                }
-            }
-
-            if (upPressed.value && downPressed.value) {
-
-                if (ContextCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.RECORD_AUDIO
-                    ) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-                    intent.putExtra(
-                        RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-                    )
-                    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
-                    intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Voida Assistance가 음성을 인식합니다.")
-                    speechRecognizerLauncher.launch(intent)
-                } else {
-                    ActivityCompat.requestPermissions(
-                        context as Activity,
-                        arrayOf(Manifest.permission.RECORD_AUDIO),
-                        100
-                    )
-                }
-
-                if(voiceInput.value != ""){
-                    runBlocking {
-                        val job = GlobalScope.launch{
-                            category = AssistantToServer(voiceInput.value)
-                        }
-                    }
-                }
-
-                while(category == null){
-                    Thread.sleep(1000L)
-                }
-
-                Log.e("debug","category" + category.toString())
-
-                AssistantSelector(
-                    isWhichPart = isWhichPart,
-                    isItemWhichPart = isItemWhichPart,
-                    llmCategory = category.toString(),
-                    navController = navController,
-                    voiceInput = voiceInput.value,
-                    input = input
+            if (ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.RECORD_AUDIO
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+                intent.putExtra(
+                    RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
                 )
-
-                true  // 이벤트 소비
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Voida Assistance가 음성을 인식합니다.")
+                speechRecognizerLauncher.launch(intent)
             } else {
-                false  // 다른 이벤트 처리 허용
+                ActivityCompat.requestPermissions(
+                    context as Activity,
+                    arrayOf(Manifest.permission.RECORD_AUDIO),
+                    100
+                )
             }
-        }
 
-        ViewCompat.addOnUnhandledKeyEventListener(view, listener)
+            if(voiceInput.value != ""){
+                runBlocking {
+                    val job = GlobalScope.launch{
+                        category = AssistantToServer(voiceInput.value)
+                    }
+                }
+            }
 
-        onDispose {
-            ViewCompat.removeOnUnhandledKeyEventListener(view, listener)
-        }
+            while(category == null){
+                Thread.sleep(1000L)
+            }
+
+            Log.e("debug","category" + category.toString())
+
+            AssistantSelector(
+                isWhichPart = isWhichPart,
+                isItemWhichPart = isItemWhichPart,
+                llmCategory = category.toString(),
+                navController = navController,
+                voiceInput = voiceInput.value,
+                input = input
+            )
     }
 
     Scaffold(
@@ -330,7 +296,13 @@ fun HomeNav(){
                                     disabledTextColor = Color.Transparent
                                 ),
                                 modifier = Modifier
-                                    .height(30.dp)
+                                    .size(
+                                        if(index != 2){
+                                            30.dp
+                                        } else {
+                                            50.dp
+                                        }
+                                    )
                                     .offset(
                                         y = if(index != 2) tmpIndex
                                          else 0.dp
@@ -342,16 +314,9 @@ fun HomeNav(){
                                     if(selectedIndex.value == 0) navController.navigate("home")
                                     else if(selectedIndex.value ==1) navController.navigate("categories")
                                     else if(selectedIndex.value ==2){
-                                        when(scale){
-                                            1f -> scale = 2f
-                                            2f -> scale = 3f
-                                            3f -> scale = 4f
-                                            else -> {
-                                                scale = 1f
-                                                offsetX = 0f
-                                                offsetY = 0f
-                                            }
-                                        }
+                                        // AI Assistant
+                                        aiAssitant()
+
                                     }
                                     else if(selectedIndex.value == 3) navController.navigate("basket")
                                     else if(selectedIndex.value == 4) navController.navigate("profile")
@@ -368,18 +333,27 @@ fun HomeNav(){
                                             )
                                         }
                                     } else{
-                                        Image(
-                                            modifier = Modifier
-                                                .size(
-                                                    if(index == 2){
-                                                        27.dp
-                                                    } else {
+                                        if (index == 2){
+                                            Image(
+                                                modifier = Modifier
+                                                    .padding(0.dp)
+                                                    .zIndex(1f)
+                                                    .size(
+                                                        50.dp
+                                                    ),
+                                                painter = painterResource(item.unSelected),
+                                                contentDescription = item.notify
+                                            )
+                                        } else {
+                                            Image(
+                                                modifier = Modifier
+                                                    .size(
                                                         20.dp
-                                                    }
-                                                ),
-                                            painter = painterResource(item.unSelected),
-                                            contentDescription = item.notify
-                                        )
+                                                    ),
+                                                painter = painterResource(item.unSelected),
+                                                contentDescription = item.notify
+                                            )
+                                        }
                                     }
                                 }
                             )
