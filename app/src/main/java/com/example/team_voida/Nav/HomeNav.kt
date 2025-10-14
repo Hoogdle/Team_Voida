@@ -171,7 +171,7 @@ fun HomeNav(){
     val isPressed by interactionSource.collectIsPressedAsState()
     val result: MutableState<List<Popular>?> = remember { mutableStateOf<List<Popular>?>(null) }
 
-    val voiceInput = remember{ mutableStateOf("양파 검색해줘.") }
+    val voiceInput = remember{ mutableStateOf("") }
 
 
     val speechRecognizerLauncher = rememberLauncherForActivityResult(
@@ -182,6 +182,7 @@ fun HomeNav(){
             if (spokenText != null) {
                 voiceInput.value = spokenText  // Update prompt with recognized text
             } else {
+                Log.e("here","here")
                 Toast.makeText(context, "음성인식에 실패하였습니다.", Toast.LENGTH_SHORT).show()
             }
         }
@@ -222,6 +223,7 @@ fun HomeNav(){
                 )
             }
 
+            Log.e("haha","haha")
             if(voiceInput.value != ""){
                 runBlocking {
                     val job = GlobalScope.launch{
@@ -230,9 +232,15 @@ fun HomeNav(){
                 }
             }
 
+
+            if(voiceInput.value == ""){
+                return
+            }
+
             while(category == null){
                 Thread.sleep(1000L)
             }
+            Log.e("haha","haha")
 
             Log.e("debug","category" + category.toString())
 
@@ -322,7 +330,7 @@ fun HomeNav(){
                                     else if(selectedIndex.value == 4) navController.navigate("profile")
                                 },
                                 icon = {
-                                    if(index == selectedIndex.value){
+                                    if(index == selectedIndex.value && index != 2){
                                         Column {
                                             Image(
                                                 modifier = Modifier
@@ -423,7 +431,7 @@ fun HomeNav(){
                 }
             ,
             navController = navController,
-            startDestination = "paymentHistory"
+            startDestination = "home"
         ) {
             // HomeNav에서 갈 수 있는 모든 페이지의 네비게이션 등록
             composable("home") {
