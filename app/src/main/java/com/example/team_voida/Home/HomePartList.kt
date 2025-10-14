@@ -40,10 +40,18 @@ fun HomePartList(
 
     var title: String = ""
     when(isWhichPart.value){
-        1 -> title = "실시간 인기"
-        2 -> title = "많이 담는 특가"
-        3 -> title = "하루 특가"
-        4 -> title = "인기 신상품"
+        1 -> {
+            title = "실시간 인기"
+        }
+        2 -> {
+            title = "많이 담는 특가"
+        }
+        3 -> {
+            title = "하루 특가"
+        }
+        4 -> {
+            title = "인기 신상품"
+        }
 
     }
     ComposableLifecycle { source, event ->
@@ -72,10 +80,22 @@ fun HomePartList(
     runBlocking {
         val job = GlobalScope.launch {
             when(isWhichPart.value){
-                1 -> result = HomePopularCall()
-                2 -> result = HomeBigSaleList()
-                3 -> result = HomeTodaySaleList()
-                4 -> result = HomeNewList()
+                1 -> {
+                    result = HomePopularCall()
+                    isItemWhichPart.value = 1
+                }
+                2 ->{
+                    result = HomeBigSaleList()
+                    isItemWhichPart.value = 2
+                }
+                3 -> {
+                    result = HomeTodaySaleList()
+                    isItemWhichPart.value = 3
+                }
+                4 -> {
+                    result = HomeNewList()
+                    isItemWhichPart.value = 4
+                }
             }
         }
     }

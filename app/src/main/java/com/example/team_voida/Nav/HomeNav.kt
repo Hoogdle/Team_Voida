@@ -485,7 +485,8 @@ fun HomeNav(){
                     homeNavFlag = homeNavFlag,
                     productFlag = productFlag,
                     selectedIndex = selectedIndex,
-                    categoryCode = categoryCode
+                    categoryCode = categoryCode,
+                    isItemWhichPart = isItemWhichPart
                 )
             }
 

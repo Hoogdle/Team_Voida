@@ -69,8 +69,11 @@ fun Categories(
     homeNavFlag: MutableState<Boolean>,
     productFlag: MutableState<Boolean>,
     selectedIndex: MutableState<Int>,
-    categoryCode: MutableState<String>
+    categoryCode: MutableState<String>,
+    isItemWhichPart: MutableState<Int>,
 ){
+
+    isItemWhichPart.value = 0
     // 카테고리 해당 하단 네비 활성화
     ComposableLifecycle { source, event ->
         if (event == Lifecycle.Event.ON_PAUSE) {
