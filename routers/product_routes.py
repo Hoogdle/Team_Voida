@@ -55,6 +55,19 @@ llm_tokenizer = AutoTokenizer.from_pretrained(llm_model_name)
 
 llm_model = torch.compile(llm_model)
 
+
+
+# Detailed Model
+d_vlm_model_name = "NCSOFT/VARCO-VISION-2.0-14B"
+d_vlm_model = LlavaOnevisionForConditionalGeneration.from_pretrained(
+    d_vlm_model_name,
+    torch_dtype=torch.float16,
+    attn_implementation="sdpa",
+    device_map="auto",
+)
+d_processor = AutoProcessor.from_pretrained(d_vlm_model_name)
+
+
 # LLM 모델 호출 함수
 def call_llm(review):
 	# LLM 모델 프롬프트 설정 
@@ -158,7 +171,7 @@ def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
 
 
 # vlm 모델 호출 함수
-def call_ai(info, img):
+def call_ai(name, info, img):
 	# 모델에 사용되는 프롬프트 설정
 
 	if(img[0] == '\"'): image_url = img[1:-1]
@@ -172,7 +185,7 @@ def call_ai(info, img):
         "role": "user",
         "content": [
 			{"type" : "image", "url" : image_url},
-            {"type": "text", "text": "먼저, 주어진 상품 이미지 정보를 잘 분석해주고, 주요 정보만을 추출하여 500자 이내에 상품 설명문 만들어줘 상품을 '설명하는' 느낌으로 핵심 정보만을 잘 추출해서 만들어줘. 주로 글자로 구성된 이미지의 경우에는 텍스트를 잘 추출해서 핵심 정보만을 살려서 요약문을 만들어줘, 정보를 요약해야 한다는거 잊지마."},
+            {"type": "text", "text": "상품명 : " +name+ "먼저, 주어진 상품 이미지 정보를 잘 분석해주고, 주요 정보만을 추출하여 500자 이내에 상품 설명문 만들어줘, 이미지의 내용을 그대로 읽는게 아니라  상품을 '설명하는' 느낌으로 핵심 정보만을 잘 추출해서 만들어줘. 주로 글자로 구성된 이미지의 경우에는 텍스트를 잘 추출해서 핵심 정보만을 살려서 요약문을 만들어줘, 정보를 요약해야 한다는거 잊지마."},
         ],
     },
     ]
@@ -192,7 +205,42 @@ def call_ai(info, img):
 
 	output = processor.decode(generate_ids_trimmed[0], skip_specail_tokens=True)
 	
-	return output
+	return output.strip("<|im_end|>")
+
+# Call Detailed VLM
+def d_call_ai(name, info, img):
+	# 모델에 사용되는 프롬프트 설정
+
+	if(img[0] == '\"'): image_url = img[1:-1]
+	else: image_url = img
+
+
+	conversation = [
+    {
+        "role": "user",
+        "content": [
+			{"type" : "image", "url" : image_url},
+            {"type": "text", "text": "상품명 : " +name+ "먼저, 주어진 상품 이미지 정보를 잘 분석해주고, 주요 정보만을 추출하여 500자 이내에 상품 설명문 만들어줘, 이미지의 내용을 그대로 읽는게 아니라  상품을 '설명하는' 느낌으로 핵심 정보만을 잘 추출해서 만들어줘. 주로 글자로 구성된 이미지의 경우에는 텍스트를 잘 추출해서 핵심 정보만을 살려서 요약문을 만들어줘, 정보를 요약해야 한다는거 잊지마."},
+        ],
+    },
+    ]
+
+	inputs = d_processor.apply_chat_template(
+		conversation,
+		add_generation_prompt = True,
+		tokenize = True,
+		return_dict = True,
+		return_tensors = "pt"
+	).to(d_vlm_model.device, torch.float16)
+	
+	generate_ids = d_vlm_model.generate(**inputs, max_new_tokens=512)
+	generate_ids_trimmed = [
+		out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generate_ids)
+	]
+
+	output = d_processor.decode(generate_ids_trimmed[0], skip_specail_tokens=True)
+	
+	return output.strip("<|im_end|>")
 
 
 # 사용자가 요청 상품 정보의 아이디로 조회하여 해당 상품의 정보 제공
@@ -202,7 +250,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
 	
-    ai_info = call_ai(prod.description, prod.img_info)
+    ai_info = call_ai(prod.name, prod.description, prod.img_info)
     
 
     return schemas.ProductDetail(
@@ -215,6 +263,26 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
         ai_review = ""
     )
 
+
+# 사용자가 요청 상품 정보의 아이디로 조회하여 해당 상품의 정보 제공
+@router.post("/ProductDetailedInfo", response_model=schemas.ProductDetail)
+def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db)):
+    prod = db.query(models.Product).filter(models.Product.id == payload.product_id).first()
+    if not prod:
+        raise HTTPException(status_code=404, detail="Product not found")
+	
+    ai_info = d_call_ai(prod.name, prod.description, prod.img_info)
+    
+
+    return schemas.ProductDetail(
+        product_id=prod.id,
+        name=prod.name,
+        image_url=prod.image_url,
+        price=float(prod.price),
+# change below as ai result
+        ai_info = ai_info,
+        ai_review = ""
+    )
 
 
 # 카테고리 상품 정보 제공
@@ -279,7 +347,26 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
 	
-    ai_info = call_ai(prod.description, prod.image_info)
+    ai_info = call_ai(prod.name,prod.description, prod.image_info)
+    
+
+    return schemas.ProductDetail(
+        product_id=prod.id,
+        name=prod.name,
+        image_url=prod.image_url,
+        price=float(prod.price),
+# change below as ai result
+        ai_info = ai_info,
+        ai_review = ""
+    )
+
+@router.post("/PopularProductDetailedInfo", response_model=schemas.ProductDetail)
+def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db)):
+    prod = db.query(models.PopularItem).filter(models.PopularItem.id == payload.product_id).first()
+    if not prod:
+        raise HTTPException(status_code=404, detail="Product not found")
+	
+    ai_info = d_call_ai(prod.name,prod.description, prod.image_info)
     
 
     return schemas.ProductDetail(
@@ -300,7 +387,27 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
 	
-    ai_info = call_ai(prod.description, prod.image_info)
+    ai_info = call_ai(prod.name, prod.description, prod.image_info)
+    
+
+    return schemas.ProductDetail(
+        product_id=prod.id,
+        name=prod.name,
+        image_url=prod.image_url,
+        price=float(prod.price),
+# change below as ai result
+        ai_info = ai_info,
+        ai_review = ""
+    )
+
+# Product Info by ID
+@router.post("/BigSaleProductDetailedInfo", response_model=schemas.ProductDetail)
+def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db)):
+    prod = db.query(models.BigSaleItem).filter(models.BigSaleItem.id == payload.product_id).first()
+    if not prod:
+        raise HTTPException(status_code=404, detail="Product not found")
+	
+    ai_info = d_call_ai(prod.name, prod.description, prod.image_info)
     
 
     return schemas.ProductDetail(
@@ -320,7 +427,48 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
 	
-    ai_info = call_ai(prod.description, prod.image_info)
+    ai_info = call_ai(prod.name, prod.description, prod.image_info)
+    
+
+    return schemas.ProductDetail(
+        product_id=prod.id,
+        name=prod.name,
+        image_url=prod.image_url,
+        price=float(prod.price),
+# change below as ai result
+        ai_info = ai_info,
+        ai_review = ""
+    )
+
+# Product Info By ID
+@router.post("/TodaySaleProductDetailedInfo", response_model=schemas.ProductDetail)
+def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db)):
+    prod = db.query(models.TodaySaleItem).filter(models.TodaySaleItem.id == payload.product_id).first()
+    if not prod:
+        raise HTTPException(status_code=404, detail="Product not found")
+	
+    ai_info = d_call_ai(prod.name, prod.description, prod.image_info)
+    
+
+    return schemas.ProductDetail(
+        product_id=prod.id,
+        name=prod.name,
+        image_url=prod.image_url,
+        price=float(prod.price),
+# change below as ai result
+        ai_info = ai_info,
+        ai_review = ""
+    )
+
+
+# Product Info by ID
+@router.post("/NewProductInfo", response_model=schemas.ProductDetail)
+def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db)):
+    prod = db.query(models.NewItem).filter(models.NewItem.id == payload.product_id).first()
+    if not prod:
+        raise HTTPException(status_code=404, detail="Product not found")
+	
+    ai_info = call_ai(prod.name, prod.description, prod.image_info)
     
 
     return schemas.ProductDetail(
@@ -334,13 +482,13 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     )
 
 # Product Info by ID
-@router.post("/NewProductInfo", response_model=schemas.ProductDetail)
+@router.post("/NewProductDetailedInfo", response_model=schemas.ProductDetail)
 def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db)):
     prod = db.query(models.NewItem).filter(models.NewItem.id == payload.product_id).first()
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
 	
-    ai_info = call_ai(prod.description, prod.image_info)
+    ai_info = d_call_ai(prod.name, prod.description, prod.image_info)
     
 
     return schemas.ProductDetail(
