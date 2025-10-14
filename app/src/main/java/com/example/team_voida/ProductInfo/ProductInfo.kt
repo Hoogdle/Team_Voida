@@ -90,6 +90,8 @@ fun ProductInfo(
 ){
 
     var result: MutableState<ProductInfoInfo?> = remember { mutableStateOf<ProductInfoInfo?>(null) }
+    var detailedResult: MutableState<ProductInfoInfo?> = remember { mutableStateOf<ProductInfoInfo?>(null) }
+
     val review: MutableState<ReviewInfo?> = remember { mutableStateOf<ReviewInfo?>(null) }
     val isReview: MutableState<Boolean> = remember { mutableStateOf(false) }
 
@@ -122,26 +124,57 @@ fun ProductInfo(
             Log.e("qqq",isItemWhichPart.value.toString())
             val job = GlobalScope.launch {
                 when(isItemWhichPart.value){
-                    0 -> result.value = ProductInfoServer(
-                        url = "https://fluent-marmoset-immensely.ngrok-free.app/ProductInfo",
-                        product_id = productID.value
-                    )
-                    1 -> result.value = ProductInfoServer(
-                        url = "https://fluent-marmoset-immensely.ngrok-free.app/PopularProductInfo",
-                        product_id = productID.value
-                    )
-                    2 -> result.value = ProductInfoServer(
-                        url = "https://fluent-marmoset-immensely.ngrok-free.app/BigSaleProductInfo",
-                        product_id = productID.value
-                    )
-                    3 -> result.value = ProductInfoServer(
-                        url = "https://fluent-marmoset-immensely.ngrok-free.app/TodaySaleProductInfo",
-                        product_id = productID.value
-                    )
-                    4 -> result.value = ProductInfoServer(
-                        url = "https://fluent-marmoset-immensely.ngrok-free.app/NewProductInfo",
-                        product_id = productID.value
-                    )
+                    0 -> {
+                        result.value = ProductInfoServer(
+                            url = "https://fluent-marmoset-immensely.ngrok-free.app/ProductInfo",
+                            product_id = productID.value
+                        )
+                        detailedResult.value = ProductInfoServer(
+                            url = "https://fluent-marmoset-immensely.ngrok-free.app/ProductDetailedInfo",
+                            product_id = productID.value
+                        )
+                    }
+
+                    1 -> {
+                        result.value = ProductInfoServer(
+                            url = "https://fluent-marmoset-immensely.ngrok-free.app/PopularProductInfo",
+                            product_id = productID.value
+                        )
+                        detailedResult.value = ProductInfoServer(
+                            url = "https://fluent-marmoset-immensely.ngrok-free.app/PopularProductDetailedInfo",
+                            product_id = productID.value
+                        )
+                    }
+                    2 -> {
+                        result.value = ProductInfoServer(
+                            url = "https://fluent-marmoset-immensely.ngrok-free.app/BigSaleProductInfo",
+                            product_id = productID.value
+                        )
+                        detailedResult.value = ProductInfoServer(
+                            url = "https://fluent-marmoset-immensely.ngrok-free.app/BigSaleProductDetailedInfo",
+                            product_id = productID.value
+                        )
+                    }
+                    3 -> {
+                        result.value = ProductInfoServer(
+                            url = "https://fluent-marmoset-immensely.ngrok-free.app/TodaySaleProductInfo",
+                            product_id = productID.value
+                        )
+                        detailedResult.value = ProductInfoServer(
+                            url = "https://fluent-marmoset-immensely.ngrok-free.app/TodaySaleProductDetailedInfo",
+                            product_id = productID.value
+                        )
+                    }
+                    4 -> {
+                        result.value = ProductInfoServer(
+                            url = "https://fluent-marmoset-immensely.ngrok-free.app/NewProductInfo",
+                            product_id = productID.value
+                        )
+                        detailedResult.value = ProductInfoServer(
+                            url = "https://fluent-marmoset-immensely.ngrok-free.app/NewProductDetailedInfo",
+                            product_id = productID.value
+                        )
+                    }
                 }
             }
         }
@@ -208,6 +241,48 @@ fun ProductInfo(
                 ),
                 lineHeight = 30.sp
             )
+            Spacer(Modifier.height(35.dp))
+            Text(
+                modifier = Modifier
+                    .padding(
+                        start = 18.dp
+                    ),
+                text = "상세 정보",
+                color = TextLittleDark,
+                style = TextStyle(
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily(Font(R.font.pretendard_bold))
+                )
+            )
+            Spacer(Modifier.height(5.dp))
+            HorizontalDivider(
+                modifier = Modifier
+                    .padding(
+                        start = 20.dp,
+                        end = 20.dp
+                    ),
+                color = Color.Black
+            )
+            Spacer(Modifier.height(5.dp))
+            if(detailedResult.value != null){
+                Text(
+                    modifier = Modifier
+                        .padding(
+                            start = 18.dp,
+                            end = 18.dp
+                        ),
+                    text = detailedResult.value!!.ai_info,
+                    color = TextLittleDark,
+                    style = TextStyle(
+                        fontSize = 18.sp,
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular))
+                    ),
+                    lineHeight = 30.sp
+                )
+            } else {
+                LoaderSet(info = "AI 요약 중", semantics = "AI가 상품 상세 정보를 생성하는 중입니다. 잠시만 기다려주세요.")
+            }
+            
             Spacer(Modifier.height(35.dp))
             Text(
                 modifier = Modifier
