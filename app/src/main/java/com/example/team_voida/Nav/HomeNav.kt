@@ -83,6 +83,7 @@ import com.example.team_voida.R
 import com.example.team_voida.SearchResult.SearchResult
 import com.example.team_voida.Start.Guide
 import com.example.team_voida.Start.Start
+import com.example.team_voida.Tools.LoaderSet
 import com.example.team_voida.session
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -127,7 +128,7 @@ val navItemList = listOf(
 @Composable
 fun HomeNav(){
 
-    // 각 화면에서 사용할 변수들 선언 ex) 네비게이션, 하단네비 Flag bit, 검색 입력란 ... 
+    // 각 화면에서 사용할 변수들 선언 ex) 네비게이션, 하단네비 Flag bit, 검색 입력란 ...
     val navController = rememberNavController() // home nav
     val basketController = rememberNavController()
     var selectedIndex = remember { mutableStateOf(0) }
@@ -172,6 +173,7 @@ fun HomeNav(){
     val result: MutableState<List<Popular>?> = remember { mutableStateOf<List<Popular>?>(null) }
 
     val voiceInput = remember{ mutableStateOf("") }
+    val isAssistantWorking = remember{ mutableStateOf(false) }
 
 
     val speechRecognizerLauncher = rememberLauncherForActivityResult(
@@ -183,6 +185,7 @@ fun HomeNav(){
                 voiceInput.value = spokenText  // Update prompt with recognized text
             } else {
                 Log.e("here","here")
+                isAssistantWorking.value = false
                 Toast.makeText(context, "음성인식에 실패하였습니다.", Toast.LENGTH_SHORT).show()
             }
         }
@@ -201,57 +204,58 @@ fun HomeNav(){
 
 
     fun aiAssitant(){
-        var category: String? = null
-            if (ContextCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.RECORD_AUDIO
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-                val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-                intent.putExtra(
-                    RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-                )
-                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
-                intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Voida Assistance가 음성을 인식합니다.")
-                speechRecognizerLauncher.launch(intent)
-            } else {
-                ActivityCompat.requestPermissions(
-                    context as Activity,
-                    arrayOf(Manifest.permission.RECORD_AUDIO),
-                    100
-                )
-            }
+        isAssistantWorking.value = true
 
-            Log.e("haha","haha")
-            if(voiceInput.value != ""){
-                runBlocking {
-                    val job = GlobalScope.launch{
-                        category = AssistantToServer(voiceInput.value)
-                    }
+        if (ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.RECORD_AUDIO
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+            intent.putExtra(
+                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+            )
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Voida Assistance가 음성을 인식합니다.")
+            speechRecognizerLauncher.launch(intent)
+        } else {
+            ActivityCompat.requestPermissions(
+                context as Activity,
+                arrayOf(Manifest.permission.RECORD_AUDIO),
+                100
+            )
+        }
+    }
+
+    if(voiceInput.value != "" && voiceInput.value != "None"){
+        var category: String? = null
+        Log.e("haha","haha")
+
+        if(voiceInput.value != ""){
+            runBlocking {
+                val job = GlobalScope.launch{
+                    category = AssistantToServer(voiceInput.value)
                 }
             }
+        }
 
+        while(category == null){
+            Thread.sleep(1000L)
+        }
+        Log.e("haha","haha")
 
-            if(voiceInput.value == ""){
-                return
-            }
+        Log.e("debug","category" + category.toString())
 
-            while(category == null){
-                Thread.sleep(1000L)
-            }
-            Log.e("haha","haha")
-
-            Log.e("debug","category" + category.toString())
-
-            AssistantSelector(
-                isWhichPart = isWhichPart,
-                isItemWhichPart = isItemWhichPart,
-                llmCategory = category.toString(),
-                navController = navController,
-                voiceInput = voiceInput.value,
-                input = input
-            )
+        AssistantSelector(
+            isWhichPart = isWhichPart,
+            isItemWhichPart = isItemWhichPart,
+            llmCategory = category.toString(),
+            navController = navController,
+            voiceInput = voiceInput.value,
+            input = input,
+            isAssistantWorking = isAssistantWorking
+        )
     }
 
     Scaffold(
@@ -313,7 +317,7 @@ fun HomeNav(){
                                     )
                                     .offset(
                                         y = if(index != 2) tmpIndex
-                                         else 0.dp
+                                        else 0.dp
                                     )
                                 ,
                                 selected = selectedIndex.value == index,
@@ -371,214 +375,217 @@ fun HomeNav(){
             }
         }
     ){ inner ->
-        NavHost(
-            modifier = Modifier
-                .padding(inner)
-                .fillMaxSize()
-                // 아래의 코드는 인터넷에 제공된 오픈소스 참고
-                // 화면을 확대 및 축소하는 기능
-                .pointerInput(Unit){
-                    detectTransformGestures{_, pan, _, _ ->
+        if(isAssistantWorking.value){
+            LoaderSet(info = "AI Asssitant", semantics = "AI Assistant가 정보를 분석하는 중입니다. 잠시만 기다려주세요.")
+        }else {
+            NavHost(
+                modifier = Modifier
+                    .padding(inner)
+                    .fillMaxSize()
+                    // 아래의 코드는 인터넷에 제공된 오픈소스 참고
+                    // 화면을 확대 및 축소하는 기능
+                    .pointerInput(Unit) {
+                        detectTransformGestures { _, pan, _, _ ->
 
-                        val newScale = scale
-                        scale = newScale.coerceIn(minScale, maxScale)
+                            val newScale = scale
+                            scale = newScale.coerceIn(minScale, maxScale)
 
-                        // Calculate new offsets based on zoom and pan
-                        val centerX = size.width / 2
-                        val centerY = size.height / 2
-                        val offsetXChange = (centerX - offsetX) * (newScale / scale - 1)
-                        val offsetYChange = (centerY - offsetY) * (newScale / scale - 1)
+                            // Calculate new offsets based on zoom and pan
+                            val centerX = size.width / 2
+                            val centerY = size.height / 2
+                            val offsetXChange = (centerX - offsetX) * (newScale / scale - 1)
+                            val offsetYChange = (centerY - offsetY) * (newScale / scale - 1)
 
-                        // Calculate min and max offsets
-                        val maxOffsetX = (size.width / 2) * (scale - 1)
-                        val minOffsetX = -maxOffsetX
-                        val maxOffsetY = (size.height / 2) * (scale - 1)
-                        val minOffsetY = -maxOffsetY
+                            // Calculate min and max offsets
+                            val maxOffsetX = (size.width / 2) * (scale - 1)
+                            val minOffsetX = -maxOffsetX
+                            val maxOffsetY = (size.height / 2) * (scale - 1)
+                            val minOffsetY = -maxOffsetY
 
-                        // Update offsets while ensuring they stay within bounds
-                        if (scale <= maxScale) {
-                            offsetX = (offsetX + pan.x * scale * slowMovement + offsetXChange)
-                                .coerceIn(minOffsetX, maxOffsetX)
-                            offsetY = (offsetY + pan.y * scale * slowMovement + offsetYChange)
-                                .coerceIn(minOffsetY, maxOffsetY)
-                        }
+                            // Update offsets while ensuring they stay within bounds
+                            if (scale <= maxScale) {
+                                offsetX = (offsetX + pan.x * scale * slowMovement + offsetXChange)
+                                    .coerceIn(minOffsetX, maxOffsetX)
+                                offsetY = (offsetY + pan.y * scale * slowMovement + offsetYChange)
+                                    .coerceIn(minOffsetY, maxOffsetY)
+                            }
 
-                        // Store initial offset on pan
-                        if (pan != Offset(0f, 0f) && initialOffset == Offset(0f, 0f)) {
-                            initialOffset = Offset(offsetX, offsetY)
-                        }
-                    }
-                }
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onDoubleTap = {
-                            // Reset scale and offset on double tap
-                            if (scale != 1f) {
-                                scale = 1f
-                                offsetX = initialOffset.x
-                                offsetY = initialOffset.y
-                            } else {
-                                scale = 2f
+                            // Store initial offset on pan
+                            if (pan != Offset(0f, 0f) && initialOffset == Offset(0f, 0f)) {
+                                initialOffset = Offset(offsetX, offsetY)
                             }
                         }
+                    }
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onDoubleTap = {
+                                // Reset scale and offset on double tap
+                                if (scale != 1f) {
+                                    scale = 1f
+                                    offsetX = initialOffset.x
+                                    offsetY = initialOffset.y
+                                } else {
+                                    scale = 2f
+                                }
+                            }
+                        )
+                    }
+                    .graphicsLayer {
+                        scaleX = scale
+                        scaleY = scale
+                        translationX = offsetX
+                        translationY = offsetY
+                    },
+                navController = navController,
+                startDestination = "home"
+            ) {
+                // HomeNav에서 갈 수 있는 모든 페이지의 네비게이션 등록
+                composable("home") {
+                    Home(
+                        navController = navController,
+                        input = input,
+                        result = result.value,
+                        basketFlag = basketFlag,
+                        homeNavFlag = homeNavFlag,
+                        productFlag = productFlag,
+                        selectedIndex = selectedIndex,
+                        isWhichPart = isWhichPart,
+                        productID = productID,
+                        isItemWhichPart = isItemWhichPart,
+                        barPrice = price
                     )
                 }
-                .graphicsLayer {
-                    scaleX = scale
-                    scaleY = scale
-                    translationX = offsetX
-                    translationY = offsetY
+                composable("searchResult") {
+                    SearchResult(
+                        navController = navController,
+                        input = input,
+                        productName = input.value,
+                        basketFlag = basketFlag,
+                        homeNavFlag = homeNavFlag,
+                        productFlag = productFlag,
+                        selectedIndex = selectedIndex,
+                        productID = productID,
+                        isItemWhichPart = isItemWhichPart,
+                        barPrice = price
+                    )
                 }
-            ,
-            navController = navController,
-            startDestination = "home"
-        ) {
-            // HomeNav에서 갈 수 있는 모든 페이지의 네비게이션 등록
-            composable("home") {
-                Home(
-                    navController = navController,
-                    input = input,
-                    result = result.value,
-                    basketFlag = basketFlag,
-                    homeNavFlag = homeNavFlag,
-                    productFlag = productFlag,
-                    selectedIndex = selectedIndex,
-                    isWhichPart = isWhichPart,
-                    productID = productID,
-                    isItemWhichPart = isItemWhichPart,
-                    barPrice = price
-                )
-            }
-            composable("searchResult") {
-                SearchResult(
-                    navController = navController,
-                    input = input,
-                    productName = input.value,
-                    basketFlag = basketFlag,
-                    homeNavFlag = homeNavFlag,
-                    productFlag = productFlag,
-                    selectedIndex = selectedIndex,
-                    productID = productID,
-                    isItemWhichPart = isItemWhichPart,
-                    barPrice = price
-                )
-            }
-            composable("basket") {
-                Basket(
-                    dynamicTotalPrice,
-                    navController,
-                    basketFlag = basketFlag,
-                    homeNavFlag = homeNavFlag,
-                    productFlag = productFlag,
-                    selectedIndex = selectedIndex,
-                    productID = productID,
-                    isItemWhichPart = isItemWhichPart
-                )
-            }
-            composable("productInfo"){
-                ProductInfo(
-                    navController = navController,
-                    basketFlag = basketFlag,
-                    homeNavFlag = homeNavFlag,
-                    productFlag = productFlag,
-                    selectedIndex = selectedIndex,
-                    productID = productID,
-                    isItemWhichPart = isItemWhichPart,
-                )
-            }
-            composable("categories"){
-                Categories(
-                    navController = navController,
-                    basketFlag = basketFlag,
-                    homeNavFlag = homeNavFlag,
-                    productFlag = productFlag,
-                    selectedIndex = selectedIndex,
-                    categoryCode = categoryCode,
-                    isItemWhichPart = isItemWhichPart
-                )
-            }
+                composable("basket") {
+                    Basket(
+                        dynamicTotalPrice,
+                        navController,
+                        basketFlag = basketFlag,
+                        homeNavFlag = homeNavFlag,
+                        productFlag = productFlag,
+                        selectedIndex = selectedIndex,
+                        productID = productID,
+                        isItemWhichPart = isItemWhichPart
+                    )
+                }
+                composable("productInfo") {
+                    ProductInfo(
+                        navController = navController,
+                        basketFlag = basketFlag,
+                        homeNavFlag = homeNavFlag,
+                        productFlag = productFlag,
+                        selectedIndex = selectedIndex,
+                        productID = productID,
+                        isItemWhichPart = isItemWhichPart,
+                    )
+                }
+                composable("categories") {
+                    Categories(
+                        navController = navController,
+                        basketFlag = basketFlag,
+                        homeNavFlag = homeNavFlag,
+                        productFlag = productFlag,
+                        selectedIndex = selectedIndex,
+                        categoryCode = categoryCode,
+                        isItemWhichPart = isItemWhichPart
+                    )
+                }
 
-            composable("payment"){
-                Payment(
-                    navController = navController,
-                    basketFlag = basketFlag,
-                    homeNavFlag = homeNavFlag,
-                    productFlag = productFlag,
-                    selectedIndex = selectedIndex,
-                    productID = productID,
-                    isItemWhichPart = isItemWhichPart,
-                    isPayOne = isPayOne
-                )
-            }
+                composable("payment") {
+                    Payment(
+                        navController = navController,
+                        basketFlag = basketFlag,
+                        homeNavFlag = homeNavFlag,
+                        productFlag = productFlag,
+                        selectedIndex = selectedIndex,
+                        productID = productID,
+                        isItemWhichPart = isItemWhichPart,
+                        isPayOne = isPayOne
+                    )
+                }
 
-            composable("profile") {
-                Profile(
-                    navController = navController,
-                    basketFlag = basketFlag,
-                    homeNavFlag = homeNavFlag,
-                    productFlag = productFlag,
-                    selectedIndex = selectedIndex
-                )
-            }
+                composable("profile") {
+                    Profile(
+                        navController = navController,
+                        basketFlag = basketFlag,
+                        homeNavFlag = homeNavFlag,
+                        productFlag = productFlag,
+                        selectedIndex = selectedIndex
+                    )
+                }
 
-            composable("account") {
-                Account(
-                    navController = navController,
-                    basketFlag = basketFlag,
-                    homeNavFlag = homeNavFlag,
-                    productFlag = productFlag,
-                    selectedIndex = selectedIndex
-                )
-            }
-            composable("partList") {
-                HomePartList(
-                    navController = navController,
-                    input = input,
-                    basketFlag = basketFlag,
-                    homeNavFlag = homeNavFlag,
-                    productFlag = productFlag,
-                    selectedIndex = selectedIndex,
-                    isWhichPart = isWhichPart,
-                    barPrice = price,
-                    productID = productID,
-                    isItemWhichPart = isItemWhichPart
-                )
-            }
+                composable("account") {
+                    Account(
+                        navController = navController,
+                        basketFlag = basketFlag,
+                        homeNavFlag = homeNavFlag,
+                        productFlag = productFlag,
+                        selectedIndex = selectedIndex
+                    )
+                }
+                composable("partList") {
+                    HomePartList(
+                        navController = navController,
+                        input = input,
+                        basketFlag = basketFlag,
+                        homeNavFlag = homeNavFlag,
+                        productFlag = productFlag,
+                        selectedIndex = selectedIndex,
+                        isWhichPart = isWhichPart,
+                        barPrice = price,
+                        productID = productID,
+                        isItemWhichPart = isItemWhichPart
+                    )
+                }
 
-            composable("categoryList") {
-                CategoryList(
-                    navController = navController,
-                    input = input,
-                    basketFlag = basketFlag,
-                    homeNavFlag = homeNavFlag,
-                    productFlag = productFlag,
-                    selectedIndex = selectedIndex,
-                    isWhichPart = isWhichPart,
-                    barPrice = price,
-                    categoryCode = categoryCode.value,
-                    productID = productID,
-                    isItemWhichPart = isItemWhichPart
-                )
-            }
+                composable("categoryList") {
+                    CategoryList(
+                        navController = navController,
+                        input = input,
+                        basketFlag = basketFlag,
+                        homeNavFlag = homeNavFlag,
+                        productFlag = productFlag,
+                        selectedIndex = selectedIndex,
+                        isWhichPart = isWhichPart,
+                        barPrice = price,
+                        categoryCode = categoryCode.value,
+                        productID = productID,
+                        isItemWhichPart = isItemWhichPart
+                    )
+                }
 
-            composable("paymentSetting") {
-                PaymentSetting(
-                    navController = navController,
-                    basketFlag = basketFlag,
-                    homeNavFlag = homeNavFlag,
-                    productFlag = productFlag,
-                    selectedIndex = selectedIndex
-                )
-            }
+                composable("paymentSetting") {
+                    PaymentSetting(
+                        navController = navController,
+                        basketFlag = basketFlag,
+                        homeNavFlag = homeNavFlag,
+                        productFlag = productFlag,
+                        selectedIndex = selectedIndex
+                    )
+                }
 
-            composable("paymentHistory") {
-                PaymentHistory(
-                    navController = navController,
-                    basketFlag = basketFlag,
-                    homeNavFlag = homeNavFlag,
-                    productFlag = productFlag,
-                    selectedIndex = selectedIndex
-                )
+                composable("paymentHistory") {
+                    PaymentHistory(
+                        navController = navController,
+                        basketFlag = basketFlag,
+                        homeNavFlag = homeNavFlag,
+                        productFlag = productFlag,
+                        selectedIndex = selectedIndex
+                    )
+                }
             }
         }
     }

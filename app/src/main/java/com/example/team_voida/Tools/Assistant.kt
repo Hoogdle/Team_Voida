@@ -134,7 +134,8 @@ fun AssistantSelector(
     llmCategory:String,
     navController: NavController,
     voiceInput: String,
-    input: MutableState<String>
+    input: MutableState<String>,
+    isAssistantWorking : MutableState<Boolean>
 ){
     var result = "None"
     when{
@@ -160,34 +161,49 @@ fun AssistantSelector(
             if (keyword != null){
                 input.value = keyword as String
                 navController.navigate("searchResult")
+                isAssistantWorking.value = false
             }
         }
         llmCategory.contains("계정설정", ignoreCase = true) ->{
             navController.navigate("account")
+            isAssistantWorking.value = false
         }
         llmCategory.contains("카테고리", ignoreCase = true) ->{
             navController.navigate("categories")
+            isAssistantWorking.value = false
         }
         llmCategory.contains("장바구니", ignoreCase = true) ->{
             navController.navigate("basket")
+            isAssistantWorking.value = false
         }
         llmCategory.contains("인기상품", ignoreCase = true) ->{
             isWhichPart.value = 1
             isItemWhichPart.value = 1
             navController.navigate("partList")
+            isAssistantWorking.value = false
         }
         llmCategory.contains("할인상품", ignoreCase = true) ->{
             isWhichPart.value = 2
             isItemWhichPart.value = 2
             navController.navigate("partList")
+            isAssistantWorking.value = false
         }
         llmCategory.contains("배송지 변경", ignoreCase = true) ->{
+            isAssistantWorking.value = false
+
         }
         llmCategory.contains("결제수단 변경", ignoreCase = true) ->{
+            isAssistantWorking.value = false
+
         }
         llmCategory.contains("도움말", ignoreCase = true) ->{
+            isAssistantWorking.value = false
+
         }
-        else -> {}
+        else -> {
+            isAssistantWorking.value = false
+
+        }
     }
 }
 
