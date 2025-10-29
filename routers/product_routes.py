@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Path
 from sqlalchemy.orm import Session
 from typing import List
+import asyncio
 
 from database import get_db
 import models, schemas
@@ -18,6 +19,10 @@ from PIL import Image
 from transformers import AutoTokenizer, AutoModelForCausalLM, LlavaOnevisionForConditionalGeneration, AutoProcessor
 import torch
 
+
+
+running_tasks: dict[str, asyncio.Task] = {}
+cancel_flags: dict[str, asyncio.Event] = {}
 
 router = APIRouter(prefix="", tags=["Product"])
 
@@ -171,7 +176,7 @@ def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
 
 
 # vlm 모델 호출 함수
-def call_ai(name, info, img):
+async def call_ai(name, info, img, return_list):
 	# 모델에 사용되는 프롬프트 설정
 
 	if(img[0] == '\"'): image_url = img[1:-1]
@@ -205,7 +210,7 @@ def call_ai(name, info, img):
 
 	output = processor.decode(generate_ids_trimmed[0], skip_specail_tokens=True)
 	
-	return output.strip("<|im_end|>")
+	return_list.append(output.strip("<|im_end|>"))
 
 # Call Detailed VLM
 def d_call_ai(name, info, img):
@@ -342,13 +347,26 @@ def get_new_items(db: Session = Depends(get_db)):
 
 # Product Info by ID
 @router.post("/PopularProductInfo", response_model=schemas.ProductDetail)
-def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db)):
+async def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db)):
     prod = db.query(models.PopularItem).filter(models.PopularItem.id == payload.product_id).first()
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
+
+    print(payload.session_id)
+    pid = payload.session_id + "_p"
+
+    ai_info = []
 	
-    ai_info = call_ai(prod.name,prod.description, prod.image_info)
-    
+    task = asyncio.create_task(call_ai(prod.name,prod.description, prod.image_info, ai_info))
+    running_tasks[pid] = task
+
+    print(running_tasks)
+  
+    while not task.done() and pid in running_tasks:
+        await asyncio.sleep(0)
+    #await task
+ 
+    print("cancel2")
 
     return schemas.ProductDetail(
         product_id=prod.id,
@@ -356,7 +374,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
         image_url=prod.image_url,
         price=float(prod.price),
 # change below as ai result
-        ai_info = ai_info,
+        ai_info = ai_info[0],
         ai_review = ""
     )
 
@@ -365,7 +383,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     prod = db.query(models.PopularItem).filter(models.PopularItem.id == payload.product_id).first()
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
-	
+
     ai_info = d_call_ai(prod.name,prod.description, prod.image_info)
     
 
@@ -500,5 +518,25 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
         ai_info = ai_info,
         ai_review = ""
     )
+
+# Product Info by ID
+@router.post("/CancelAI")
+def product_info(payload: schemas.CancelAIRequest, db: Session = Depends(get_db)):
+    session_id = payload.session_id
+    session_product = session_id + "_p"
+    session_detail = session_id + "_d"
+    session_review = session_id + "_r"
+
+    if session_product in running_tasks:
+        running_tasks[session_product].cancel()
+        print("cancel1")
+        del running_tasks[session_product]
+    if session_detail in running_tasks:
+        running_tasks[session_detail].cancel()
+        del running_tasks[session_detail]
+    if session_review in running_tasks:
+        running_tasks[session_review].cancel()
+        del running_tasks[session_review]
+
 
 

@@ -20,7 +20,7 @@ class EmailRequest(BaseModel):
 
 class ProductIDRequest(BaseModel):
     product_id: int
-
+    session_id: str
 
 class ProductDetail(BaseModel):
     product_id: int
@@ -152,3 +152,6 @@ class AssistantCategory(BaseModel):
 
 class AssistantSearch(BaseModel):
 	voiceInput: str
+
+class CancelAIRequest(BaseModel):
+	session_id: str
