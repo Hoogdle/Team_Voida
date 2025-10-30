@@ -484,7 +484,7 @@ fun ProductInfoBottomBar(
                             action = when(isItemWhichPart.value){
                                 0 -> "/BasketInsert"
                                 1 -> "/BasketInsert/Popular"
-                                2 -> "/BasketInsert/Popular"
+                                2 -> "/BasketInsert/BigSale"
                                 3 -> "/BasketInsert/TodaySale"
                                 4 -> "/BasketInsert/New"
                                 else -> ""

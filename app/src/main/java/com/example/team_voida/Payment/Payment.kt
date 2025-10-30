@@ -134,6 +134,7 @@ fun Payment(
         }
     }
 
+    Log.e("payment",productID.value.toString())
     // 결제 정보를 받은 경우 결제 페이지 정보 제공
     if(paymentInfo.value != null){
         Column (
