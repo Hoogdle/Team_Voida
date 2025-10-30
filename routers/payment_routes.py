@@ -13,6 +13,7 @@ def basket_payment(payload: schemas.BasketPayment, db: Session = Depends(get_db)
 	# 세션 아이디를 통해 유저 정보확인
 	user = check_session(db,payload.session_id)
 	basket_items = db.query(models.Basket).filter(models.Basket.user_id == user.id).all()
+	basket_items.sort(key = lambda x : x.date_time, reverse = True)	
 
 	if not basket_items:
 		raise HTTPException(status_code=404, detail="No items in basket")
