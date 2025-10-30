@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
+from datetime import datetime
 from database import get_db
 import models, schemas
 from utils.session_check import *
@@ -86,7 +87,7 @@ def insert_to_basket(payload: schemas.BasketInsertRequest, db: Session = Depends
 	product = db.query(models.PopularItem).filter(models.PopularItem.id == payload.product_id).first()
 
 	re_product = db.query(models.Product).filter(models.Product.name == product.name).first()
-	new_item = models.Basket(user_id=user.id, product_id=re_product.id, quantity=1)
+	new_item = models.Basket(user_id=user.id, product_id=re_product.id, quantity=1, date_time = datetime.now())
 	db.add(new_item)
 	db.commit()
 	return {"detail": "Inserted successfully"}

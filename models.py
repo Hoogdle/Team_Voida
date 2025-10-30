@@ -70,6 +70,7 @@ class Basket(Base):
     user_id = Column(Integer, ForeignKey("user_profiles.id"))
     product_id = Column(Integer, ForeignKey("products.id"))
     quantity = Column(Integer, default=1)
+    date_time = Column(DateTime)
 
     user = relationship("UserProfile", back_populates="basket_items")
     product = relationship("Product", back_populates="in_basket")
