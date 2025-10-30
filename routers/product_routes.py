@@ -325,7 +325,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     stop_event = threading.Event()
 
     # Call AI
-    ai_process = threading.Thread(target = call_ai, args = (prod.name,prod.description, prod.image_info, ai_info, stop_event))
+    ai_process = threading.Thread(target = call_ai, args = (prod.name,prod.description, prod.img_info, ai_info, stop_event))
 
     # Setting Stop Flag
     stop_flags[pid] = stop_event
@@ -358,7 +358,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     stop_event = threading.Event()
 
     # Call AI
-    ai_process = threading.Thread(target = d_call_ai, args = (prod.name,prod.description, prod.image_info, ai_info, stop_event))
+    ai_process = threading.Thread(target = d_call_ai, args = (prod.name,prod.description, prod.img_info, ai_info, stop_event))
 
     # Setting Stop Flag
     stop_flags[pid] = stop_event

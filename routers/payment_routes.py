@@ -99,6 +99,7 @@ def one_item_payment(payload: schemas.OneItemRequest, db: Session = Depends(get_
 @router.post("/OneItemPayment/Popular", response_model=schemas.OneItemPaymentResponse)
 def one_item_payment(payload: schemas.OneItemRequest, db: Session = Depends(get_db)):
 
+	print(f"Popular index : {payload.product_id}")
 	user = check_session(db,payload.session_id)
 
 	product = db.query(models.PopularItem).filter(models.PopularItem.id == payload.product_id).first()
@@ -132,9 +133,10 @@ def one_item_payment(payload: schemas.OneItemRequest, db: Session = Depends(get_
 @router.post("/OneItemPayment/BigSale", response_model=schemas.OneItemPaymentResponse)
 def one_item_payment(payload: schemas.OneItemRequest, db: Session = Depends(get_db)):
 
+	print(f"BigSale index : {payload.product_id}")
 	user = check_session(db,payload.session_id)
 
-	product = db.query(models.BigSaleItem).filter(models.PopularItem.id == payload.product_id).first()
+	product = db.query(models.BigSaleItem).filter(models.BigSaleItem.id == payload.product_id).first()
 
 	re_product = db.query(models.Product).filter(models.Product.name == product.name).first()
 
@@ -165,9 +167,10 @@ def one_item_payment(payload: schemas.OneItemRequest, db: Session = Depends(get_
 @router.post("/OneItemPayment/TodaySale", response_model=schemas.OneItemPaymentResponse)
 def one_item_payment(payload: schemas.OneItemRequest, db: Session = Depends(get_db)):
 
+	print(f"TodaySale index : {payload.product_id}")
 	user = check_session(db,payload.session_id)
 
-	product = db.query(models.TodaySaleItem).filter(models.PopularItem.id == payload.product_id).first()
+	product = db.query(models.TodaySaleItem).filter(models.TodaySaleItem.id == payload.product_id).first()
 
 	re_product = db.query(models.Product).filter(models.Product.name == product.name).first()
 
@@ -199,7 +202,7 @@ def one_item_payment(payload: schemas.OneItemRequest, db: Session = Depends(get_
 
 	user = check_session(db,payload.session_id)
 
-	product = db.query(models.NewItem).filter(models.PopularItem.id == payload.product_id).first()
+	product = db.query(models.NewItem).filter(models.NewItem.id == payload.product_id).first()
 
 	re_product = db.query(models.Product).filter(models.Product.name == product.name).first()
 
