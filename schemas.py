@@ -143,6 +143,7 @@ class UserNameRequest(BaseModel):
 
 class ReviewRequest(BaseModel):
 	product_id: int
+	session_id: str
 
 class ReviewProvide(BaseModel):
 	ai_review: str

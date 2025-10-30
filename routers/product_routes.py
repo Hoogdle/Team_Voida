@@ -74,7 +74,7 @@ d_processor = AutoProcessor.from_pretrained(d_vlm_model_name)
 
 
 # LLM 모델 호출 함수
-def call_llm(review):
+def call_llm(review, return_list, stop_event):
 	# LLM 모델 프롬프트 설정 
 	messages = [
       {"role": "system", "content": "너는 상품 요약을 수행하는 언어 모델이야"},
@@ -92,9 +92,10 @@ def call_llm(review):
 	)
 
 	output = llm_model.generate(
-		input_ids.to("cuda"),
+		input_ids = input_ids.to("cuda"),
 		eos_token_id=llm_tokenizer.eos_token_id,
 		max_new_tokens=128,
+		stop_event = stop_event,
 		do_sample=False,
 	)	
 
@@ -109,19 +110,33 @@ def call_llm(review):
 	result = result[start_index:end_index]
 	result.replace('\n','')
 
-	return result
+	return_list.append(result)
 
 @router.post("/Review", response_model = schemas.ReviewProvide)
 def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
 	prod = db.query(models.Product).filter(models.Product.id == payload.product_id).first()
 	if not prod:
 		raise HTTPException(status_code=404, detail="Product not found")
-	review = call_llm(prod.product_review)
 
+	pid = payload.session_id + "_r"
+
+	ai_info = []
+	stop_event = threading.Event()
+
+    # Call AI
+	ai_process = threading.Thread(target = call_llm, args = (re_prod.product_review, ai_info, stop_event))
+
+    # Setting Stop Flag
+	stop_flags[pid] = stop_event
+    
+    # Start and Wait
+	ai_process.start()
+	ai_process.join()
 	
 	return schemas.ReviewProvide(
-			ai_review = review)
+			ai_review = ai_info[0])
 
+	
 @router.post("/Review/Popular", response_model = schemas.ReviewProvide)
 def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
 
@@ -129,11 +144,24 @@ def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
 	re_prod = db.query(models.Product).filter(models.Product.name == prod.name).first()
 	if not prod:
 		raise HTTPException(status_code=404, detail="Product not found")
-	review = call_llm(re_prod.product_review)
+	pid = payload.session_id + "_r"
 
+	ai_info = []
+	stop_event = threading.Event()
+
+    # Call AI
+	ai_process = threading.Thread(target = call_llm, args = (re_prod.product_review, ai_info, stop_event))
+
+    # Setting Stop Flag
+	stop_flags[pid] = stop_event
+    
+    # Start and Wait
+	ai_process.start()
+	ai_process.join()
 	
 	return schemas.ReviewProvide(
-			ai_review = review)
+			ai_review = ai_info[0])
+
 
 @router.post("/Review/BigSale", response_model = schemas.ReviewProvide)
 def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
@@ -142,11 +170,23 @@ def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
 	re_prod = db.query(models.Product).filter(models.Product.name == prod.name).first()
 	if not prod:
 		raise HTTPException(status_code=404, detail="Product not found")
-	review = call_llm(re_prod.product_review)
+	pid = payload.session_id + "_r"
 
+	ai_info = []
+	stop_event = threading.Event()
+
+    # Call AI
+	ai_process = threading.Thread(target = call_llm, args = (re_prod.product_review, ai_info, stop_event))
+
+    # Setting Stop Flag
+	stop_flags[pid] = stop_event
+    
+    # Start and Wait
+	ai_process.start()
+	ai_process.join()
 	
 	return schemas.ReviewProvide(
-			ai_review = review)
+			ai_review = ai_info[0])
 
 @router.post("/Review/TodaySale", response_model = schemas.ReviewProvide)
 def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
@@ -155,11 +195,23 @@ def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
 	re_prod = db.query(models.Product).filter(models.Product.name == prod.name).first()
 	if not prod:
 		raise HTTPException(status_code=404, detail="Product not found")
-	review = call_llm(re_prod.product_review)
+	pid = payload.session_id + "_r"
 
+	ai_info = []
+	stop_event = threading.Event()
+
+    # Call AI
+	ai_process = threading.Thread(target = call_llm, args = (re_prod.product_review, ai_info, stop_event))
+
+    # Setting Stop Flag
+	stop_flags[pid] = stop_event
+    
+    # Start and Wait
+	ai_process.start()
+	ai_process.join()
 	
 	return schemas.ReviewProvide(
-			ai_review = review)
+			ai_review = ai_info[0])
 
 @router.post("/Review/New", response_model = schemas.ReviewProvide)
 def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
@@ -168,12 +220,24 @@ def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
 	re_prod = db.query(models.Product).filter(models.Product.name == prod.name).first()
 	if not prod:
 		raise HTTPException(status_code=404, detail="Product not found")
-	review = call_llm(re_prod.product_review)
+	
+	pid = payload.session_id + "_r"
 
+	ai_info = []
+	stop_event = threading.Event()
+
+    # Call AI
+	ai_process = threading.Thread(target = call_llm, args = (re_prod.product_review, ai_info, stop_event))
+
+    # Setting Stop Flag
+	stop_flags[pid] = stop_event
+    
+    # Start and Wait
+	ai_process.start()
+	ai_process.join()
 	
 	return schemas.ReviewProvide(
-			ai_review = review)
-
+			ai_review = ai_info[0])
 
 # vlm 모델 호출 함수
 def call_ai(name, info, img, return_list, stop_event):
@@ -277,7 +341,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
         image_url=prod.image_url,
         price=float(prod.price),
 # change below as ai result
-        ai_info = ai_info,
+        ai_info = ai_info[0],
         ai_review = ""
     )
 
@@ -597,7 +661,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
         image_url=prod.image_url,
         price=float(prod.price),
 # change below as ai result
-        ai_info = ai_info,
+        ai_info = ai_info[0],
         ai_review = ""
     )
 
@@ -644,16 +708,17 @@ def product_info(payload: schemas.CancelAIRequest, db: Session = Depends(get_db)
 
     if session_product in stop_flags:
         stop_flags[session_product].set()
-        print("cancel1")
+        print("cancel product info")
         del stop_flags[session_product]
     
     if session_detail in stop_flags:
         stop_flags[session_detail].set()
+        print("cancel product deep")
         del stop_flags[session_detail]
-    '''
-    if session_review in running_tasks:
-        running_tasks[session_review].cancel()
-        del running_tasks[session_review]
-    '''
+
+    if session_review in stop_flags:
+        stop_flags[session_review].set()
+        print("cancel review info")
+        del stop_flags[session_review]
 
 
