@@ -12,6 +12,8 @@ router = APIRouter(prefix="", tags=["Basket"])
 # 바스켓 아이템을 갖고오는 헬퍼 함수
 def serialize_basket_items(user_id: int, db: Session) -> List[schemas.BasketItem]:
     items = db.query(models.Basket).filter(models.Basket.user_id == user_id).all()
+    items.sort(key = lambda x : x.date_time, reverse = True)
+
     return [
         schemas.BasketItem(
             product_id=item.product.id,
