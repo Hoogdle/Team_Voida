@@ -213,7 +213,7 @@ def call_ai(name, info, img, return_list, stop_event):
 	return_list.append(output.strip("<|im_end|>"))
 
 # Call Detailed VLM
-def d_call_ai(name, info, img):
+def d_call_ai(name, info, img, return_list, stop_event):
 	# 모델에 사용되는 프롬프트 설정
 
 	if(img[0] == '\"'): image_url = img[1:-1]
@@ -238,14 +238,14 @@ def d_call_ai(name, info, img):
 		return_tensors = "pt"
 	).to(d_vlm_model.device, torch.float16)
 	
-	generate_ids = d_vlm_model.generate(**inputs, max_new_tokens=512)
+	generate_ids = d_vlm_model.generate(**inputs, max_new_tokens=512, stop_event = stop_event)
 	generate_ids_trimmed = [
 		out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generate_ids)
 	]
 
 	output = d_processor.decode(generate_ids_trimmed[0], skip_specail_tokens=True)
 	
-	return output.strip("<|im_end|>")
+	return_list.append(output.strip("<|im_end|>"))
 
 
 # 사용자가 요청 상품 정보의 아이디로 조회하여 해당 상품의 정보 제공
@@ -255,8 +255,21 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
 	
-    ai_info = call_ai(prod.name, prod.description, prod.img_info)
+    pid = payload.session_id + "_p"
+
+    ai_info = []
+    stop_event = threading.Event()
+
+    # Call AI
+    ai_process = threading.Thread(target = call_ai, args = (prod.name,prod.description, prod.image_info, ai_info, stop_event))
+
+    # Setting Stop Flag
+    stop_flags[pid] = stop_event
     
+    # Start and Wait
+    ai_process.start()
+    ai_process.join()
+
 
     return schemas.ProductDetail(
         product_id=prod.id,
@@ -275,9 +288,21 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     prod = db.query(models.Product).filter(models.Product.id == payload.product_id).first()
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
-	
-    ai_info = d_call_ai(prod.name, prod.description, prod.img_info)
+    pid = payload.session_id + "_d"
+
+    ai_info = []
+    stop_event = threading.Event()
+
+    # Call AI
+    ai_process = threading.Thread(target = d_call_ai, args = (prod.name,prod.description, prod.image_info, ai_info, stop_event))
+
+    # Setting Stop Flag
+    stop_flags[pid] = stop_event
     
+    # Start and Wait
+    ai_process.start()
+    ai_process.join()
+ 
 
     return schemas.ProductDetail(
         product_id=prod.id,
@@ -285,7 +310,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
         image_url=prod.image_url,
         price=float(prod.price),
 # change below as ai result
-        ai_info = ai_info,
+        ai_info = ai_info[0],
         ai_review = ""
     )
 
@@ -352,23 +377,20 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    print(payload.session_id)
     pid = payload.session_id + "_p"
 
     ai_info = []
     stop_event = threading.Event()
-    ai_process = threading.Thread(target = call_ai, args = (prod.name,prod.description, prod.image_info, ai_info, stop_event))
-    stop_flags[pid] = stop_event
-    ai_process.start()
-    
-    print("s_j")
-    ai_process.join()
-    print("e_j")
 
-    #task = asyncio.create_task(call_ai(prod.name,prod.description, prod.image_info, ai_info))
-    #running_tasks[pid] = task
-  
-    #await task
+    # Call AI
+    ai_process = threading.Thread(target = call_ai, args = (prod.name,prod.description, prod.image_info, ai_info, stop_event))
+
+    # Setting Stop Flag
+    stop_flags[pid] = stop_event
+    
+    # Start and Wait
+    ai_process.start()
+    ai_process.join()
  
     return schemas.ProductDetail(
         product_id=prod.id,
@@ -386,8 +408,21 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    ai_info = d_call_ai(prod.name,prod.description, prod.image_info)
+    pid = payload.session_id + "_d"
+
+    ai_info = []
+    stop_event = threading.Event()
+
+    # Call AI
+    ai_process = threading.Thread(target = d_call_ai, args = (prod.name,prod.description, prod.image_info, ai_info, stop_event))
+
+    # Setting Stop Flag
+    stop_flags[pid] = stop_event
     
+    # Start and Wait
+    ai_process.start()
+    ai_process.join()
+
 
     return schemas.ProductDetail(
         product_id=prod.id,
@@ -395,7 +430,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
         image_url=prod.image_url,
         price=float(prod.price),
 # change below as ai result
-        ai_info = ai_info,
+        ai_info = ai_info[0],
         ai_review = ""
     )
 
@@ -407,8 +442,21 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
 	
-    ai_info = call_ai(prod.name, prod.description, prod.image_info)
+    pid = payload.session_id + "_p"
+
+    ai_info = []
+    stop_event = threading.Event()
+
+    # Call AI
+    ai_process = threading.Thread(target = call_ai, args = (prod.name,prod.description, prod.image_info, ai_info, stop_event))
+
+    # Setting Stop Flag
+    stop_flags[pid] = stop_event
     
+    # Start and Wait
+    ai_process.start()
+    ai_process.join()
+
 
     return schemas.ProductDetail(
         product_id=prod.id,
@@ -416,7 +464,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
         image_url=prod.image_url,
         price=float(prod.price),
 # change below as ai result
-        ai_info = ai_info,
+        ai_info = ai_info[0],
         ai_review = ""
     )
 
@@ -427,8 +475,21 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
 	
-    ai_info = d_call_ai(prod.name, prod.description, prod.image_info)
+    pid = payload.session_id + "_d"
+
+    ai_info = []
+    stop_event = threading.Event()
+
+    # Call AI
+    ai_process = threading.Thread(target = d_call_ai, args = (prod.name,prod.description, prod.image_info, ai_info, stop_event))
+
+    # Setting Stop Flag
+    stop_flags[pid] = stop_event
     
+    # Start and Wait
+    ai_process.start()
+    ai_process.join()
+
 
     return schemas.ProductDetail(
         product_id=prod.id,
@@ -436,7 +497,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
         image_url=prod.image_url,
         price=float(prod.price),
 # change below as ai result
-        ai_info = ai_info,
+        ai_info = ai_info[0],
         ai_review = ""
     )
 
@@ -447,8 +508,21 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
 	
-    ai_info = call_ai(prod.name, prod.description, prod.image_info)
+    pid = payload.session_id + "_p"
+
+    ai_info = []
+    stop_event = threading.Event()
+
+    # Call AI
+    ai_process = threading.Thread(target = call_ai, args = (prod.name,prod.description, prod.image_info, ai_info, stop_event))
+
+    # Setting Stop Flag
+    stop_flags[pid] = stop_event
     
+    # Start and Wait
+    ai_process.start()
+    ai_process.join()
+
 
     return schemas.ProductDetail(
         product_id=prod.id,
@@ -456,7 +530,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
         image_url=prod.image_url,
         price=float(prod.price),
 # change below as ai result
-        ai_info = ai_info,
+        ai_info = ai_info[0],
         ai_review = ""
     )
 
@@ -467,8 +541,21 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
 	
-    ai_info = d_call_ai(prod.name, prod.description, prod.image_info)
+    pid = payload.session_id + "_d"
+
+    ai_info = []
+    stop_event = threading.Event()
+
+    # Call AI
+    ai_process = threading.Thread(target = d_call_ai, args = (prod.name,prod.description, prod.image_info, ai_info, stop_event))
+
+    # Setting Stop Flag
+    stop_flags[pid] = stop_event
     
+    # Start and Wait
+    ai_process.start()
+    ai_process.join()
+
 
     return schemas.ProductDetail(
         product_id=prod.id,
@@ -476,7 +563,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
         image_url=prod.image_url,
         price=float(prod.price),
 # change below as ai result
-        ai_info = ai_info,
+        ai_info = ai_info[0],
         ai_review = ""
     )
 
@@ -488,8 +575,21 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
 	
-    ai_info = call_ai(prod.name, prod.description, prod.image_info)
+    pid = payload.session_id + "_p"
+
+    ai_info = []
+    stop_event = threading.Event()
+
+    # Call AI
+    ai_process = threading.Thread(target = call_ai, args = (prod.name,prod.description, prod.image_info, ai_info, stop_event))
+
+    # Setting Stop Flag
+    stop_flags[pid] = stop_event
     
+    # Start and Wait
+    ai_process.start()
+    ai_process.join()
+
 
     return schemas.ProductDetail(
         product_id=prod.id,
@@ -508,8 +608,21 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
 	
-    ai_info = d_call_ai(prod.name, prod.description, prod.image_info)
+    pid = payload.session_id + "_d"
+
+    ai_info = []
+    stop_event = threading.Event()
+
+    # Call AI
+    ai_process = threading.Thread(target = d_call_ai, args = (prod.name,prod.description, prod.image_info, ai_info, stop_event))
+
+    # Setting Stop Flag
+    stop_flags[pid] = stop_event
     
+    # Start and Wait
+    ai_process.start()
+    ai_process.join()
+
 
     return schemas.ProductDetail(
         product_id=prod.id,
@@ -517,7 +630,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
         image_url=prod.image_url,
         price=float(prod.price),
 # change below as ai result
-        ai_info = ai_info,
+        ai_info = ai_info[0],
         ai_review = ""
     )
 
@@ -533,10 +646,11 @@ def product_info(payload: schemas.CancelAIRequest, db: Session = Depends(get_db)
         stop_flags[session_product].set()
         print("cancel1")
         del stop_flags[session_product]
+    
+    if session_detail in stop_flags:
+        stop_flags[session_detail].set()
+        del stop_flags[session_detail]
     '''
-    if session_detail in running_tasks:
-        running_tasks[session_detail].cancel()
-        del running_tasks[session_detail]
     if session_review in running_tasks:
         running_tasks[session_review].cancel()
         del running_tasks[session_review]
