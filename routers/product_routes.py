@@ -5,7 +5,7 @@ import asyncio
 
 from database import get_db
 import models, schemas
-from threading
+import threading
 
 import sys
 sys.path.insert(1, "/home/xodud7737/AiApp/LLaVA-NeXT")
@@ -358,7 +358,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     ai_info = []
     stop_event = threading.Event()
     ai_process = threading.Thread(target = call_ai, args = (prod.name,prod.description, prod.image_info, ai_info, stop_event))
-
+    stop_flags[pid] = stop_event
     ai_process.start()
     
     print("s_j")
@@ -529,16 +529,17 @@ def product_info(payload: schemas.CancelAIRequest, db: Session = Depends(get_db)
     session_detail = session_id + "_d"
     session_review = session_id + "_r"
 
-    if session_product in running_tasks:
-        running_tasks[session_product].cancel()
+    if session_product in stop_flags:
+        stop_flags[session_product].set()
         print("cancel1")
-        del running_tasks[session_product]
+        del stop_flags[session_product]
+    '''
     if session_detail in running_tasks:
         running_tasks[session_detail].cancel()
         del running_tasks[session_detail]
     if session_review in running_tasks:
         running_tasks[session_review].cancel()
         del running_tasks[session_review]
-
+    '''
 
 
