@@ -5,6 +5,7 @@ import asyncio
 
 from database import get_db
 import models, schemas
+from threading
 
 import sys
 sys.path.insert(1, "/home/xodud7737/AiApp/LLaVA-NeXT")
@@ -21,8 +22,7 @@ import torch
 
 
 
-running_tasks: dict[str, asyncio.Task] = {}
-cancel_flags: dict[str, asyncio.Event] = {}
+stop_flags: dict[str, threading.Event] = {}
 
 router = APIRouter(prefix="", tags=["Product"])
 
@@ -176,7 +176,7 @@ def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
 
 
 # vlm 모델 호출 함수
-async def call_ai(name, info, img, return_list):
+def call_ai(name, info, img, return_list, stop_event):
 	# 모델에 사용되는 프롬프트 설정
 
 	if(img[0] == '\"'): image_url = img[1:-1]
@@ -203,7 +203,7 @@ async def call_ai(name, info, img, return_list):
 		return_tensors = "pt"
 	).to(vlm_model.device, torch.float16)
 	
-	generate_ids = vlm_model.generate(**inputs, max_new_tokens=512)
+	generate_ids = vlm_model.generate(**inputs, max_new_tokens=512, stop_event=stop_event)
 	generate_ids_trimmed = [
 		out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generate_ids)
 	]
@@ -347,7 +347,7 @@ def get_new_items(db: Session = Depends(get_db)):
 
 # Product Info by ID
 @router.post("/PopularProductInfo", response_model=schemas.ProductDetail)
-async def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db)):
+def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db)):
     prod = db.query(models.PopularItem).filter(models.PopularItem.id == payload.product_id).first()
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -356,18 +356,20 @@ async def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(
     pid = payload.session_id + "_p"
 
     ai_info = []
-	
-    task = asyncio.create_task(call_ai(prod.name,prod.description, prod.image_info, ai_info))
-    running_tasks[pid] = task
+    stop_event = threading.Event()
+    ai_process = threading.Thread(target = call_ai, args = (prod.name,prod.description, prod.image_info, ai_info, stop_event))
 
-    print(running_tasks)
+    ai_process.start()
+    
+    print("s_j")
+    ai_process.join()
+    print("e_j")
+
+    #task = asyncio.create_task(call_ai(prod.name,prod.description, prod.image_info, ai_info))
+    #running_tasks[pid] = task
   
-    while not task.done() and pid in running_tasks:
-        await asyncio.sleep(0)
     #await task
  
-    print("cancel2")
-
     return schemas.ProductDetail(
         product_id=prod.id,
         name=prod.name,
