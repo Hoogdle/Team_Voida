@@ -31,6 +31,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -89,6 +90,25 @@ fun ProductInfo(
     isItemWhichPart: MutableState<Int>,
 ){
 
+
+    var requiredDetail = true
+
+    DisposableEffect(Unit) {
+        Log.e("enter","xxx")
+
+        // Component를 벗어날 때 수행
+        onDispose {
+            //session.sessionId.value
+            requiredDetail = false
+            runBlocking {
+                val job = GlobalScope.launch {
+                    CancelAI(session_id = session.sessionId.value)
+                }
+            }
+            Log.e("enter","xxx")
+        }
+    }
+
     var result: MutableState<ProductInfoInfo?> = remember { mutableStateOf<ProductInfoInfo?>(null) }
     var detailedResult: MutableState<ProductInfoInfo?> = remember { mutableStateOf<ProductInfoInfo?>(null) }
 
@@ -127,53 +147,73 @@ fun ProductInfo(
                     0 -> {
                         result.value = ProductInfoServer(
                             url = "https://fluent-marmoset-immensely.ngrok-free.app/ProductInfo",
-                            product_id = productID.value
+                            product_id = productID.value,
+                            session_id = session.sessionId.value
                         )
                         detailedResult.value = ProductInfoServer(
                             url = "https://fluent-marmoset-immensely.ngrok-free.app/ProductDetailedInfo",
-                            product_id = productID.value
+                            product_id = productID.value,
+                            session_id = session.sessionId.value
+
                         )
                     }
 
                     1 -> {
                         result.value = ProductInfoServer(
                             url = "https://fluent-marmoset-immensely.ngrok-free.app/PopularProductInfo",
-                            product_id = productID.value
+                            product_id = productID.value,
+                            session_id = session.sessionId.value
                         )
-                        detailedResult.value = ProductInfoServer(
+                        if(requiredDetail) {
+                            detailedResult.value = ProductInfoServer(
                             url = "https://fluent-marmoset-immensely.ngrok-free.app/PopularProductDetailedInfo",
-                            product_id = productID.value
+                            product_id = productID.value,
+                            session_id = session.sessionId.value
                         )
+                        }
                     }
                     2 -> {
                         result.value = ProductInfoServer(
                             url = "https://fluent-marmoset-immensely.ngrok-free.app/BigSaleProductInfo",
-                            product_id = productID.value
+                            product_id = productID.value,
+                            session_id = session.sessionId.value
                         )
-                        detailedResult.value = ProductInfoServer(
-                            url = "https://fluent-marmoset-immensely.ngrok-free.app/BigSaleProductDetailedInfo",
-                            product_id = productID.value
-                        )
+                        if(requiredDetail){
+                            detailedResult.value = ProductInfoServer(
+                                url = "https://fluent-marmoset-immensely.ngrok-free.app/BigSaleProductDetailedInfo",
+                                product_id = productID.value,
+                                session_id = session.sessionId.value
+                            )
+                        }
                     }
                     3 -> {
                         result.value = ProductInfoServer(
                             url = "https://fluent-marmoset-immensely.ngrok-free.app/TodaySaleProductInfo",
-                            product_id = productID.value
+                            product_id = productID.value,
+                            session_id = session.sessionId.value
                         )
-                        detailedResult.value = ProductInfoServer(
-                            url = "https://fluent-marmoset-immensely.ngrok-free.app/TodaySaleProductDetailedInfo",
-                            product_id = productID.value
-                        )
+
+                        if(requiredDetail) {
+                            detailedResult.value = ProductInfoServer(
+                                url = "https://fluent-marmoset-immensely.ngrok-free.app/TodaySaleProductDetailedInfo",
+                                product_id = productID.value,
+                                session_id = session.sessionId.value
+                            )
+                        }
                     }
                     4 -> {
                         result.value = ProductInfoServer(
                             url = "https://fluent-marmoset-immensely.ngrok-free.app/NewProductInfo",
-                            product_id = productID.value
+                            product_id = productID.value,
+                            session_id = session.sessionId.value
                         )
-                        detailedResult.value = ProductInfoServer(
-                            url = "https://fluent-marmoset-immensely.ngrok-free.app/NewProductDetailedInfo",
-                            product_id = productID.value
-                        )
+                        if(requiredDetail) {
+                            detailedResult.value = ProductInfoServer(
+                                url = "https://fluent-marmoset-immensely.ngrok-free.app/NewProductDetailedInfo",
+                                product_id = productID.value,
+                                session_id = session.sessionId.value
+                            )
+                        }
                     }
                 }
             }
@@ -325,7 +365,8 @@ fun ProductInfo(
                             val job = GlobalScope.launch {
                                 review.value = ReviewInfoServer(
                                     product_id = productID.value,
-                                    isWhichItem = isItemWhichPart.value
+                                    isWhichItem = isItemWhichPart.value,
+                                    session_id = session.sessionId.value
                                 )
                             }
                         }

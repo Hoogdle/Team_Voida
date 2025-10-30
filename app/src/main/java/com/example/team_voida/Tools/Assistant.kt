@@ -127,7 +127,6 @@ suspend fun AssistantSearch(
 }
 
 
-
 fun AssistantSelector(
     isWhichPart: MutableState<Int>,
     isItemWhichPart: MutableState<Int>,
@@ -202,7 +201,6 @@ fun AssistantSelector(
         }
         else -> {
             isAssistantWorking.value = false
-
         }
     }
 }
