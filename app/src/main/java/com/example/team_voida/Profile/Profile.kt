@@ -131,7 +131,7 @@ fun Profile(
                 ),
             color = SearchBarColor
         )
-        ProfileButton("결제내역",{})
+        ProfileButton("결제내역",{navController.navigate("paymentHistory")})
         HorizontalDivider(
             modifier = Modifier
                 .padding(
