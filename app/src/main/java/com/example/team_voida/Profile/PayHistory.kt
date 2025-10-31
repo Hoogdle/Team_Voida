@@ -1,21 +1,32 @@
 package com.example.team_voida.Profile
 
 import android.util.Log
+import android.widget.Space
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsEndWidth
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -27,7 +38,12 @@ import androidx.navigation.NavController
 import com.example.team_voida.Basket.ComposableLifecycle
 import com.example.team_voida.Notification.Notification
 import com.example.team_voida.R
+import com.example.team_voida.ui.theme.Selected
+import com.example.team_voida.ui.theme.TextColor
 import com.example.team_voida.ui.theme.TextLittleDark
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.Locale
 
 
 data class PaymentItemHistory(
@@ -39,7 +55,6 @@ data class PaymentItemHistory(
     val price: String,
     val flag: Int // buy or refund
 )
-
 val tmpPaymentItemHistory = listOf(
     PaymentItemHistory(
         year = "2025",
@@ -93,6 +108,7 @@ val tmpPaymentItemHistory = listOf(
     ),
 
 )
+
 @Composable
 fun PaymentHistory(
     navController: NavController,
@@ -104,6 +120,7 @@ fun PaymentHistory(
 
     val scrollState = rememberScrollState()
     val isAdding = remember { mutableStateOf(false) }
+
 
     // 유저 정보 페이지에 해당하는 하단 네비 Flag Bit 활성화
     ComposableLifecycle { source, event ->
@@ -177,5 +194,109 @@ fun PaymentHistory(
             expiredDate = "10"
         )
 
+        Spacer(Modifier.height(20.dp))
+
+        tmpPaymentItemHistory.forEach {
+            PaymentHistoryItem(
+                year = it.year,
+                month = it.month,
+                date = it.date,
+                time = it.time,
+                orderNum = it.orderNum,
+                price = it.price,
+                flag = it.flag
+            )
+            Spacer(Modifier.height(10.dp))
+        }
+
+    }
+}
+
+@Composable
+fun PaymentHistoryItem(
+    year: String,
+    month: String,
+    date: String,
+    time: String,
+    orderNum: String,
+    price: String,
+    flag: Int // 0 -> Buy, 1 -> Refund
+){
+    val floatPrice = price.toFloat()
+    val textPrice = DecimalFormat("#,###", DecimalFormatSymbols(Locale.US)).format(floatPrice)
+
+    Box(
+        modifier = Modifier
+            .padding(
+                horizontal = 15.dp
+            )
+            .clip(
+                shape = RoundedCornerShape(15.dp)
+            )
+            .background(
+                color = Selected
+            )
+            .height(
+                80.dp
+            )
+
+    ){
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ){
+            Image(
+                painter = painterResource(
+                    if(flag==1) R.drawable.buy
+                    else R.drawable.refund
+                ),
+                contentDescription = "",
+                modifier = Modifier
+                    .padding(25.dp)
+                    .size(25.dp)
+            )
+
+            Column(
+            ){
+                Text(
+                    modifier = Modifier
+                        .padding(
+                            top = 21.dp
+                        ),
+                    text = year + "년 " + month + "월 " + date + "일 " + time,
+                    style = TextStyle(
+                        color = TextColor,
+                        fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                        fontSize = 11.sp
+                    )
+                )
+                Text(
+                    modifier = Modifier
+                        .padding(
+                            bottom = 15.dp
+                        ),
+                    text = orderNum,
+                    style = TextStyle(
+                        color = TextColor,
+                        fontFamily = FontFamily(Font(R.font.roboto_semibold)),
+                        fontSize = 20.sp
+                    )
+                )
+            }
+
+            Spacer(Modifier.weight(1f))
+
+            Text(
+                modifier = Modifier
+                    .padding(
+                        25.dp,
+                    ),
+                text = textPrice + "원",
+                style = TextStyle(
+                    color = TextColor,
+                    fontFamily = FontFamily(Font(R.font.roboto_bold)),
+                    fontSize = 20.sp
+                )
+            )
+        }
     }
 }
