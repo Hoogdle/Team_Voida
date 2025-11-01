@@ -15,22 +15,43 @@ def read_home(db: Session = Depends(get_db)):
     # 모든 상품 정보를 담을 리스트
     product_ids = []
 
+    
+    prod1 = db.query(models.Home).filter(models.Home.sector == 1).all()
+    prod2 = db.query(models.Home).filter(models.Home.sector == 2).all()
+    prod3 = db.query(models.Home).filter(models.Home.sector == 3).all()
+    prod4 = db.query(models.Home).filter(models.Home.sector == 4).all()
+
     # DB 쿼리를 활용해 각 카테고리별 상품을 리스트에 저장
-    product_ids += [item for item in db.query(models.PopularItem).limit(10)]
-    product_ids += [item for item in db.query(models.BigSaleItem).limit(10)]
-    product_ids += [item for item in db.query(models.TodaySaleItem).limit(10)]
-    product_ids += [item for item in db.query(models.NewItem).limit(10)]
+    product_ids += [item for item in db.query(models.Product).filter(models.Product.id.in_(prod1.product_id)).limit(10)]
+    product_ids += [item for item in db.query(models.Product).filter(models.Product.id.in_(prod2.product_id)).limit(10)]
+    product_ids += [item for item in db.query(models.Product).filter(models.Product.id.in_(prod3.product_id)).limit(10)]
+    product_ids += [item for item in db.query(models.Product).filter(models.Product.id.in_(prod4.product_id)).limit(10)]
 
     if not product_ids:
         raise HTTPException(status_code=404, detail="No items found")
 
-#products = db.query(models.Product).filter(models.Product.id.in_(product_ids)).all()
+    result = [
+        schemas.ProductSummary(
+            id = item.id,
+            name = item.title,
+            description = item.description,
+            price = item.price,
+            image_url = item.product_url,
+            category = item.category,
+        )
+        for item in product_ids
+    ]
+
+    #products = db.query(models.Product).filter(models.Product.id.in_(product_ids)).all()
     return product_ids
 
 #  인기 상품 카테고리에 속하는 상품 20개 제공
 @router.get("/PopluarItems", response_model=List[schemas.ProductSummary])
 def read_popular(db: Session = Depends(get_db)):
-    items = db.query(models.PopularItem).limit(20).all()
+
+    items = db.query(models.Home).filter(models.Home.sector == 1).limit(20).all()
+    items = db.query(models.Product).filter(models.Product.id.in_(items.product_id)).limit(20)
+
     if not items:
         raise HTTPException(status_code=404, detail="Popular items not found")
       
