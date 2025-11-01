@@ -88,13 +88,13 @@ CREATE TABLE "pay" (
   "pay_id" TEXT
 );
 
-CREATE TABLE "Home" (
+CREATE TABLE "home" (
   "id" SERIAL PRIMARY KEY,
   "product_id" INTEGER,
   "sector" INTEGER
 );
 
-CREATE TABLE "Review" (
+CREATE TABLE "review" (
   "id" SERIAL PRIMARY KEY,
   "product_id" INTEGER,
   "review1" TEXT,
@@ -120,8 +120,8 @@ ALTER TABLE "card" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
 ALTER TABLE "pay" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
-ALTER TABLE "Home" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");
+ALTER TABLE "home" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");
 
 ALTER TABLE "basket_items" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");
 
-ALTER TABLE "Review" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");
+ALTER TABLE "review" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");
