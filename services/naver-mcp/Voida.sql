@@ -94,6 +94,14 @@ CREATE TABLE "Home" (
   "sector" INTEGER
 );
 
+CREATE TABLE "Review" (
+  "id" SERIAL PRIMARY KEY,
+  "product_id" INTEGER,
+  "review1" TEXT,
+  "review2" TEXT,
+  "review3" TEXT
+);
+
 CREATE UNIQUE INDEX ON "basket_items" ("user_id", "product_id");
 
 ALTER TABLE "images" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id") ON DELETE CASCADE;
@@ -115,3 +123,5 @@ ALTER TABLE "pay" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 ALTER TABLE "Home" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");
 
 ALTER TABLE "basket_items" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");
+
+ALTER TABLE "Review" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");
