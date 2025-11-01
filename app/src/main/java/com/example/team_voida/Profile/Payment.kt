@@ -424,7 +424,9 @@ fun CustomAlertDialog(
     title: String,
     description: String,
     onClickCancel: () -> Unit,
-    onClickConfirm: () -> Unit
+    onClickConfirm: () -> Unit,
+    leftText: String = "취소",
+    rightText: String = "삭제"
 ) {
     Dialog(
         onDismissRequest = { onClickCancel() },
@@ -499,7 +501,7 @@ fun CustomAlertDialog(
 
                         ) {
                         Text(
-                            text = "취소",
+                            text = leftText,
                             textAlign = TextAlign.Center,
                             style = TextStyle(
                                 fontSize = 14.sp,
@@ -529,7 +531,7 @@ fun CustomAlertDialog(
                         ),
                     ) {
                         Text(
-                            text = "삭제",
+                            text = rightText,
                             textAlign = TextAlign.Center,
                             style = TextStyle(
                                 fontSize = 14.sp,

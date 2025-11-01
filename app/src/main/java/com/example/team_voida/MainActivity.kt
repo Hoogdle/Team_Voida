@@ -39,8 +39,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val navController = rememberNavController()
-            StartNav()
-           // HomeNav()
+            //StartNav()
+            HomeNav()
         }
     }
 }

@@ -138,7 +138,7 @@ fun Profile(
                     start = 10.dp,
                     end = 10.dp
                 ),
-            color = SearchBarColor
+            color = SearchBarColor  
         )
         
         ProfileButton("결제수단",{navController.navigate("paymentSetting")})

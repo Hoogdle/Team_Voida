@@ -77,6 +77,7 @@ import com.example.team_voida.ProductInfo.ProductInfoInfo
 import com.example.team_voida.ProductInfo.sampleProductInfoData
 import com.example.team_voida.Profile.Account
 import com.example.team_voida.Profile.PaymentHistory
+import com.example.team_voida.Profile.PaymentHistoryList
 import com.example.team_voida.Profile.PaymentSetting
 import com.example.team_voida.Profile.Profile
 import com.example.team_voida.R
@@ -175,6 +176,7 @@ fun HomeNav(){
     val voiceInput = remember{ mutableStateOf("") }
     val isAssistantWorking = remember{ mutableStateOf(false) }
 
+    val orderNumber = remember{ mutableStateOf("") }
 
     val speechRecognizerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
@@ -437,7 +439,7 @@ fun HomeNav(){
                         translationY = offsetY
                     },
                 navController = navController,
-                startDestination = "home"
+                startDestination = "paymentHistory"
             ) {
                 // HomeNav에서 갈 수 있는 모든 페이지의 네비게이션 등록
                 composable("home") {
@@ -583,7 +585,18 @@ fun HomeNav(){
                         basketFlag = basketFlag,
                         homeNavFlag = homeNavFlag,
                         productFlag = productFlag,
-                        selectedIndex = selectedIndex
+                        selectedIndex = selectedIndex,
+                        orderNumber = orderNumber
+                    )
+                }
+                composable("paymentHistoryList") {
+                    PaymentHistoryList(
+                        navController = navController,
+                        basketFlag = basketFlag,
+                        homeNavFlag = homeNavFlag,
+                        productFlag = productFlag,
+                        selectedIndex = selectedIndex,
+                        orderNumber = orderNumber
                     )
                 }
             }

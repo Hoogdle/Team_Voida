@@ -4,6 +4,7 @@ import android.util.Log
 import android.widget.Space
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -115,7 +116,8 @@ fun PaymentHistory(
     basketFlag: MutableState<Boolean>,
     homeNavFlag: MutableState<Boolean>,
     productFlag: MutableState<Boolean>,
-    selectedIndex: MutableState<Int>
+    selectedIndex: MutableState<Int>,
+    orderNumber: MutableState<String>
 ) {
 
     val scrollState = rememberScrollState()
@@ -153,7 +155,6 @@ fun PaymentHistory(
     ) {
         Notification("현재 등록된 카드에서 결제한 기록을 확인할 수 있습니다. 아래에 현재 등록된 카드와 결제 내역을 확인하세요.")
 
-        Spacer(Modifier.height(10.dp))
         Text(
             modifier = Modifier
                 .padding(
@@ -204,7 +205,9 @@ fun PaymentHistory(
                 time = it.time,
                 orderNum = it.orderNum,
                 price = it.price,
-                flag = it.flag
+                flag = it.flag,
+                orderNumberSetter = orderNumber,
+                navController = navController
             )
             Spacer(Modifier.height(10.dp))
         }
@@ -220,7 +223,9 @@ fun PaymentHistoryItem(
     time: String,
     orderNum: String,
     price: String,
-    flag: Int // 0 -> Buy, 1 -> Refund
+    flag: Int,// 0 -> Buy, 1 -> Refund
+    orderNumberSetter: MutableState<String>,
+    navController: NavController
 ){
     val floatPrice = price.toFloat()
     val textPrice = DecimalFormat("#,###", DecimalFormatSymbols(Locale.US)).format(floatPrice)
@@ -239,6 +244,12 @@ fun PaymentHistoryItem(
             .height(
                 80.dp
             )
+            .clickable {
+                if (flag ==1){
+                orderNumberSetter.value = orderNum
+                navController.navigate("paymentHistoryList")
+                    }
+            }
 
     ){
         Row(

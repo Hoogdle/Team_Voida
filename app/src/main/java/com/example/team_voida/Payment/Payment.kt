@@ -167,9 +167,13 @@ fun Payment(
 
             Spacer(Modifier.height(15.dp))
 
-            PaymentAddress()
+            PaymentAddress(
+                editable = true
+            )
             Spacer(Modifier.height(7.dp))
-            PaymentContact()
+            PaymentContact(
+                editable = true
+            )
             Spacer(Modifier.height(15.dp))
 
             var num = 0
@@ -193,7 +197,9 @@ fun Payment(
 
 // 배송지 주소 컴포저블
 @Composable
-fun PaymentAddress(){
+fun PaymentAddress(
+    editable: Boolean
+){
     Column(
         modifier = Modifier
             .semantics(mergeDescendants = true){
@@ -250,39 +256,42 @@ fun PaymentAddress(){
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 )
             )
-            Button(
-                onClick = {},
-                modifier = Modifier
-                    .size(30.dp)
-                    .width(1.dp)
-                    .offset(
-                        x = -10.dp,
-                        y = 20.dp
-                    )
-                ,
-                colors = ButtonColors(
-                    containerColor = Color.Transparent,
-                    contentColor = Color.Transparent,
-                    disabledContentColor = Color.Transparent,
-                    disabledContainerColor = Color.Transparent
-                ),
-                contentPadding = PaddingValues(0.dp)
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.payment_edit),
-                    contentDescription = "배송지 수정 버튼",
+            if(editable){
+                Button(
+                    onClick = {},
                     modifier = Modifier
+                        .size(30.dp)
+                        .width(1.dp)
+                        .offset(
+                            x = -10.dp,
+                            y = 20.dp
+                        )
+                    ,
+                    colors = ButtonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = Color.Transparent,
+                        disabledContentColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent
+                    ),
+                    contentPadding = PaddingValues(0.dp)
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.payment_edit),
+                        contentDescription = "배송지 수정 버튼",
+                        modifier = Modifier
 
-                )
+                    )
+                }
             }
-
         }
     }
 }
 
 // 연락처 정보 컴포저블
 @Composable
-fun PaymentContact(){
+fun PaymentContact(
+    editable: Boolean
+){
     Column(
         modifier = Modifier
             .semantics(mergeDescendants = true){
@@ -339,32 +348,33 @@ fun PaymentContact(){
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 )
             )
-            Button(
-                onClick = {},
-                modifier = Modifier
-                    .size(30.dp)
-                    .width(1.dp)
-                    .offset(
-                        x = -10.dp,
-                        y = 20.dp
-                    )
-                ,
-                colors = ButtonColors(
-                    containerColor = Color.Transparent,
-                    contentColor = Color.Transparent,
-                    disabledContentColor = Color.Transparent,
-                    disabledContainerColor = Color.Transparent
-                ),
-                contentPadding = PaddingValues(0.dp)
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.payment_edit),
-                    contentDescription = "연락처 수정 버튼",
+            if(editable){
+                Button(
+                    onClick = {},
                     modifier = Modifier
+                        .size(30.dp)
+                        .width(1.dp)
+                        .offset(
+                            x = -10.dp,
+                            y = 20.dp
+                        )
+                    ,
+                    colors = ButtonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = Color.Transparent,
+                        disabledContentColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent
+                    ),
+                    contentPadding = PaddingValues(0.dp)
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.payment_edit),
+                        contentDescription = "연락처 수정 버튼",
+                        modifier = Modifier
 
-                )
+                    )
+                }
             }
-
         }
     }
 }
