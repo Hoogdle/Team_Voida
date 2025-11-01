@@ -42,7 +42,7 @@ CREATE TABLE "sessions" (
 
 CREATE TABLE "basket_items" (
   "id" SERIAL PRIMARY KEY,
-  "user_id" TEXT NOT NULL,
+  "user_id" INTEGER NOT NULL,
   "product_id" INTEGER NOT NULL,
   "name" TEXT,
   "img" TEXT,
@@ -76,7 +76,7 @@ CREATE TABLE "card" (
   "user_id" INTEGER,
   "name" TEXT,
   "company" TEXT,
-  "card_code" "CHAR(64)",
+  "card_code" TEXT,
   "date" Date
 );
 
