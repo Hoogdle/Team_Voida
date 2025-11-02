@@ -75,241 +75,242 @@ d_processor = AutoProcessor.from_pretrained(d_vlm_model_name)
 
 # LLM 모델 호출 함수
 def call_llm(review, return_list, stop_event):
-	# LLM 모델 프롬프트 설정 
-	messages = [
+    # LLM 모델 프롬프트 설정
+    messages = [
       {"role": "system", "content": "너는 상품 요약을 수행하는 언어 모델이야"},
       {"role": "user", "content": "아래에 상품에 대한 리뷰 정보가 주어져있어. 주어진 리뷰 정보를 50자 이내의 문장으로, 리뷰를 요약해서 친절하게 존댓말과 함께  설명하는 형태로 요약문을 만들어줘. 최대한 간결하고 빠르게 핵심 정보만을 전달해줘." + review}
   ]
 
-	inputs = llm_tokenizer.apply_chat_template(messages, return_tensors="pt").to(llm_model.device)
-	
+    inputs = llm_tokenizer.apply_chat_template(messages, return_tensors="pt").to(llm_model.device)
 
-	input_ids = llm_tokenizer.apply_chat_template(
+
+    input_ids = llm_tokenizer.apply_chat_template(
     messages,
     tokenize=True,
     add_generation_prompt=True,
     return_tensors="pt"
-	)
+    )
 
-	output = llm_model.generate(
-		input_ids = input_ids.to("cuda"),
-		eos_token_id=llm_tokenizer.eos_token_id,
-		max_new_tokens=128,
-		stop_event = stop_event,
-		do_sample=False,
-	)	
+    output = llm_model.generate(
+        input_ids = input_ids.to("cuda"),
+        eos_token_id=llm_tokenizer.eos_token_id,
+        max_new_tokens=128,
+        stop_event = stop_event,
+        do_sample=False,
+    )
 
-	# AI output 전처리
-	result = (llm_tokenizer.decode(output[0]))
+    # AI output 전처리
+    result = (llm_tokenizer.decode(output[0]))
 
-	start_index = result.find(start_token) + len(start_token)
+    start_index = result.find(start_token) + len(start_token)
 
-	end_index = result.find(end_token) + len(end_token)
-	end_index = result.find(end_token, end_index)
+    end_index = result.find(end_token) + len(end_token)
+    end_index = result.find(end_token, end_index)
 
-	result = result[start_index:end_index]
-	result.replace('\n','')
+    result = result[start_index:end_index]
+    result.replace('\n','')
 
-	return_list.append(result)
+    return_list.append(result)
 
 @router.post("/Review", response_model = schemas.ReviewProvide)
 def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
-	prod = db.query(models.Product).filter(models.Product.id == payload.product_id).first()
-	if not prod:
-		raise HTTPException(status_code=404, detail="Product not found")
+    prod = db.query(models.Review).filter(models.Review.product_id == payload.product_id).first()
+    if not prod:
+        raise HTTPException(status_code=404, detail="Product not found")
 
-	pid = payload.session_id + "_r"
-
-	ai_info = []
-	stop_event = threading.Event()
+    review = f"리뷰1 : {prod.review1}, 리뷰2 : {prod.review2}, 리뷰3 : {prod.review3}"
+    pid = payload.session_id + "_r"
+     
+    ai_info = []
+    stop_event = threading.Event()
 
     # Call AI
-	ai_process = threading.Thread(target = call_llm, args = (re_prod.product_review, ai_info, stop_event))
+    ai_process = threading.Thread(target = call_llm, args = (review, ai_info, stop_event))
 
     # Setting Stop Flag
-	stop_flags[pid] = stop_event
+    stop_flags[pid] = stop_event
     
     # Start and Wait
-	ai_process.start()
-	ai_process.join()
-	
-	return schemas.ReviewProvide(
-			ai_review = ai_info[0])
+    ai_process.start()
+    ai_process.join()
 
-	
+    return schemas.ReviewProvide(
+            ai_review = ai_info[0])
+
+
 @router.post("/Review/Popular", response_model = schemas.ReviewProvide)
 def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
 
-	prod = db.query(models.PopularItem).filter(models.PopularItem.id == payload.product_id).first()
-	re_prod = db.query(models.Product).filter(models.Product.name == prod.name).first()
-	if not prod:
-		raise HTTPException(status_code=404, detail="Product not found")
-	pid = payload.session_id + "_r"
+    prod = db.query(models.PopularItem).filter(models.PopularItem.id == payload.product_id).first()
+    re_prod = db.query(models.Product).filter(models.Product.name == prod.name).first()
+    if not prod:
+        raise HTTPException(status_code=404, detail="Product not found")
+    pid = payload.session_id + "_r"
 
-	ai_info = []
-	stop_event = threading.Event()
+    ai_info = []
+    stop_event = threading.Event()
 
     # Call AI
-	ai_process = threading.Thread(target = call_llm, args = (re_prod.product_review, ai_info, stop_event))
+    ai_process = threading.Thread(target = call_llm, args = (re_prod.product_review, ai_info, stop_event))
 
     # Setting Stop Flag
-	stop_flags[pid] = stop_event
+    stop_flags[pid] = stop_event
     
     # Start and Wait
-	ai_process.start()
-	ai_process.join()
-	
-	return schemas.ReviewProvide(
-			ai_review = ai_info[0])
+    ai_process.start()
+    ai_process.join()
+
+    return schemas.ReviewProvide(
+            ai_review = ai_info[0])
 
 
 @router.post("/Review/BigSale", response_model = schemas.ReviewProvide)
 def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
 
-	prod = db.query(models.BigSaleItem).filter(models.BigSaleItem.id == payload.product_id).first()
-	re_prod = db.query(models.Product).filter(models.Product.name == prod.name).first()
-	if not prod:
-		raise HTTPException(status_code=404, detail="Product not found")
-	pid = payload.session_id + "_r"
+    prod = db.query(models.BigSaleItem).filter(models.BigSaleItem.id == payload.product_id).first()
+    re_prod = db.query(models.Product).filter(models.Product.name == prod.name).first()
+    if not prod:
+        raise HTTPException(status_code=404, detail="Product not found")
+    pid = payload.session_id + "_r"
 
-	ai_info = []
-	stop_event = threading.Event()
+    ai_info = []
+    stop_event = threading.Event()
 
     # Call AI
-	ai_process = threading.Thread(target = call_llm, args = (re_prod.product_review, ai_info, stop_event))
+    ai_process = threading.Thread(target = call_llm, args = (re_prod.product_review, ai_info, stop_event))
 
     # Setting Stop Flag
-	stop_flags[pid] = stop_event
+    stop_flags[pid] = stop_event
     
     # Start and Wait
-	ai_process.start()
-	ai_process.join()
-	
-	return schemas.ReviewProvide(
-			ai_review = ai_info[0])
+    ai_process.start()
+    ai_process.join()
+
+    return schemas.ReviewProvide(
+            ai_review = ai_info[0])
 
 @router.post("/Review/TodaySale", response_model = schemas.ReviewProvide)
 def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
 
-	prod = db.query(models.TodaySaleItem).filter(models.TodaySaleItem.id == payload.product_id).first()
-	re_prod = db.query(models.Product).filter(models.Product.name == prod.name).first()
-	if not prod:
-		raise HTTPException(status_code=404, detail="Product not found")
-	pid = payload.session_id + "_r"
+    prod = db.query(models.TodaySaleItem).filter(models.TodaySaleItem.id == payload.product_id).first()
+    re_prod = db.query(models.Product).filter(models.Product.name == prod.name).first()
+    if not prod:
+        raise HTTPException(status_code=404, detail="Product not found")
+    pid = payload.session_id + "_r"
 
-	ai_info = []
-	stop_event = threading.Event()
+    ai_info = []
+    stop_event = threading.Event()
 
     # Call AI
-	ai_process = threading.Thread(target = call_llm, args = (re_prod.product_review, ai_info, stop_event))
+    ai_process = threading.Thread(target = call_llm, args = (re_prod.product_review, ai_info, stop_event))
 
     # Setting Stop Flag
-	stop_flags[pid] = stop_event
+    stop_flags[pid] = stop_event
     
     # Start and Wait
-	ai_process.start()
-	ai_process.join()
-	
-	return schemas.ReviewProvide(
-			ai_review = ai_info[0])
+    ai_process.start()
+    ai_process.join()
+
+    return schemas.ReviewProvide(
+            ai_review = ai_info[0])
 
 @router.post("/Review/New", response_model = schemas.ReviewProvide)
 def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
 
-	prod = db.query(models.NewItem).filter(models.NewItem.id == payload.product_id).first()
-	re_prod = db.query(models.Product).filter(models.Product.name == prod.name).first()
-	if not prod:
-		raise HTTPException(status_code=404, detail="Product not found")
-	
-	pid = payload.session_id + "_r"
+    prod = db.query(models.NewItem).filter(models.NewItem.id == payload.product_id).first()
+    re_prod = db.query(models.Product).filter(models.Product.name == prod.name).first()
+    if not prod:
+        raise HTTPException(status_code=404, detail="Product not found")
 
-	ai_info = []
-	stop_event = threading.Event()
+    pid = payload.session_id + "_r"
+
+    ai_info = []
+    stop_event = threading.Event()
 
     # Call AI
-	ai_process = threading.Thread(target = call_llm, args = (re_prod.product_review, ai_info, stop_event))
+    ai_process = threading.Thread(target = call_llm, args = (re_prod.product_review, ai_info, stop_event))
 
     # Setting Stop Flag
-	stop_flags[pid] = stop_event
+    stop_flags[pid] = stop_event
     
     # Start and Wait
-	ai_process.start()
-	ai_process.join()
-	
-	return schemas.ReviewProvide(
-			ai_review = ai_info[0])
+    ai_process.start()
+    ai_process.join()
+
+    return schemas.ReviewProvide(
+            ai_review = ai_info[0])
 
 # vlm 모델 호출 함수
 def call_ai(name, info, img, return_list, stop_event):
-	# 모델에 사용되는 프롬프트 설정
+    # 모델에 사용되는 프롬프트 설정
 
-	if(img[0] == '\"'): image_url = img[1:-1]
-	else: image_url = img
+    if(img[0] == '\"'): image_url = img[1:-1]
+    else: image_url = img
 
-	# For Debugging	
-	print(image_url)
+    # For Debugging
+    print(image_url)
 
-	conversation = [
+    conversation = [
     {
         "role": "user",
         "content": [
-			{"type" : "image", "url" : image_url},
+            {"type" : "image", "url" : image_url},
             {"type": "text", "text": "상품명 : " +name+ "먼저, 주어진 상품 이미지 정보를 잘 분석해주고, 주요 정보만을 추출하여 500자 이내에 상품 설명문 만들어줘, 이미지의 내용을 그대로 읽는게 아니라  상품을 '설명하는' 느낌으로 핵심 정보만을 잘 추출해서 만들어줘. 주로 글자로 구성된 이미지의 경우에는 텍스트를 잘 추출해서 핵심 정보만을 살려서 요약문을 만들어줘, 정보를 요약해야 한다는거 잊지마."},
         ],
     },
     ]
 
-	inputs = processor.apply_chat_template(
-		conversation,
-		add_generation_prompt = True,
-		tokenize = True,
-		return_dict = True,
-		return_tensors = "pt"
-	).to(vlm_model.device, torch.float16)
-	
-	generate_ids = vlm_model.generate(**inputs, max_new_tokens=512, stop_event=stop_event)
-	generate_ids_trimmed = [
-		out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generate_ids)
-	]
+    inputs = processor.apply_chat_template(
+        conversation,
+        add_generation_prompt = True,
+        tokenize = True,
+        return_dict = True,
+        return_tensors = "pt"
+    ).to(vlm_model.device, torch.float16)
 
-	output = processor.decode(generate_ids_trimmed[0], skip_specail_tokens=True)
-	
-	return_list.append(output.strip("<|im_end|>"))
+    generate_ids = vlm_model.generate(**inputs, max_new_tokens=512, stop_event=stop_event)
+    generate_ids_trimmed = [
+        out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generate_ids)
+    ]
+
+    output = processor.decode(generate_ids_trimmed[0], skip_specail_tokens=True)
+
+    return_list.append(output.strip("<|im_end|>"))
 
 # Call Detailed VLM
 def d_call_ai(name, info, img, return_list, stop_event):
-	# 모델에 사용되는 프롬프트 설정
+    # 모델에 사용되는 프롬프트 설정
 
-	if(img[0] == '\"'): image_url = img[1:-1]
-	else: image_url = img
+    if(img[0] == '\"'): image_url = img[1:-1]
+    else: image_url = img
 
 
-	conversation = [
+    conversation = [
     {
         "role": "user",
         "content": [
-			{"type" : "image", "url" : image_url},
+            {"type" : "image", "url" : image_url},
             {"type": "text", "text": "상품명 : " +name+ "먼저, 주어진 상품 이미지 정보를 잘 분석해주고, 주요 정보만을 추출하여 500자 이내에 상품 설명문 만들어줘, 이미지의 내용을 그대로 읽는게 아니라  상품을 '설명하는' 느낌으로 핵심 정보만을 잘 추출해서 만들어줘. 주로 글자로 구성된 이미지의 경우에는 텍스트를 잘 추출해서 핵심 정보만을 살려서 요약문을 만들어줘, 정보를 요약해야 한다는거 잊지마."},
         ],
     },
     ]
 
-	inputs = d_processor.apply_chat_template(
-		conversation,
-		add_generation_prompt = True,
-		tokenize = True,
-		return_dict = True,
-		return_tensors = "pt"
-	).to(d_vlm_model.device, torch.float16)
-	
-	generate_ids = d_vlm_model.generate(**inputs, max_new_tokens=512, stop_event = stop_event)
-	generate_ids_trimmed = [
-		out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generate_ids)
-	]
+    inputs = d_processor.apply_chat_template(
+        conversation,
+        add_generation_prompt = True,
+        tokenize = True,
+        return_dict = True,
+        return_tensors = "pt"
+    ).to(d_vlm_model.device, torch.float16)
 
-	output = d_processor.decode(generate_ids_trimmed[0], skip_specail_tokens=True)
-	
-	return_list.append(output.strip("<|im_end|>"))
+    generate_ids = d_vlm_model.generate(**inputs, max_new_tokens=512, stop_event = stop_event)
+    generate_ids_trimmed = [
+        out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generate_ids)
+    ]
+
+    output = d_processor.decode(generate_ids_trimmed[0], skip_specail_tokens=True)
+
+    return_list.append(output.strip("<|im_end|>"))
 
 
 # 사용자가 요청 상품 정보의 아이디로 조회하여 해당 상품의 정보 제공
@@ -318,7 +319,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     prod = db.query(models.Product).filter(models.Product.id == payload.product_id).first()
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
-	
+
     pid = payload.session_id + "_p"
 
     ai_info = []
@@ -505,7 +506,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     prod = db.query(models.BigSaleItem).filter(models.BigSaleItem.id == payload.product_id).first()
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
-	
+
     pid = payload.session_id + "_p"
 
     ai_info = []
@@ -538,7 +539,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     prod = db.query(models.BigSaleItem).filter(models.BigSaleItem.id == payload.product_id).first()
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
-	
+
     pid = payload.session_id + "_d"
 
     ai_info = []
@@ -571,7 +572,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     prod = db.query(models.TodaySaleItem).filter(models.TodaySaleItem.id == payload.product_id).first()
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
-	
+
     pid = payload.session_id + "_p"
 
     ai_info = []
@@ -604,7 +605,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     prod = db.query(models.TodaySaleItem).filter(models.TodaySaleItem.id == payload.product_id).first()
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
-	
+
     pid = payload.session_id + "_d"
 
     ai_info = []
@@ -638,7 +639,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     prod = db.query(models.NewItem).filter(models.NewItem.id == payload.product_id).first()
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
-	
+
     pid = payload.session_id + "_p"
 
     ai_info = []
@@ -671,7 +672,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     prod = db.query(models.NewItem).filter(models.NewItem.id == payload.product_id).first()
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
-	
+
     pid = payload.session_id + "_d"
 
     ai_info = []
