@@ -11,16 +11,16 @@ router = APIRouter(prefix="", tags=["Basket"])
 
 # 바스켓 아이템을 갖고오는 헬퍼 함수
 def serialize_basket_items(user_id: int, db: Session) -> List[schemas.BasketItem]:
-    items = db.query(models.Basket).filter(models.Basket.user_id == user_id).all()
-    items.sort(key = lambda x : x.date_time, reverse = True)
+    items = db.query(models.BasketItem).filter(models.BasketItem.user_id == user_id).all()
+    items.sort(key = lambda x : x.created_at, reverse = True)
 
     return [
         schemas.BasketItem(
             product_id=item.product.id,
-            img=item.product.image_url,
-            name=item.product.name,
+            img=item.product.img,
+            name=item.product.title,
             price=item.product.price,
-            number=item.quantity
+            number=item.number
         )
         for item in items
     ]
@@ -37,11 +37,11 @@ def get_basket(payload: schemas.BasketRequest,db: Session = Depends(get_db)):
 def add_to_basket(payload: schemas.BasketModifyRequest,db: Session = Depends(get_db)):
 
 	user = check_session(db,payload.session_id)
-	basket_item = db.query(models.Basket).filter_by(user_id=user.id, product_id=payload.product_id).first()
+	basket_item = db.query(models.BasketItem).filter_by(user_id=user.id, product_id=payload.product_id).first()
 	if basket_item:
-		basket_item.quantity += 1
+		basket_item.number += 1
 	else:
-		basket_item = models.Basket(user_id=user.id, product_id=payload.product_id, quantity=1)
+		basket_item = models.BasketItem(user_id=user.id, product_id=payload.product_id, number=1)
 		db.add(basket_item)
 	db.commit()
 	return serialize_basket_items(user.id, db)
@@ -51,12 +51,15 @@ def add_to_basket(payload: schemas.BasketModifyRequest,db: Session = Depends(get
 def subtract_from_basket(payload: schemas.BasketModifyRequest,db: Session = Depends(get_db)):
 
 	user = check_session(db, payload.session_id)
-	basket_item = db.query(models.Basket).filter_by(user_id=user.id, product_id=payload.product_id).first()
-	if not basket_item or basket_item.quantity <= 0:
+	basket_item = db.query(models.BasketItem).filter_by(user_id=user.id, product_id=payload.product_id).first()
+
+	if not basket_item or basket_item.number <= 0:
 		raise HTTPException(status_code=400, detail="Item not in basket")
-	basket_item.quantity -= 1
-	if basket_item.quantity == 0:
+
+	basket_item.number -= 1
+	if basket_item.number == 0:
 		db.delete(basket_item)
+
 	db.commit()
 	return serialize_basket_items(user.id, db)
 
@@ -65,10 +68,12 @@ def subtract_from_basket(payload: schemas.BasketModifyRequest,db: Session = Depe
 def delete_from_basket(payload: schemas.BasketModifyRequest, db: Session = Depends(get_db)):
 
 	user = check_session(db, payload.session_id)
-	basket_item = db.query(models.Basket).filter_by(user_id=user.id, product_id=payload.product_id).first()
+	basket_item = db.query(models.BasketItem).filter_by(user_id=user.id, product_id=payload.product_id).first()
+
 	if basket_item:
 		db.delete(basket_item)
 		db.commit()
+
 	return serialize_basket_items(user.id, db)
 
 # 상품 페이지에서 아이템 단 하나 추가하는 함수
@@ -76,11 +81,12 @@ def delete_from_basket(payload: schemas.BasketModifyRequest, db: Session = Depen
 def insert_to_basket(payload: schemas.BasketInsertRequest, db: Session = Depends(get_db)):
 
 	user = check_session(db,payload.session_id)
-	new_item = models.Basket(user_id=user.id, product_id=payload.product_id, quantity=1)
+	new_item = models.BasketItem(user_id=user.id, product_id=payload.product_id, number=1)
 	db.add(new_item)
 	db.commit()
 	return {"detail": "Inserted successfully"}
 
+'''
 # 인기 카테고리에 속하는 아이템을 장바구니에 추가하는 함수
 @router.post("/BasketInsert/Popular", response_model=dict)
 def insert_to_basket(payload: schemas.BasketInsertRequest, db: Session = Depends(get_db)):
@@ -132,5 +138,4 @@ def insert_to_basket(payload: schemas.BasketInsertRequest, db: Session = Depends
 	db.add(new_item)
 	db.commit()
 	return {"detail": "Inserted successfully"}
-
-
+'''
