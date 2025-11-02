@@ -16,7 +16,7 @@ def search_items(payload: schemas.SearchRequest, db: Session = Depends(get_db)):
     q = f"%{payload.search}%"
     results = (
         db.query(models.Product)
-        .filter(models.Product.name.ilike(q))
+        .filter(models.Product.title.ilike(q))
         .limit(20)
         .all()
     )
@@ -26,8 +26,8 @@ def search_items(payload: schemas.SearchRequest, db: Session = Depends(get_db)):
     return [
         schemas.ProductSummary(
             product_id=item.id,
-            img=item.image_url,
-            name=item.name,
+            img=item.img,
+            name=item.title,
             price=item.price,
         )
         for item in results

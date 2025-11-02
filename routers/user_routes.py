@@ -30,7 +30,7 @@ def sign_up(payload: schemas.SignUpRequest, db: Session = Depends(get_db)):
         email=payload.email,
         pw=hashed_pw.decode("utf-8"),
         cell=payload.cell,
-	un=payload.un,
+	    un=payload.un,
         address=""
     )
     db.add(new_user)
