@@ -384,57 +384,124 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
 # 현재는 '야채' 카테고리만 구현됨
 @router.get("/CategoriesItems/{category}", response_model=List[schemas.ProductSummary])
 def category_items(category: str, db: Session = Depends(get_db)):
-    category = "\"" + category + "\""
     results = db.query(models.Product).filter(models.Product.category == category).all()
+
+    result = [
+        schemas.ProductSummary(
+            id = item.id,
+            name = item.title,
+            description = item.description,
+            price = float(item.price),
+            image_url = item.img,
+            category = item.category
+        )
+        for item in results
+    ]
 
     if not results:
         raise HTTPException(status_code=404, detail=f"No items in category '{category}'")
 
-    return results
+    return result
 
 # Popular Items
 # 아래의 각 카테고리 로직은 모두 동일 Bigslae, New...
 @router.get("/PopularItems", response_model=List[schemas.ProductSummary])
 def get_big_sale_items(db: Session = Depends(get_db)):
-    items = db.query(models.PopularItem).all()
+    items = db.query(models.Home).filter(models.Home.sector == 1).all()
+    filtering = [item.product_id for item in items]
+
+    items = db.query(models.Product).filter(models.Product.id.in_(filtering)).all()
 
     if not items:
-        raise HTTPException(status_code=404, detail="No big sale items found")
+        raise HTTPException(status_code=404, detail="Popular Not found")
 
-    return items
+    result = [
+        schemas.ProductSummary(
+            id = item.id,
+            name = item.title,
+            description = item.description,
+            price = float(item.price),
+            image_url = item.img
+        )
+        for item in items
+    ]
+    return result
 
 
 
 # Big Sale Items
 @router.get("/BigSaleItems", response_model=List[schemas.ProductSummary])
 def get_big_sale_items(db: Session = Depends(get_db)):
-    items = db.query(models.BigSaleItem).all()
-    if not items:
-        raise HTTPException(status_code=404, detail="No big sale items found")
+    items = db.query(models.Home).filter(models.Home.sector == 2).all()
+    filtering = [item.product_id for item in items]
 
-    return items
+    items = db.query(models.Product).filter(models.Product.id.in_(filtering)).all()
+
+    if not items:
+        raise HTTPException(status_code=404, detail="Popular Not found")
+
+    result = [
+        schemas.ProductSummary(
+            id=item.id,
+            name=item.title,
+            description=item.description,
+            price=float(item.price),
+            image_url=item.img
+        )
+        for item in items
+    ]
+    return result
 
 
 # Today Sale Items
 @router.get("/TodaySaleItems", response_model=List[schemas.ProductSummary])
 def get_today_sale_items(db: Session = Depends(get_db)):
-    items = db.query(models.TodaySaleItem).all()
-    if not items:
-        raise HTTPException(status_code=404, detail="No today sale items found")
+    items = db.query(models.Home).filter(models.Home.sector == 3).all()
+    filtering = [item.product_id for item in items]
 
-    return items
+    items = db.query(models.Product).filter(models.Product.id.in_(filtering)).all()
+
+    if not items:
+        raise HTTPException(status_code=404, detail="Popular Not found")
+
+    result = [
+        schemas.ProductSummary(
+            id=item.id,
+            name=item.title,
+            description=item.description,
+            price=float(item.price),
+            image_url=item.img
+        )
+        for item in items
+    ]
+    return result
 
 
 # New Items
 @router.get("/NewItems", response_model=List[schemas.ProductSummary])
 def get_new_items(db: Session = Depends(get_db)):
-    items = db.query(models.NewItem).all()
+    items = db.query(models.Home).filter(models.Home.sector == 4).all()
+    filtering = [item.product_id for item in items]
+
+    items = db.query(models.Product).filter(models.Product.id.in_(filtering)).all()
+
     if not items:
-        raise HTTPException(status_code=404, detail="No new items found")
+        raise HTTPException(status_code=404, detail="Popular Not found")
 
-    return items
+    result = [
+        schemas.ProductSummary(
+            id=item.id,
+            name=item.title,
+            description=item.description,
+            price=float(item.price),
+            image_url=item.img
+        )
+        for item in items
+    ]
+    return result
 
 
+'''
 # Product Info by ID
 @router.post("/PopularProductInfo", response_model=schemas.ProductDetail)
 def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db)):
@@ -698,6 +765,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
         ai_info = ai_info[0],
         ai_review = ""
     )
+'''
 
 # Product Info by ID
 @router.post("/CancelAI")
