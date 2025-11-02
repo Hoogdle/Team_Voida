@@ -12,8 +12,8 @@ def basket_payment(payload: schemas.BasketPayment, db: Session = Depends(get_db)
 
 	# 세션 아이디를 통해 유저 정보확인
 	user = check_session(db,payload.session_id)
-	basket_items = db.query(models.Basket).filter(models.Basket.user_id == user.id).all()
-	basket_items.sort(key = lambda x : x.date_time, reverse = True)	
+	basket_items = db.query(models.BasketItem).filter(models.BasketItem.user_id == user.id).all()
+	basket_items.sort(key = lambda x : x.created_at, reverse = True)
 
 	if not basket_items:
 		raise HTTPException(status_code=404, detail="No items in basket")
@@ -21,16 +21,15 @@ def basket_payment(payload: schemas.BasketPayment, db: Session = Depends(get_db)
 	items = [
         schemas.BasketItem(
             product_id=item.product.id,
-            img=item.product.image_url,
-            name=item.product.name,
+            img=item.product.img,
+            name=item.product.title,
             price=item.product.price,
-            number=item.quantity
+            number=item.number
         )
         for item in basket_items
     ]
 
-	# 배송지 정보와 추출된 상품 정보 제공
-	# 배송지 정보 및 연락처 정보는 추후 구현 필요
+	# TODO, apply user info
 	return schemas.PaymentResponse(
         address= "서울특별시 서대문구 북아현로 12",
         phone= "010-1234-5678",
@@ -43,7 +42,7 @@ def basket_payment(payload: schemas.BasketPayment, db: Session = Depends(get_db)
 def one_item_payment(payload: schemas.OneItemRequest, db: Session = Depends(get_db)):
 
 	user = check_session(db,payload.session_id)
-	profile = db.query(models.UserProfile).filter(models.UserProfile.id == user.id).first()
+	profile = db.query(models.User).filter(models.User.id == user.id).first()
 
 	if not profile:
 		raise HTTPException(status_code=404, detail="User profile not found")
@@ -58,42 +57,15 @@ def one_item_payment(payload: schemas.OneItemRequest, db: Session = Depends(get_
         email="xodud7737@gmail.com",
         item=[schemas.BasketItem(
             product_id=prod.id,
-            img=prod.image_url,
-            name=prod.name,
+            img=prod.img,
+            name=prod.title,
             price=prod.price,
             number=1
         )]
     )
 
 
-
-@router.post("/OneItemPayment", response_model=schemas.OneItemPaymentResponse)
-def one_item_payment(payload: schemas.OneItemRequest, db: Session = Depends(get_db)):
-
-	user = check_session(db,payload.session_id)
-	profile = db.query(models.UserProfile).filter(models.UserProfile.id == user.id).first()
-
-	if not profile:
-		raise HTTPException(status_code=404, detail="User profile not found")
-
-	prod = db.query(models.Product).get(payload.product_id)
-	if not prod:
-		raise HTTPException(status_code=404, detail="Product not found")
-
-	return schemas.OneItemPaymentResponse(
-        address="서울특별시 서대문구 북아현로 12" ,
-        phone="010-1234-5678" ,
-        email="xodud7737@gmail.com",
-        item=[schemas.BasketItem(
-            product_id=prod.id,
-            img=prod.image_url,
-            name=prod.name,
-            price=prod.price,
-            number=1
-        )]
-    )
-
-
+'''
 # 단일 상품 중 인기상품 결제시 사용되는 함수
 # BigSale, New... 모두 같은 로직 사용
 # DB를 초기 다소 복잡하게 설계하여 로직 또한 약간 꼬이는 문제발생
@@ -228,4 +200,4 @@ def one_item_payment(payload: schemas.OneItemRequest, db: Session = Depends(get_
             number=1
         )]
     )
-
+'''
