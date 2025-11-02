@@ -315,10 +315,13 @@ def d_call_ai(name, info, img, return_list, stop_event):
     return_list.append(output.strip("<|im_end|>"))
 
 
-# 사용자가 요청 상품 정보의 아이디로 조회하여 해당 상품의 정보 제공
 @router.post("/ProductInfo", response_model=schemas.ProductDetail)
 def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db)):
     prod = db.query(models.Product).filter(models.Product.id == payload.product_id).first()
+    img = db.query(models.Image).filter(models.Image.product_id == payload.product_id).all()
+
+
+    # TODO 큰사이즈 사진 처리, 일단은 1장 처리하게 구현
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
 
@@ -328,7 +331,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     stop_event = threading.Event()
 
     # Call AI
-    ai_process = threading.Thread(target = call_ai, args = (prod.title,prod.description, prod.img_info, ai_info, stop_event))
+    ai_process = threading.Thread(target = call_ai, args = (prod.title,prod.description, img.image_url, ai_info, stop_event))
 
     # Setting Stop Flag
     stop_flags[pid] = stop_event
@@ -352,6 +355,8 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
 @router.post("/ProductDetailedInfo", response_model=schemas.ProductDetail)
 def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db)):
     prod = db.query(models.Product).filter(models.Product.id == payload.product_id).first()
+    img = db.query(models.Image).filter(models.Image.product_id == payload.product_id).all()
+
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
     pid = payload.session_id + "_d"
@@ -360,7 +365,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     stop_event = threading.Event()
 
     # Call AI
-    ai_process = threading.Thread(target = d_call_ai, args = (prod.title,prod.description, prod.img_info, ai_info, stop_event))
+    ai_process = threading.Thread(target = d_call_ai, args = (prod.title,prod.description, img.image_url, ai_info, stop_event))
 
     # Setting Stop Flag
     stop_flags[pid] = stop_event
