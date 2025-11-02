@@ -20,12 +20,13 @@ def get_current_user(
     return user
 
 def check_session(db,session_id = None):
-	if not session_id:
-		raise HTTPException(status_code=401, detail="Unauthorized")
+    if not session_id:
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
-	user = db.query(models.User).filter_by(session_id=session_id).first()
-	if not user:
-		raise HTTPException(status_code=401, detail="Invalid session")
+    session = db.query(models.Session).filter_by(session_id=session_id).first()
+    user = db.query(models.User).filter(models.User.id == session.user_id).first()
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid session")
 
-	return user
+    return user
 

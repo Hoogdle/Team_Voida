@@ -1,7 +1,7 @@
 
 from datetime import datetime, date
 from sqlalchemy import (
-    Column, Integer, String, Text, BigInteger, DateTime, Date, ForeignKey
+    Column, Integer, String, Text, BigInteger, DateTime, Date, ForeignKey, Boolean
 )
 from sqlalchemy.orm import relationship, declarative_base
 
@@ -119,6 +119,7 @@ class Order(Base):
     address = Column(Text)
     phone = Column(Text)
     email = Column(Text)
+    is_cancel = Column(Boolean)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="orders")
@@ -136,6 +137,7 @@ class OrderItem(Base):
     product_id = Column(Integer, ForeignKey("products.id", ondelete="SET NULL"))
     quantity = Column(Integer, nullable=False)
     price = Column(BigInteger)
+    is_cancel = Column(Boolean)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     order = relationship("Order", back_populates="order_items")

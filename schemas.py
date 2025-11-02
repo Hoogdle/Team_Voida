@@ -16,7 +16,7 @@ class ProductSummary(BaseModel):
         orm_mode = True
 
 class EmailRequest(BaseModel):
-	email: Optional[str]
+    email: Optional[str]
 
 class ProductIDRequest(BaseModel):
     product_id: int
@@ -54,8 +54,8 @@ class BasketRequest(BaseModel):
     session_id: str
 
 class BasketModifyRequest(BaseModel):
-	session_id: str
-	product_id: int
+    session_id: str
+    product_id: int
 
 
 class BasketInsertRequest(BaseModel):
@@ -83,7 +83,7 @@ class OneItemPaymentResponse(BaseModel):
     item: List[BasketItem]
 
 class BasketPayment(BaseModel):
-	session_id: str
+    session_id: str
 # -------------------- Order --------------------
 class OrderItemCreate(BaseModel):
     product_id: int
@@ -92,22 +92,37 @@ class OrderItemCreate(BaseModel):
 
 
 class OrderCreate(BaseModel):
-    user_id: int
+    session_id: str
+    address: str
+    phone: str
+    email: str
     total_price: float
-    created_at: datetime
     items: List[OrderItemCreate]
+
+class OrderInfoRequest(BaseModel):
+    session_id: str
+    order_num: str
 
 
 class OrderResponse(BaseModel):
-    id: int
-    user_id: int
+    order_num: str
     total_price: float
-    created_at: datetime
+    success: bool
 
     model_config = {
         "from_attributes": True
     }
 
+class OrderList(BaseModel):
+    order_num: str
+    order_date: str # TODO, check the type
+    price: float
+
+class OrderListRequest(BaseModel):
+    session_id: str
+
+class OrderListResponse(BaseModel):
+    order_list: List[OrderList]
 
 class TodaySaleItemResponse(BaseModel):
     id: int
@@ -142,17 +157,17 @@ class UserNameRequest(BaseModel):
     un: str
 
 class ReviewRequest(BaseModel):
-	product_id: int
-	session_id: str
+    product_id: int
+    session_id: str
 
 class ReviewProvide(BaseModel):
-	ai_review: str
+    ai_review: str
 
 class AssistantCategory(BaseModel):
-	voiceInput: str
+    voiceInput: str
 
 class AssistantSearch(BaseModel):
-	voiceInput: str
+    voiceInput: str
 
 class CancelAIRequest(BaseModel):
-	session_id: str
+    session_id: str
