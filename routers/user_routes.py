@@ -52,7 +52,7 @@ def sign_up(payload: schemas.SignUpRequest, db: Session = Depends(get_db)):
 @router.post("/SignIn", response_model=schemas.LoginResponse)
 def sign_in(payload: schemas.LoginRequest, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.email == payload.email).first()
-    if not user or not bcrypt.checkpw(payload.pw.encode("utf-8"), user.password.encode("utf-8")):
+    if not user or not bcrypt.checkpw(payload.pw.encode("utf-8"), user.pw.encode("utf-8")):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
 
     session_id = str(uuid.uuid4())

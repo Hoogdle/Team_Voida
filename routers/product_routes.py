@@ -407,7 +407,7 @@ def category_items(category: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail=f"No items in category '{category}'")
 
     return result
-
+'''
 # Popular Items
 # 아래의 각 카테고리 로직은 모두 동일 Bigslae, New...
 @router.get("/PopularItems", response_model=List[schemas.ProductSummary])
@@ -505,7 +505,7 @@ def get_new_items(db: Session = Depends(get_db)):
     ]
     return result
 
-
+'''
 '''
 # Product Info by ID
 @router.post("/PopularProductInfo", response_model=schemas.ProductDetail)

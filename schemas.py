@@ -10,6 +10,7 @@ class ProductSummary(BaseModel):
     price: Optional[float]
     image_url: Optional[str] = None
     category: Optional[str] = None
+    sector: int
 
     class Config:
         from_attributes = True
