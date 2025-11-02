@@ -1,6 +1,26 @@
-# 네이버 쇼핑 파이프라인
+pen API를 사용하여 상품 정보를 수집하고, 상세 페이지에서 이미지를 다운로드하는 파이프라인입니다.
 
-네이버 쇼핑 Open API를 사용하여 상품 정보를 수집하고, 상세 페이지에서 이미지를 다운로드하는 파이프라인입니다.
+## 기술 스택 및 버전
+
+### Python
+- Python 3.9+ (권장)
+
+### 주요 프레임워크 및 라이브러리
+- **FastAPI**: REST API 서버 (`server.py`)
+- **pydantic**: 데이터 검증 및 모델 정의
+- **httpx**: 비동기 HTTP 클라이언트
+- **aiohttp**: 비동기 HTTP 클라이언트 (파이프라인용)
+- **requests**: 동기 HTTP 클라이언트
+- **psycopg2-binary**: 2.9.9 - PostgreSQL 어댑터
+- **Selenium**: 4.15.2 - 웹 스크래핑 (상세 페이지 수집용)
+- **webdriver-manager**: 4.0.1 - Chrome WebDriver 관리
+- **python-dotenv**: 환경 변수 관리
+- **Pillow**: 이미지 처리
+- **lxml**: HTML 파싱
+- **PostgreSQL**: 데이터베이스
+
+### 버전 정보
+자세한 버전 정보는 `requirements.txt`를 참고하세요.
 
 ## 주요 기능
 
@@ -142,4 +162,6 @@ naver-shop-pipeline/
 ## 라이선스
 
 MIT
+
+
 

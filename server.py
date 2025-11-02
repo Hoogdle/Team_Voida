@@ -1,4 +1,4 @@
-import os, re, io, json, hashlib, asyncio, mimetypes, pathlib, traceback, random, time
+mport os, re, io, json, hashlib, asyncio, mimetypes, pathlib, traceback, random, time
 from pathlib import Path
 from typing import Optional, Tuple, List
 from datetime import datetime
@@ -97,6 +97,7 @@ CREATE TABLE IF NOT EXISTS images (
 
 ALTER TABLE products ADD COLUMN IF NOT EXISTS product_url TEXT;
 CREATE UNIQUE INDEX IF NOT EXISTS ux_products_product_url ON products(product_url);
+ALTER TABLE products ADD COLUMN IF NOT EXISTS img TEXT;
 ALTER TABLE products ADD COLUMN IF NOT EXISTS description TEXT;
 ALTER TABLE products ADD COLUMN IF NOT EXISTS ai_info TEXT;
 ALTER TABLE products ADD COLUMN IF NOT EXISTS ai_review TEXT;
@@ -149,10 +150,11 @@ def _to_int_safe(x) -> Optional[int]:
         return None
 
 # =======================
-# 파싱 유틸 (jpg/png만)
+# 파싱 유틸 (jpg/png 기반에서 webp, gif 추가)
 # =======================
+# 이미지 확장자 추가
 IMG_URL_RE = re.compile(
-    r'https?://[^\s"\'<>]+\.(?:jpg|jpeg|png)(?:\?[^\s"\'<>]*)?',
+    r'https?://[^\s"\'<>]+\.(?:jpg|jpeg|png|webp|gif)(?:\?[^\s"\'<>]*)?',
     re.IGNORECASE
 )
 
@@ -348,6 +350,29 @@ WHERE product_id=%s AND image_url=%s;
 """
 
 # =======================
+# Review 업서트 함수
+# =======================
+UPSERT_REVIEW_SQL = """
+INSERT INTO "review" ("product_id", "review1", "review2", "review3")
+VALUES (%s, %s, %s, %s)
+ON CONFLICT ("product_id") DO UPDATE
+SET "review1" = EXCLUDED."review1",
+    "review2" = EXCLUDED."review2",
+    "review3" = EXCLUDED."review3";
+"""
+
+def save_top3_reviews(product_id: int, reviews: List[str]) -> None:
+    """리뷰 리스트(최대 3개)를 받아 DB에 업서트."""
+    r1, r2, r3 = (reviews + [None, None, None])[:3]
+    conn = db()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(UPSERT_REVIEW_SQL, (product_id, r1, r2, r3))
+        conn.commit()
+    finally:
+        conn.close()
+
+# =======================
 # 이미지 다운로드
 # =======================
 async def fetch_image(client: httpx.AsyncClient, url: str):
@@ -355,7 +380,8 @@ async def fetch_image(client: httpx.AsyncClient, url: str):
         r = await client.get(url, headers=client.headers, follow_redirects=True, timeout=TIMEOUT)
         if r.status_code == 200:
             ct = (r.headers.get("Content-Type") or "").lower()
-            if ct.startswith("image/jpeg") or ct.startswith("image/png"):
+            if ct.startswith("image/jpeg") or ct.startswith("image/png") \
+               or ct.startswith("image/webp") or ct.startswith("image/gif"):
                 return r.content, ct
     except Exception:
         return None, None
@@ -372,6 +398,8 @@ async def download_images(product_id: int, urls: List[str]):
                 await pace_by_host(u)
                 await asyncio.sleep(random.uniform(0, 0.2))
                 client.headers["User-Agent"] = pick_ua()
+
+                client.headers["Referer"] = "https://smartstore.naver.com/"
 
                 content, ct = await fetch_image(client, u)
                 if not content:
@@ -568,6 +596,11 @@ class AssistantSearch(BaseModel):
 class CancelAIRequest(BaseModel):
     session_id: str
 
+# -------------------- Review --------------------
+class ReviewIn(BaseModel):
+    product_id: int
+    reviews: list[str]  # 최대 3개 넣어주세요.
+
 # =======================
 # VLM summary generator (optional)
 # =======================
@@ -730,10 +763,9 @@ def list_products(search: Optional[str] = None) -> List[ProductSummary]:
                p.title AS name,
                p.description,
                p.price::float AS price,
-               (
-                 SELECT i.image_url FROM images i
-                  WHERE i.product_id = p.id AND COALESCE(i.status,'pending') = 'ok'
-                  ORDER BY i.id ASC LIMIT 1
+               COALESCE( 
+                (SELECT i.image_url FROM images i WHERE i.product_id = p.id AND COALESCE(i.status,'pending') = 'ok' ORDER BY i.id ASC LIMIT 1),
+                p.img
                ) AS image_url,
                p.category
           FROM products p
@@ -781,11 +813,14 @@ def get_product_detail(product_id: int) -> ProductDetail:
                    p.price::float AS price,
                    p.ai_info,
                    p.ai_review,
+                   COALESCE(
                    (
                      SELECT i.image_url FROM images i
                       WHERE i.product_id = p.id AND COALESCE(i.status,'pending') = 'ok'
                       ORDER BY i.id ASC LIMIT 1
-                   ) AS image_url,
+                   ),
+                   p.img
+                ) AS image_url,
                    p.category
               FROM products p
              WHERE p.id = %s
@@ -811,3 +846,10 @@ def get_product_detail(product_id: int) -> ProductDetail:
             ai_info=ai_info or "",
             ai_review=ai_review or "",
         )
+
+@app.post("/reviews/upsert")
+def upsert_reviews(payload: ReviewIn = Body(...)):
+    """리뷰를 업서트하는 엔드포인트. 최대 3개의 리뷰를 받아서 저장합니다."""
+    save_top3_reviews(payload.product_id, payload.reviews)
+    return {"ok": True, "product_id": payload.product_id, "count": len(payload.reviews)}
+
