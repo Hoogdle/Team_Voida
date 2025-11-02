@@ -11,6 +11,7 @@ val sampleSearchResult = Array(50){
         description = "",
         name = "[KF365] 대추방울토마토 750g",
         price = 6990f,
-        category = ""
+        category = "",
+        sector = 0
     )
 }

@@ -109,6 +109,7 @@ fun Home(
     // 임시로 result를 공통으로 사용
 
     if(result != null){
+        Log.e("home","get item")
         Column (
             modifier = Modifier
                 .fillMaxSize()
@@ -124,7 +125,9 @@ fun Home(
             HomePopularRanking(navController,isWhichPart,1,isItemWhichPart)
             if (result != null) {
                 HomeProducts(
-                    result = result.slice(0..9),
+                    result = result.filter {
+                        it.sector == 1
+                    },
                     productID = productID,
                     navController = navController,
                     isItemWhichPart = isItemWhichPart,
@@ -143,7 +146,9 @@ fun Home(
             )
             if (result != null) {
                 HomeProducts(
-                    result = result.slice(10..19),
+                    result = result.filter {
+                        it.sector == 2
+                    },
                     productID = productID,
                     navController = navController,
                     isItemWhichPart = isItemWhichPart,
@@ -162,7 +167,9 @@ fun Home(
             )
             if (result != null) {
                 HomeProducts(
-                    result = result.slice(20..29),
+                    result = result.filter {
+                        it.sector == 3
+                    },
                     productID = productID,
                     navController = navController,
                     isItemWhichPart = isItemWhichPart,
@@ -181,7 +188,9 @@ fun Home(
             )
             if (result != null) {
                 HomeProducts(
-                    result = result.slice(30..39),
+                    result = result.filter {
+                        it.sector == 4
+                    },
                     productID = productID,
                     navController = navController,
                     isItemWhichPart = isItemWhichPart,
@@ -356,34 +365,37 @@ fun HomeProducts(
             ){
                 if(count != null && index.value <= count){
 
-                    val tmpResult1 = result!![realIndex*2]
-                    val tmpResult2 = result!![realIndex*2+1]
-                    HomeCard(
-                        id = tmpResult1.id,
-                        img = tmpResult1.image_url,
-                        name = tmpResult1.name,
-                        price = tmpResult1.price,
-                        description = tmpResult1.description,
-                        category = tmpResult1.category,
-                        productID = productID,
-                        navController = navController,
-                        isItemWhichPart = isItemWhichPart,
-                        indexRow = indexRow,
-                        barPrice = barPrice
-                    )
-                    HomeCard(
-                        id = tmpResult2.id,
-                        img = tmpResult2.image_url,
-                        name = tmpResult2.name,
-                        price = tmpResult2.price,
-                        description = tmpResult2.description,
-                        category = tmpResult2.category,
-                        productID = productID,
-                        navController = navController,
-                        isItemWhichPart = isItemWhichPart,
-                        indexRow = indexRow,
-                        barPrice = barPrice
-                    )
+                    if(realIndex*2 <= count-1 && realIndex*2+1 <= count-1){
+                        val tmpResult1 = result!![realIndex*2]
+                        val tmpResult2 = result!![realIndex*2+1]
+
+                        HomeCard(
+                            id = tmpResult1.id,
+                            img = tmpResult1.image_url,
+                            name = tmpResult1.name,
+                            price = tmpResult1.price,
+                            description = tmpResult1.description,
+                            category = tmpResult1.category,
+                            productID = productID,
+                            navController = navController,
+                            isItemWhichPart = isItemWhichPart,
+                            indexRow = indexRow,
+                            barPrice = barPrice
+                        )
+                        HomeCard(
+                            id = tmpResult2.id,
+                            img = tmpResult2.image_url,
+                            name = tmpResult2.name,
+                            price = tmpResult2.price,
+                            description = tmpResult2.description,
+                            category = tmpResult2.category,
+                            productID = productID,
+                            navController = navController,
+                            isItemWhichPart = isItemWhichPart,
+                            indexRow = indexRow,
+                            barPrice = barPrice
+                        )
+                    }
                 }
             }
         }

@@ -81,7 +81,7 @@ fun HomePartList(
         val job = GlobalScope.launch {
             when(isWhichPart.value){
                 1 -> {
-                    result = HomePopularCall()
+                    result = HomePopularList()
                     isItemWhichPart.value = 1
                 }
                 2 ->{
