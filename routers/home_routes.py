@@ -50,39 +50,117 @@ def read_home(db: Session = Depends(get_db)):
 def read_popular(db: Session = Depends(get_db)):
 
     items = db.query(models.Home).filter(models.Home.sector == 1).limit(20).all()
-    items = db.query(models.Product).filter(models.Product.id.in_(items.product_id)).limit(20)
 
     if not items:
         raise HTTPException(status_code=404, detail="Popular items not found")
+    
+    filterd_id = [item.product_id for item in items]
+    items = db.query(models.Product).filter(models.Product.id.in_(filterd_id)).limit(20)
+
+    result = [
+        schemas.ProductSummary(
+            id = item.id,
+            name = item.title,
+            description=item.description,
+            price = item.price,
+            image_url=item.product_url,
+            category=item.category
+        )
+        for item in items
+    ]
       
     return items
 
 #  할인 카테고리에 속하는 상품 20개 제공
 @router.get("/BigSaleItems", response_model=List[schemas.ProductSummary])
 def read_bigsale(db: Session = Depends(get_db)):
-    items = db.query(models.BigSaleItem).limit(20).all()
+    items = db.query(models.Home).filter(models.Home.sector == 2).limit(20).all()
+
     if not items:
-        raise HTTPException(status_code=404, detail="Big sale items not found")
+        raise HTTPException(status_code=404, detail="BigSaleItems items not found")
+    
+    filterd_id = [item.product_id for item in items]
+    items = db.query(models.Product).filter(models.Product.id.in_(filterd_id)).limit(20)
+
+    result = [
+        schemas.ProductSummary(
+            id = item.id,
+            name = item.title,
+            description=item.description,
+            price = item.price,
+            image_url=item.product_url,
+            category=item.category
+        )
+        for item in items
+    ]
+      
     return items
 
 
 @router.get("/TodaySaleItems", response_model=List[schemas.ProductSummary])
 def read_today_sale(db: Session = Depends(get_db)):
-    items = db.query(models.TodaySaleItem).limit(20).all()
+    items = db.query(models.Home).filter(models.Home.sector == 3).limit(20).all()
+
     if not items:
-        raise HTTPException(status_code=404, detail="Today's sale items not found")
+        raise HTTPException(status_code=404, detail="TodaySaleItems items not found")
+    
+    filterd_id = [item.product_id for item in items]
+    items = db.query(models.Product).filter(models.Product.id.in_(filterd_id)).limit(20)
+
+    result = [
+        schemas.ProductSummary(
+            id = item.id,
+            name = item.title,
+            description=item.description,
+            price = item.price,
+            image_url=item.product_url,
+            category=item.category
+        )
+        for item in items
+    ]
+      
     return items
 
 #  신상품 카테고리에 속하는 상품 20개 제공
 @router.get("/NewItems", response_model=List[schemas.ProductSummary])
 def read_new_items(db: Session = Depends(get_db)):
-    items = db.query(models.NewItem).limit(20).all()
+    items = db.query(models.Home).filter(models.Home.sector == 3).limit(20).all()
+
     if not items:
-        raise HTTPException(status_code=404, detail="New items not found")
+        raise HTTPException(status_code=404, detail="NewItems items not found")
+    
+    filterd_id = [item.product_id for item in items]
+    items = db.query(models.Product).filter(models.Product.id.in_(filterd_id)).limit(20)
+
+    result = [
+        schemas.ProductSummary(
+            id = item.id,
+            name = item.title,
+            description=item.description,
+            price = item.price,
+            image_url=item.product_url,
+            category=item.category
+        )
+        for item in items
+    ]
+      
     return items
+
 # 상품 검색 요청 처리 및 상풍 제공
 @router.post("/SearchItems", response_model=list[ProductSummary])
 async def search_items(request: SearchRequest, db: Session = Depends(get_db)):
     keyword = request.search.lower()
-    results = db.query(Product).filter(Product.name.ilike(f"%{keyword}%")).all()
+    results = db.query(Product).filter(Product.title.ilike(f"%{keyword}%")).all()
+
+    result = [
+        schemas.ProductSummary(
+            id = item.id,
+            name = item.title,
+            description=item.description,
+            price=item.price,
+            image_url=item.product_url,
+            category=item.category
+        )
+        for item in results
+    ]
     return results
