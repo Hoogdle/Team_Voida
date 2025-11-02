@@ -137,7 +137,7 @@ def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
     return schemas.ReviewProvide(
             ai_review = ai_info[0])
 
-
+'''
 @router.post("/Review/Popular", response_model = schemas.ReviewProvide)
 def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
 
@@ -240,6 +240,8 @@ def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
     return schemas.ReviewProvide(
             ai_review = ai_info[0])
 
+'''
+
 # vlm 모델 호출 함수
 def call_ai(name, info, img, return_list, stop_event):
     # 모델에 사용되는 프롬프트 설정
@@ -326,7 +328,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     stop_event = threading.Event()
 
     # Call AI
-    ai_process = threading.Thread(target = call_ai, args = (prod.name,prod.description, prod.img_info, ai_info, stop_event))
+    ai_process = threading.Thread(target = call_ai, args = (prod.title,prod.description, prod.img_info, ai_info, stop_event))
 
     # Setting Stop Flag
     stop_flags[pid] = stop_event
@@ -338,10 +340,9 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
 
     return schemas.ProductDetail(
         product_id=prod.id,
-        name=prod.name,
-        image_url=prod.image_url,
+        name=prod.title,
+        image_url=prod.img,
         price=float(prod.price),
-# change below as ai result
         ai_info = ai_info[0],
         ai_review = ""
     )
@@ -359,7 +360,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     stop_event = threading.Event()
 
     # Call AI
-    ai_process = threading.Thread(target = d_call_ai, args = (prod.name,prod.description, prod.img_info, ai_info, stop_event))
+    ai_process = threading.Thread(target = d_call_ai, args = (prod.title,prod.description, prod.img_info, ai_info, stop_event))
 
     # Setting Stop Flag
     stop_flags[pid] = stop_event
@@ -371,10 +372,9 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
 
     return schemas.ProductDetail(
         product_id=prod.id,
-        name=prod.name,
-        image_url=prod.image_url,
+        name=prod.title,
+        image_url=prod.img,
         price=float(prod.price),
-# change below as ai result
         ai_info = ai_info[0],
         ai_review = ""
     )

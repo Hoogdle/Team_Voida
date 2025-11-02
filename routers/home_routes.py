@@ -36,7 +36,7 @@ def read_home(db: Session = Depends(get_db)):
             name = item.title,
             description = item.description,
             price = item.price,
-            image_url = item.product_url,
+            image_url = item.img,
             category = item.category,
         )
         for item in product_ids
@@ -63,7 +63,7 @@ def read_popular(db: Session = Depends(get_db)):
             name = item.title,
             description=item.description,
             price = item.price,
-            image_url=item.product_url,
+            image_url=item.img,
             category=item.category
         )
         for item in items
@@ -88,7 +88,7 @@ def read_bigsale(db: Session = Depends(get_db)):
             name = item.title,
             description=item.description,
             price = item.price,
-            image_url=item.product_url,
+            image_url=item.img,
             category=item.category
         )
         for item in items
@@ -113,7 +113,7 @@ def read_today_sale(db: Session = Depends(get_db)):
             name = item.title,
             description=item.description,
             price = item.price,
-            image_url=item.product_url,
+            image_url=item.img,
             category=item.category
         )
         for item in items
@@ -138,7 +138,7 @@ def read_new_items(db: Session = Depends(get_db)):
             name = item.title,
             description=item.description,
             price = item.price,
-            image_url=item.product_url,
+            image_url=item.img,
             category=item.category
         )
         for item in items
@@ -158,7 +158,7 @@ async def search_items(request: SearchRequest, db: Session = Depends(get_db)):
             name = item.title,
             description=item.description,
             price=item.price,
-            image_url=item.product_url,
+            image_url=item.img,
             category=item.category
         )
         for item in results
