@@ -171,3 +171,28 @@ class AssistantSearch(BaseModel):
 
 class CancelAIRequest(BaseModel):
     session_id: str
+
+
+class CardInfo(BaseModel):
+    name: str
+    company: str
+    card_code: str
+    date: str
+
+class CardRegisterRequest(BaseModel):
+    session_id: str
+    name: str
+    company: str
+    card_code: str
+    date: str # TODO, type
+
+class CardRegisterResponse(BaseModel):
+    is_registered: bool
+
+class CardDeleteRequest(BaseModel):
+    session_id: str
+    card_code: str
+
+class CardDeleteResponse(BaseModel):
+    card_list: List[CardInfo]
+
