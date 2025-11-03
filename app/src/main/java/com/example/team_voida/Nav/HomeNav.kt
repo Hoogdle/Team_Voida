@@ -439,7 +439,7 @@ fun HomeNav(){
                         translationY = offsetY
                     },
                 navController = navController,
-                startDestination = "home"
+                startDestination = "profile"
             ) {
                 // HomeNav에서 갈 수 있는 모든 페이지의 네비게이션 등록
                 composable("home") {
