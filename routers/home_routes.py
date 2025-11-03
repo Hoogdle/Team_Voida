@@ -208,9 +208,9 @@ async def search_items(request: SearchRequest, db: Session = Depends(get_db)):
             description=item.description,
             price=item.price,
             image_url=item.img,
-            category=item.category,
+            category=str(item.category),
             sector = 0
         )
         for item in results
     ]
-    return results
+    return result
