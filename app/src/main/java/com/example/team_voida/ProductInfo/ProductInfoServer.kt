@@ -143,16 +143,8 @@ suspend fun ReviewInfoServer(
 
     var url = ""
 
-    when(isWhichItem){
-        1 -> url = "/Popular"
-        2 -> url = "/BigSale"
-        3 -> url = "/TodaySale"
-        4 -> url = "/New"
-        else -> url = ""
-    }
-
     try {
-        val url = URL(" https://fluent-marmoset-immensely.ngrok-free.app/Review${url}") // edit1
+        val url = URL(" https://fluent-marmoset-immensely.ngrok-free.app/Review") // edit1
         val connection = url.openConnection() as java.net.HttpURLConnection
         connection.doOutput = true // 서버로 보내기 위해 doOutPut 옵션 활성화
         connection.doInput = true

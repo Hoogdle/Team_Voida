@@ -150,68 +150,73 @@ fun ProductInfo(
                             product_id = productID.value,
                             session_id = session.sessionId.value
                         )
-                        detailedResult.value = ProductInfoServer(
-                            url = "https://fluent-marmoset-immensely.ngrok-free.app/ProductDetailedInfo",
-                            product_id = productID.value,
-                            session_id = session.sessionId.value
+                        if(requiredDetail){
+                            detailedResult.value = ProductInfoServer(
+                                url = "https://fluent-marmoset-immensely.ngrok-free.app/ProductDetailedInfo",
+                                product_id = productID.value,
+                                session_id = session.sessionId.value
 
-                        )
+                            )
+                        }
                     }
 
                     1 -> {
                         result.value = ProductInfoServer(
-                            url = "https://fluent-marmoset-immensely.ngrok-free.app/PopularProductInfo",
-                            product_id = productID.value,
-                            session_id = session.sessionId.value
-                        )
-                        if(requiredDetail) {
-                            detailedResult.value = ProductInfoServer(
-                            url = "https://fluent-marmoset-immensely.ngrok-free.app/PopularProductDetailedInfo",
-                            product_id = productID.value,
-                            session_id = session.sessionId.value
-                        )
-                        }
-                    }
-                    2 -> {
-                        result.value = ProductInfoServer(
-                            url = "https://fluent-marmoset-immensely.ngrok-free.app/BigSaleProductInfo",
+                            url = "https://fluent-marmoset-immensely.ngrok-free.app/ProductInfo",
                             product_id = productID.value,
                             session_id = session.sessionId.value
                         )
                         if(requiredDetail){
                             detailedResult.value = ProductInfoServer(
-                                url = "https://fluent-marmoset-immensely.ngrok-free.app/BigSaleProductDetailedInfo",
+                                url = "https://fluent-marmoset-immensely.ngrok-free.app/ProductDetailedInfo",
                                 product_id = productID.value,
                                 session_id = session.sessionId.value
+
+                            )
+                        }
+                    }
+                    2 -> {
+                        result.value = ProductInfoServer(
+                            url = "https://fluent-marmoset-immensely.ngrok-free.app/ProductInfo",
+                            product_id = productID.value,
+                            session_id = session.sessionId.value
+                        )
+                        if(requiredDetail){
+                            detailedResult.value = ProductInfoServer(
+                                url = "https://fluent-marmoset-immensely.ngrok-free.app/ProductDetailedInfo",
+                                product_id = productID.value,
+                                session_id = session.sessionId.value
+
                             )
                         }
                     }
                     3 -> {
                         result.value = ProductInfoServer(
-                            url = "https://fluent-marmoset-immensely.ngrok-free.app/TodaySaleProductInfo",
+                            url = "https://fluent-marmoset-immensely.ngrok-free.app/ProductInfo",
                             product_id = productID.value,
                             session_id = session.sessionId.value
                         )
-
-                        if(requiredDetail) {
+                        if(requiredDetail){
                             detailedResult.value = ProductInfoServer(
-                                url = "https://fluent-marmoset-immensely.ngrok-free.app/TodaySaleProductDetailedInfo",
+                                url = "https://fluent-marmoset-immensely.ngrok-free.app/ProductDetailedInfo",
                                 product_id = productID.value,
                                 session_id = session.sessionId.value
+
                             )
                         }
                     }
                     4 -> {
                         result.value = ProductInfoServer(
-                            url = "https://fluent-marmoset-immensely.ngrok-free.app/NewProductInfo",
+                            url = "https://fluent-marmoset-immensely.ngrok-free.app/ProductInfo",
                             product_id = productID.value,
                             session_id = session.sessionId.value
                         )
-                        if(requiredDetail) {
+                        if(requiredDetail){
                             detailedResult.value = ProductInfoServer(
-                                url = "https://fluent-marmoset-immensely.ngrok-free.app/NewProductDetailedInfo",
+                                url = "https://fluent-marmoset-immensely.ngrok-free.app/ProductDetailedInfo",
                                 product_id = productID.value,
                                 session_id = session.sessionId.value
+
                             )
                         }
                     }
