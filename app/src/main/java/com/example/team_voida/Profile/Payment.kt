@@ -64,10 +64,12 @@ import androidx.navigation.NavController
 import com.example.team_voida.Basket.BasketInfo
 import com.example.team_voida.Basket.BasketListServer
 import com.example.team_voida.Basket.ComposableLifecycle
+import com.example.team_voida.Login.ResetPW1
 import com.example.team_voida.Notification.Notification
 import com.example.team_voida.Payment.PaymentMethodList
 import com.example.team_voida.ProfileServer.AccountInfoServer
 import com.example.team_voida.ProfileServer.CardAdd
+import com.example.team_voida.ProfileServer.CardDel
 import com.example.team_voida.ProfileServer.CardInfo
 import com.example.team_voida.ProfileServer.CardListServer
 import com.example.team_voida.R
@@ -515,7 +517,8 @@ fun CustomAlertDialog(
     onClickCancel: () -> Unit,
     onClickConfirm: () -> Unit,
     leftText: String = "취소",
-    rightText: String = "삭제"
+    rightText: String = "삭제",
+    cardID: Int = -1
 ) {
     Dialog(
         onDismissRequest = { onClickCancel() },
@@ -607,7 +610,21 @@ fun CustomAlertDialog(
                     )
 
                     Button(
-                        onClick = { onClickConfirm() },
+                        onClick = {
+                            var result: Boolean = false
+
+                            runBlocking {
+                                val job = GlobalScope.launch {
+                                    result = CardDel(
+                                        session_id = session.sessionId.value,
+                                        card_id = cardID
+                                    )
+                                }
+                            }
+                            Thread.sleep(2000L)
+
+                            // TODO, 삭제 알림
+                        },
                         shape = RectangleShape,
                         modifier = Modifier
                             .weight(1f)
@@ -817,7 +834,8 @@ fun PaymentCard(
                 title = customAlertDialogState.value.title,
                 description = customAlertDialogState.value.description,
                 onClickCancel = { customAlertDialogState.value.onClickCancel() },
-                onClickConfirm = { customAlertDialogState.value.onClickConfirm() }
+                onClickConfirm = { customAlertDialogState.value.onClickConfirm() },
+                cardID = cardID
             )
         }
 //        출처: https://dev-inventory.com/27 [개발자가 들려주는 IT 이야기:티스토리]
