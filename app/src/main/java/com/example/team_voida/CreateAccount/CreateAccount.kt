@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -50,6 +51,8 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.navigation.NavController
 import com.example.team_voida.Home.HomePopularCall
@@ -68,8 +71,11 @@ fun CreateAccount(
     pw: MutableState<String>,
     rePw: MutableState<String>,
     cell: MutableState<String>,
-    navController: NavController
-){
+    navController: NavController,
+    address: MutableState<String>,
+    pwVisibility: MutableState<Boolean>,
+    rePwVisibility: MutableState<Boolean>,
+    ){
     Column (
         modifier = Modifier
             .fillMaxSize()
@@ -78,7 +84,7 @@ fun CreateAccount(
 
         // 안내바
         Notification(
-            text = "계정생성 페이지입니다. 아래에 차례로 이메일, 비밀번호, 비밀번호 재입력, 전화번호를 입력 후, 하단의 '계정생성' 버튼을 눌러주세요."
+            text = "계정생성 페이지입니다. 아래에 차례로 이메일, 비밀번호, 비밀번호 재입력, 전화번호, 주소를 입력한 후, 하단의 '계정생성' 버튼을 눌러주세요."
         )
         Spacer(Modifier.height(25.dp))
         Text(
@@ -91,14 +97,16 @@ fun CreateAccount(
                 fontFamily = FontFamily(Font(R.font.roboto_bold)),
             )
         )
-
+        
         // 입력란 리스트
         Spacer(Modifier.height(45.dp))
         CreateAccountTextField(email,"이메일 주소")
         Spacer(Modifier.height(10.dp))
-        CreateAccountPassWordField(pw,"비밀번호 입력")
+        CreateAccountPassWordField(pw,"비밀번호 입력",pwVisibility)
         Spacer(Modifier.height(10.dp))
-        CreateAccountPassWordField(rePw,"비밀번호 재입력")
+        CreateAccountPassWordField(rePw,"비밀번호 재입력",rePwVisibility)
+        Spacer(Modifier.height(10.dp))
+        CreateAccountTextField(address,"주소 입력")
         Spacer(Modifier.height(10.dp))
         CreateAccountContactField(cell,"전화번호 입력")
         Spacer(Modifier.height(85.dp))
@@ -212,7 +220,8 @@ fun CreateAccountTextField(
 @Composable
 fun CreateAccountPassWordField(
     pw: MutableState<String>,
-    placeholder: String
+    placeholder: String,
+    passwordVisibility: MutableState<Boolean>
 ){
     val interactionSource = remember{ MutableInteractionSource() }
 
@@ -251,6 +260,8 @@ fun CreateAccountPassWordField(
                 fontFamily = FontFamily(Font(R.font.pretendard_regular)),
                 fontSize = 14.sp
             ),
+            visualTransformation = if (passwordVisibility.value) VisualTransformation.None else PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
 
             decorationBox = @Composable{ innerTextField ->
                 TextFieldDefaults.DecorationBox(
@@ -291,7 +302,9 @@ fun CreateAccountPassWordField(
                 .offset(
                     x = 330.dp,
                     y = 20.dp
-                ),
+                )
+                .clickable { passwordVisibility.value = !passwordVisibility.value }
+            ,
             painter = painterResource(R.drawable.eye_password),
             contentDescription = "비밀번호 가리기 버튼"
         )
@@ -420,6 +433,7 @@ fun CreateAccountButton(
             .clip(shape = RoundedCornerShape(15.dp))
             ,
         onClick = {
+            Log.e("pw",pw.toString())
             if(pw.value != rePw.value){
                 Toast.makeText(context, "두 비밀번호가 일치하지 않습니다.",Toast.LENGTH_SHORT).show()
             } else {

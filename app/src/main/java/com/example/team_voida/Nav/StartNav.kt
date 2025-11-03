@@ -35,6 +35,8 @@ import com.example.team_voida.Basket.BasketListServer
 import com.example.team_voida.CreateAccount.CreateAccount
 import com.example.team_voida.CreateAccount.CreateAccountNaming
 import com.example.team_voida.Home.Home
+import com.example.team_voida.Login.ForgotPw
+import com.example.team_voida.Login.ForgotPw2
 import com.example.team_voida.Login.Login
 import com.example.team_voida.Start.Guide
 import com.example.team_voida.Start.Start
@@ -60,18 +62,14 @@ fun StartNav(){
     val email = remember { mutableStateOf("") }
     val pw = remember { mutableStateOf("") }
     val rePw = remember { mutableStateOf("") }
+
+    val pwVisibility = remember { mutableStateOf(false) }
+    val rePwVisibility = remember { mutableStateOf(false) }
+
     val cell = remember { mutableStateOf("") }
+    val address = remember { mutableStateOf("") }
 
     // check git hub
-
-
-
-
-
-
-
-
-
     // StartNav와 관련된 페이지, (로그인,회원가입, 안내...) 에 대한 네비 등록
     NavHost(navController = navController, startDestination = "start") {
         composable("start") { Start(navController = navController) }
@@ -81,15 +79,22 @@ fun StartNav(){
                 pw  = pw,
                 rePw = rePw,
                 cell = cell,
-                navController = navController
+                navController = navController,
+                address = address,
+                pwVisibility = pwVisibility,
+                rePwVisibility = rePwVisibility
             )
         }
         composable("login"){ Login(navController = navController) }
+        composable("forgotpw1"){ ForgotPw(navController = navController) }
+        composable("pwReset"){ ForgotPw2(navController = navController) }
+
         composable("naming") { CreateAccountNaming(
             email = email.value,
             pw = pw.value,
             cell = cell.value,
-            navController = navController
+            navController = navController,
+            address = address
         )
         }
         composable("guide") { Guide(navController = navController) }

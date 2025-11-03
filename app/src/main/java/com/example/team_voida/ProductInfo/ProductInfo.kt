@@ -488,10 +488,10 @@ fun ProductInfoBottomBar(
                         BasketInsert(
                             action = when(isItemWhichPart.value){
                                 0 -> "/BasketInsert"
-                                1 -> "/BasketInsert/Popular"
-                                2 -> "/BasketInsert/BigSale"
-                                3 -> "/BasketInsert/TodaySale"
-                                4 -> "/BasketInsert/New"
+                                1 -> "/BasketInsert"
+                                2 -> "/BasketInsert"
+                                3 -> "/BasketInsert"
+                                4 -> "/BasketInsert"
                                 else -> ""
                             },
                             session_id = session.sessionId.value,

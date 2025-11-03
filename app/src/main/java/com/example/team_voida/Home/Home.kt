@@ -513,7 +513,7 @@ fun HomeCard(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.width(140.dp),
-                    text = name.substring(1,name.length-1),
+                    text = name,
                     color = Color.Black,
                     style = TextStyle(
                         fontSize = 10.sp,

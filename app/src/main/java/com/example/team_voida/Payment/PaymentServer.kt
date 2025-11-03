@@ -35,7 +35,7 @@ suspend fun PaymentServerOne(
 
 
     try {
-        val url = URL(" https://fluent-marmoset-immensely.ngrok-free.app/OneItemPayment${action}") // edit1
+        val url = URL(" https://fluent-marmoset-immensely.ngrok-free.app/OneItemPayment") // edit1
         val connection = url.openConnection() as java.net.HttpURLConnection
         connection.doOutput = true // 서버로 보내기 위해 doOutPut 옵션 활성화
         connection.doInput = true

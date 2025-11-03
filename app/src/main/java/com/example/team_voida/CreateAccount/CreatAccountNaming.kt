@@ -57,7 +57,8 @@ fun CreateAccountNaming(
     email: String,
     pw: String,
     cell: String,
-    navController: NavController
+    navController: NavController,
+    address: MutableState<String>
 ){
     val un = remember{ mutableStateOf("") }
 
@@ -109,7 +110,9 @@ fun CreateAccountNaming(
             pw,
             cell,
             un,
-            navController)
+            navController,
+            address
+        )
         Spacer(Modifier.height(10.dp))
         Text(
             modifier = Modifier
@@ -217,7 +220,8 @@ fun UserNameButton(
     pw: String,
     cell: String,
     un: MutableState<String>,
-    navController: NavController
+    navController: NavController,
+    address: MutableState<String>
 ){
     val context = LocalContext.current
 
@@ -246,7 +250,8 @@ fun UserNameButton(
                         email = email,
                         pw = pw,
                         cell = cell,
-                        un = un.value
+                        un = un.value,
+                        address = address.value
                     )
                 }
             }

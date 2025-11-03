@@ -98,13 +98,16 @@ suspend fun CreateAccountServer(
     email: String,
     pw: String,
     cell: String,
-    un: String
+    un: String,
+    address: String
 ):Boolean?{
     val jsonObject = JSONObject()
     jsonObject.put("email", email)
     jsonObject.put("pw", pw)
     jsonObject.put("cell", cell)
     jsonObject.put("un", un)
+    jsonObject.put("address", address)
+
 
     var result: String? = ""
     val jsonObjectString = jsonObject.toString()

@@ -56,7 +56,6 @@ import com.example.team_voida.Categories.cateSports
 import com.example.team_voida.Notification.Notification
 import com.example.team_voida.ProductInfo.Loader
 import com.example.team_voida.R
-import com.example.team_voida.SearchResult.sampleSearchResult
 import com.example.team_voida.Tools.LoaderSet
 import com.example.team_voida.session
 import com.example.team_voida.ui.theme.Selected
@@ -116,10 +115,10 @@ fun Payment(
             if(isPayOne.value){
                 paymentInfo.value = PaymentServerOne(
                     action = when (isItemWhichPart.value) {
-                        1 -> "/Popular"
-                        2 -> "/BigSale"
-                        3 -> "/TodaySale"
-                        4 -> "/New"
+                        1 -> ""
+                        2 -> ""
+                        3 -> ""
+                        4 -> ""
                         else -> ""
                     },
                     session_id = session.sessionId.value,

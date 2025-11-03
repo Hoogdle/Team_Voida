@@ -19,7 +19,6 @@ import com.example.team_voida.Basket.ComposableLifecycle
 import com.example.team_voida.CreateAccount.CheckEmail
 import com.example.team_voida.Notification.Notification
 import com.example.team_voida.SearchResult.SearchProducts
-import com.example.team_voida.SearchResult.sampleSearchResult
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
