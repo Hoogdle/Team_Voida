@@ -2,6 +2,7 @@ package com.example.team_voida.Profile
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -45,6 +46,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -59,16 +61,27 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
+import com.example.team_voida.Basket.BasketInfo
+import com.example.team_voida.Basket.BasketListServer
 import com.example.team_voida.Basket.ComposableLifecycle
 import com.example.team_voida.Notification.Notification
 import com.example.team_voida.Payment.PaymentMethodList
+import com.example.team_voida.ProfileServer.AccountInfoServer
+import com.example.team_voida.ProfileServer.CardAdd
+import com.example.team_voida.ProfileServer.CardInfo
+import com.example.team_voida.ProfileServer.CardListServer
 import com.example.team_voida.R
+import com.example.team_voida.Tools.LoaderSet
+import com.example.team_voida.session
 import com.example.team_voida.ui.theme.ButtonBlue
 import com.example.team_voida.ui.theme.Selected
 import com.example.team_voida.ui.theme.SkyBlue
 import com.example.team_voida.ui.theme.TextColor
 import com.example.team_voida.ui.theme.TextLittleDark
 import com.example.team_voida.ui.theme.TextWhite
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlin.math.log
 
 @Composable
@@ -104,69 +117,109 @@ fun PaymentSetting(
             Log.e("123","on_resume")
         }
     }
+    val cardInfo: MutableState<List<CardInfo>?> = remember { mutableStateOf<List<CardInfo>?>(null) }
 
-    Column (
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .verticalScroll(scrollState)
 
-    ) {
-        Notification("결제수단 설정 화면입니다. 현재 결제수단을 확인하시고, 다른 결제수단으로 변경하시거나 새로운 결제수단을 등록하세요.")
-
-        Spacer(Modifier.height(10.dp))
-        Text(
-            modifier = Modifier
-                .padding(
-                    start = 10.dp,
-                    top = 23.dp
-                ),
-            textAlign = TextAlign.Center,
-            text = "Settings",
-            color = TextLittleDark,
-            style = TextStyle(
-                fontSize = 25.sp,
-                fontFamily = FontFamily(Font(R.font.roboto_bold)),
-            )
-        )
-
-        Text(
-            modifier = Modifier
-                .padding(
-                    start = 10.dp,
-                    top = 10.dp
-                ),
-            textAlign = TextAlign.Center,
-            text = "결제수단 변경",
-            color = TextLittleDark,
-            style = TextStyle(
-                fontSize = 15.sp,
-                fontFamily = FontFamily(Font(R.font.roboto_regular)),
-            )
-        )
-
-        Spacer(Modifier.height(15.dp))
-
-        PaymentAddButton(
-            isAdding = isAdding
-        )
-
-        if(isAdding.value){
-            PaymentAdd(
-                isAdding = isAdding
-            )
+    if(cardInfo.value == null){
+        runBlocking {
+            val job = GlobalScope.launch{
+                cardInfo.value = CardListServer(session.sessionId.value)
+            }
         }
 
-        Spacer(Modifier.height(15.dp))
-
-        PaymentCard(
-            company = "ibk",
-            paymentNumber = "1111222233334444",
-            name = "Travis",
-            expiredMonth = "12",
-            expiredDate = "10"
+        cardInfo.value = listOf(
+            CardInfo(
+                cardId = 2,
+                company = "ibk",
+                cardCode = "1234567812341111",
+                date = "12:24"
+            ),
+            CardInfo(
+                cardId = 3,
+                company = "bnk",
+                cardCode = "1234567812341111",
+                date = "12:24"
+            ),
+            CardInfo(
+                cardId = 5,
+                company = "kb",
+                cardCode = "1234567812341111",
+                date = "12:24"
+            )
         )
+    }
 
+    if(cardInfo.value != null) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White)
+                .verticalScroll(scrollState)
+
+        ) {
+            Notification("결제수단 설정 화면입니다. 현재 결제수단을 확인하시고, 다른 결제수단으로 변경하시거나 새로운 결제수단을 등록하세요.")
+
+            Spacer(Modifier.height(10.dp))
+            Text(
+                modifier = Modifier
+                    .padding(
+                        start = 10.dp,
+                        top = 23.dp
+                    ),
+                textAlign = TextAlign.Center,
+                text = "Settings",
+                color = TextLittleDark,
+                style = TextStyle(
+                    fontSize = 25.sp,
+                    fontFamily = FontFamily(Font(R.font.roboto_bold)),
+                )
+            )
+
+            Text(
+                modifier = Modifier
+                    .padding(
+                        start = 10.dp,
+                        top = 10.dp
+                    ),
+                textAlign = TextAlign.Center,
+                text = "결제수단 변경",
+                color = TextLittleDark,
+                style = TextStyle(
+                    fontSize = 15.sp,
+                    fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                )
+            )
+
+            Spacer(Modifier.height(15.dp))
+
+            PaymentAddButton(
+                isAdding = isAdding
+            )
+
+            if (isAdding.value) {
+                PaymentAdd(
+                    isAdding = isAdding,
+                    cardList = cardInfo
+                )
+            }
+
+            Spacer(Modifier.height(15.dp))
+
+            cardInfo.value!!.forEach {
+                PaymentCard(
+                    cardID = it.cardId,
+                    company = it.company,
+                    paymentNumber = it.cardCode,
+                    name = "",
+                    expiredMonth = it.date,
+                    expiredDate = it.date
+                )
+
+                Spacer(Modifier.height(10.dp))
+            }
+        }
+    } else{
+        LoaderSet(semantics = "결제수단 정보를 불러오는 중입니다. 잠시만 기다려주세요.")
     }
 }
 
@@ -255,8 +308,15 @@ fun PaymentRegisterPreButton(
 fun PaymentRegisterLastButton(
     pw: String,
     lastCheck: MutableState<Boolean>,
-    isAdding: MutableState<Boolean>
+    isAdding: MutableState<Boolean>,
+    cardCompany: String,
+    cardNum: String,
+    cardDate: String,
+    cardCvv: String,
+    cardList: MutableState<List<CardInfo>?>
 ){
+    val context = LocalContext.current
+
     Button(
         shape = RoundedCornerShape(10.dp),
         colors = ButtonColors(
@@ -272,6 +332,27 @@ fun PaymentRegisterLastButton(
 
         ,
         onClick = {
+            var result: List<CardInfo>? = null
+
+            runBlocking {
+                val job = GlobalScope.launch{
+                    result = CardAdd(
+                        session_id = session.sessionId.value,
+                        cardCompany = cardCompany,
+                        cardNum = cardNum,
+                        cardDate = cardDate,
+                        cardCvv = cardCvv
+                    )
+                }
+            }
+            Thread.sleep(2000L)
+
+            if (result == null){
+                Toast.makeText(context, "카드 등록에 실패하였습니다.", Toast.LENGTH_SHORT).show()
+            } else {
+                cardList.value = result
+            }
+
             lastCheck.value = true
             isAdding.value = false
         }
@@ -294,7 +375,8 @@ fun PaymentRegisterLastButton(
 
 @Composable
 fun PaymentAdd(
-    isAdding: MutableState<Boolean>
+    isAdding: MutableState<Boolean>,
+    cardList: MutableState<List<CardInfo>?>
 ){
 
     val cardNum: MutableState<String> = remember{mutableStateOf("")}
@@ -352,7 +434,7 @@ fun PaymentAdd(
                     )
 
                     Spacer(Modifier.height(10.dp))
-                    AccountTextField("카드번호를 입력해주세요.", height = 50.dp,cardNum)
+                    AccountPWTextField("카드번호를 입력해주세요.", height = 50.dp, input = cardNum, offSetX = 300.dp, offSetY = 15.dp)
                     Spacer(Modifier.height(10.dp))
 
                     Text(
@@ -391,7 +473,7 @@ fun PaymentAdd(
                     )
 
                     Spacer(Modifier.height(10.dp))
-                    AccountTextField("CVV를 입력해주세요.", height = 50.dp,cvv)
+                    AccountPWTextField("CVV를 입력해주세요.", height = 50.dp, input = cvv, offSetX = 300.dp, offSetY = 15.dp)
 
                     Spacer(Modifier.height(10.dp))
                     PaymentRegisterPreButton(
@@ -406,7 +488,14 @@ fun PaymentAdd(
                         Spacer(Modifier.height(10.dp))
                         AccountTextField("비밀번호", height = 50.dp,pw)
                         Spacer(Modifier.height(10.dp))
-                        PaymentRegisterLastButton(pw.value, lastCheck = lastCheck, isAdding)
+                        PaymentRegisterLastButton(
+                            pw.value, lastCheck = lastCheck, isAdding,
+                            cardCompany = bankList[whichBank.value],
+                            cardNum = cardNum.value,
+                            cardDate = expiredDate.value,
+                            cardCvv = cvv.value,
+                            cardList = cardList
+                            )
                     }
                 }
             }
@@ -560,6 +649,7 @@ data class CustomAlertDialogState(
 
 @Composable
 fun PaymentCard(
+    cardID: Int,
     company: String,
     paymentNumber: String,
     name: String,

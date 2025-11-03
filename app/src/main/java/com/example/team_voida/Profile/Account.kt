@@ -437,7 +437,9 @@ fun AccountPWTextField(
     placeholder: String,
     input: MutableState<String>,
     height: Dp = 70.dp,
-    isFull: Boolean = true
+    isFull: Boolean = true,
+    offSetX: Dp = 330.dp,
+    offSetY: Dp = 23.dp
 ){
     val interactionSource = remember{ MutableInteractionSource() }
     val visibility = remember { mutableStateOf(false) }
@@ -524,8 +526,8 @@ fun AccountPWTextField(
                 }
                 .size(20.dp)
                 .offset(
-                    x = 330.dp,
-                    y = 23.dp
+                    x = offSetX,
+                    y = offSetY
                 ),
             painter = painterResource(R.drawable.eye_password),
             contentDescription = "비밀번호 가리기 버튼"

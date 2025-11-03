@@ -188,6 +188,7 @@ fun PaymentHistory(
         Spacer(Modifier.height(15.dp))
 
         PaymentCard(
+            cardID = 1,
             company = "ibk",
             paymentNumber = "1111222233334444",
             name = "Travis",
