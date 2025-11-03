@@ -571,17 +571,27 @@ async def scan_product_detail(session, prod_id: int, product_url: str) -> int:
     inserted = 0
     with get_conn() as conn, conn.cursor() as cur:
         for u in urls:
+            if not u or not u.strip():
+                continue
             try:
                 cur.execute("""
                     INSERT INTO images (product_id, image_url, status)
                     VALUES (%s, %s, 'pending')
                     ON CONFLICT (image_url) DO NOTHING;
-                """, (prod_id, u))
-                inserted += cur.rowcount
-            except Exception:
+                """, (prod_id, u.strip()))
+                # ON CONFLICT DO NOTHING의 경우 inserted row는 1, 아니면 0
+                if cur.rowcount > 0:
+                    inserted += 1
+            except Exception as e:
                 conn.rollback()
-        cur.execute("UPDATE products SET detail_scanned = TRUE WHERE id = %s;", (prod_id,))
-        conn.commit()
+                print(f"[WARN] Failed to insert image URL: product_id={prod_id}, url={u[:50] if u else None}, error={e}")
+                continue  # 다음 이미지로 진행
+        try:
+            cur.execute("UPDATE products SET detail_scanned = TRUE WHERE id = %s;", (prod_id,))
+            conn.commit()
+        except Exception as e:
+            conn.rollback()
+            print(f"[WARN] Failed to update detail_scanned: product_id={prod_id}, error={e}")
     return inserted
 
 def load_products_to_scan(limit=200):
@@ -755,17 +765,27 @@ def selenium_collect_one_product(prod_id: int, product_url: str, headless: bool 
 
         with get_conn() as conn, conn.cursor() as cur:
             for u in cleaned:
+                if not u or not u.strip():
+                    continue
                 try:
                     cur.execute("""
                         INSERT INTO images (product_id, image_url, status)
                         VALUES (%s, %s, 'pending')
                         ON CONFLICT (image_url) DO NOTHING;
-                    """, (prod_id, u))
-                    new_count += cur.rowcount
-                except Exception:
+                    """, (prod_id, u.strip()))
+                    # ON CONFLICT DO NOTHING의 경우 inserted row는 1, 아니면 0
+                    if cur.rowcount > 0:
+                        new_count += 1
+                except Exception as e:
                     conn.rollback()
-            cur.execute("UPDATE products SET detail_scanned = TRUE WHERE id = %s;", (prod_id,))
-            conn.commit()
+                    print(f"[WARN] Failed to insert image URL (selenium): product_id={prod_id}, url={u[:50] if u else None}, error={e}")
+                    continue  # 다음 이미지로 진행
+            try:
+                cur.execute("UPDATE products SET detail_scanned = TRUE WHERE id = %s;", (prod_id,))
+                conn.commit()
+            except Exception as e:
+                conn.rollback()
+                print(f"[WARN] Failed to update detail_scanned (selenium): product_id={prod_id}, error={e}")
         return new_count
     finally:
         try: driver.quit()
