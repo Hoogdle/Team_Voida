@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -43,7 +42,6 @@ import com.example.team_voida.Payment.PaymentInfo
 import com.example.team_voida.Payment.PaymentNum
 import com.example.team_voida.Payment.PaymentRow
 import com.example.team_voida.R
-import com.example.team_voida.ui.theme.ButtonBlue
 import com.example.team_voida.ui.theme.CancelColor
 import com.example.team_voida.ui.theme.TextLittleDark
 import com.example.team_voida.ui.theme.TextWhite

@@ -36,12 +36,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
+import com.example.team_voida.Basket.BasketInfo
+import com.example.team_voida.Basket.BasketListServer
 import com.example.team_voida.Basket.ComposableLifecycle
 import com.example.team_voida.Notification.Notification
+import com.example.team_voida.ProfileServer.PayHistory
+import com.example.team_voida.ProfileServer.PayHistoryList
+import com.example.team_voida.ProfileServer.PayHistoryListServer
 import com.example.team_voida.R
+import com.example.team_voida.Tools.LoaderSet
+import com.example.team_voida.session
 import com.example.team_voida.ui.theme.Selected
 import com.example.team_voida.ui.theme.TextColor
 import com.example.team_voida.ui.theme.TextLittleDark
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
@@ -146,73 +156,89 @@ fun PaymentHistory(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .verticalScroll(scrollState)
 
-    ) {
-        Notification("현재 등록된 카드에서 결제한 기록을 확인할 수 있습니다. 아래에 현재 등록된 카드와 결제 내역을 확인하세요.")
+    val payHistory: MutableState<PayHistory?> = remember { mutableStateOf<PayHistory?>(null) }
 
-        Text(
-            modifier = Modifier
-                .padding(
-                    start = 10.dp,
-                    top = 23.dp
-                ),
-            textAlign = TextAlign.Center,
-            text = "Settings",
-            color = TextLittleDark,
-            style = TextStyle(
-                fontSize = 25.sp,
-                fontFamily = FontFamily(Font(R.font.roboto_bold)),
-            )
-        )
-
-        Text(
-            modifier = Modifier
-                .padding(
-                    start = 10.dp,
-                    top = 10.dp
-                ),
-            textAlign = TextAlign.Center,
-            text = "결제내역",
-            color = TextLittleDark,
-            style = TextStyle(
-                fontSize = 15.sp,
-                fontFamily = FontFamily(Font(R.font.roboto_regular)),
-            )
-        )
-
-        Spacer(Modifier.height(15.dp))
-
-        PaymentCard(
-            cardID = 1,
-            company = "ibk",
-            paymentNumber = "1111222233334444",
-            name = "Travis",
-            expiredMonth = "12",
-            expiredDate = "10"
-        )
-
-        Spacer(Modifier.height(20.dp))
-
-        tmpPaymentItemHistory.forEach {
-            PaymentHistoryItem(
-                year = it.year,
-                month = it.month,
-                date = it.date,
-                time = it.time,
-                orderNum = it.orderNum,
-                price = it.price,
-                flag = it.flag,
-                orderNumberSetter = orderNumber,
-                navController = navController
-            )
-            Spacer(Modifier.height(10.dp))
+    // 서버에 장바구니 정보 요청
+    if(payHistory.value == null){
+        runBlocking {
+            val job = GlobalScope.launch{
+                payHistory.value = PayHistoryListServer(session.sessionId.value)
+            }
         }
+    }
 
+    if(payHistory.value != null) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White)
+                .verticalScroll(scrollState)
+
+        ) {
+            Notification("현재 등록된 카드에서 결제한 기록을 확인할 수 있습니다. 아래에 현재 등록된 카드와 결제 내역을 확인하세요.")
+
+            Text(
+                modifier = Modifier
+                    .padding(
+                        start = 10.dp,
+                        top = 23.dp
+                    ),
+                textAlign = TextAlign.Center,
+                text = "Settings",
+                color = TextLittleDark,
+                style = TextStyle(
+                    fontSize = 25.sp,
+                    fontFamily = FontFamily(Font(R.font.roboto_bold)),
+                )
+            )
+
+            Text(
+                modifier = Modifier
+                    .padding(
+                        start = 10.dp,
+                        top = 10.dp
+                    ),
+                textAlign = TextAlign.Center,
+                text = "결제내역",
+                color = TextLittleDark,
+                style = TextStyle(
+                    fontSize = 15.sp,
+                    fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                )
+            )
+
+            Spacer(Modifier.height(15.dp))
+
+            PaymentCard(
+                cardID = 1,
+                company = "ibk",
+                paymentNumber = "1111222233334444",
+                name = "Travis",
+                expiredMonth = "12",
+                expiredDate = "10"
+            )
+
+            Spacer(Modifier.height(20.dp))
+
+            tmpPaymentItemHistory.forEach {
+                PaymentHistoryItem(
+                    year = it.year,
+                    month = it.month,
+                    date = it.date,
+                    time = it.time,
+                    orderNum = it.orderNum,
+                    price = it.price,
+                    flag = it.flag,
+                    orderNumberSetter = orderNumber,
+                    navController = navController
+                )
+                Spacer(Modifier.height(10.dp))
+            }
+
+        }
+    } else {
+        LoaderSet(semantics = "결제내역을 불러오는 중입니다.")
     }
 }
 

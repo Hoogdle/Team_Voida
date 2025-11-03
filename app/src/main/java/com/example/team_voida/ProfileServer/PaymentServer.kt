@@ -11,9 +11,9 @@ import java.net.URL
 
 @Serializable
 data class CardInfo(
-    val cardId: Int,
+    val card_id: Int,
     val company: String,
-    val cardCode: String,
+    val card_code: String,
     val date: String
 )
 

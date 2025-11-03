@@ -131,21 +131,21 @@ fun PaymentSetting(
 
         cardInfo.value = listOf(
             CardInfo(
-                cardId = 2,
+                card_id = 2,
                 company = "ibk",
-                cardCode = "1234567812341111",
+                card_code = "1234567812341111",
                 date = "12:24"
             ),
             CardInfo(
-                cardId = 3,
+                card_id = 3,
                 company = "bnk",
-                cardCode = "1234567812341111",
+                card_code = "1234567812341111",
                 date = "12:24"
             ),
             CardInfo(
-                cardId = 5,
+                card_id = 5,
                 company = "kb",
-                cardCode = "1234567812341111",
+                card_code = "1234567812341111",
                 date = "12:24"
             )
         )
@@ -209,9 +209,9 @@ fun PaymentSetting(
 
             cardInfo.value!!.forEach {
                 PaymentCard(
-                    cardID = it.cardId,
+                    cardID = it.card_id,
                     company = it.company,
-                    paymentNumber = it.cardCode,
+                    paymentNumber = it.card_code,
                     name = "",
                     expiredMonth = it.date,
                     expiredDate = it.date
