@@ -1,22 +1,6 @@
 {
   "items": [
     {
-      "title": "마마쇼 건강한 <b>강아지 간식</b> 치킨슬라이스 1kg 대용량 <b>애견간식</b>",
-      "link": "https://smartstore.naver.com/main/products/11101764861",
-      "image": "https://shopping-phinf.pstatic.net/main_8864627/88646275183.7.jpg",
-      "lprice": "9250",
-      "hprice": "",
-      "mallName": "씨엔앨글로벌",
-      "productId": "88646275183",
-      "productType": "2",
-      "brand": "마마쇼",
-      "maker": "",
-      "category1": "생활/건강",
-      "category2": "반려동물",
-      "category3": "강아지 간식",
-      "category4": "육포/건조간식"
-    },
-    {
       "title": "테비사사미 <b>강아지간식</b> 1kg 대용량 <b>애견간식</b>",
       "link": "https://www.hmall.com/md/pda/itemPtc?ReferCode=429&slitmCd=2217016140&utm_source=naver&utm_medium=cps_pcs&utm_campaign=sale",
       "image": "https://shopping-phinf.pstatic.net/main_5003105/50031054810.jpg",
@@ -27,6 +11,22 @@
       "productType": "2",
       "brand": "테비토퍼",
       "maker": "테비토퍼",
+      "category1": "생활/건강",
+      "category2": "반려동물",
+      "category3": "강아지 간식",
+      "category4": "육포/건조간식"
+    },
+    {
+      "title": "마마쇼 건강한 <b>강아지 간식</b> 치킨슬라이스 1kg 대용량 <b>애견간식</b>",
+      "link": "https://smartstore.naver.com/main/products/11101764861",
+      "image": "https://shopping-phinf.pstatic.net/main_8864627/88646275183.7.jpg",
+      "lprice": "9250",
+      "hprice": "",
+      "mallName": "씨엔앨글로벌",
+      "productId": "88646275183",
+      "productType": "2",
+      "brand": "마마쇼",
+      "maker": "",
       "category1": "생활/건강",
       "category2": "반려동물",
       "category3": "강아지 간식",
@@ -49,20 +49,20 @@
       "category4": "개껌"
     },
     {
-      "title": "강아지 수제간식 보양식 오리목뼈 100g+100g <b>애견간식</b> 대형견 반려견 노견 다이어트",
-      "link": "https://smartstore.naver.com/main/products/4895488272",
-      "image": "https://shopping-phinf.pstatic.net/main_8244001/82440011828.9.jpg",
-      "lprice": "4500",
+      "title": "<b>강아지</b> 덴탈껌 가수분해 <b>간식</b> 츄 치석제거 껌 티덴브러쉬(피부)15+1",
+      "link": "https://smartstore.naver.com/main/products/8211278732",
+      "image": "https://shopping-phinf.pstatic.net/main_8575577/85755779066.jpg",
+      "lprice": "500",
       "hprice": "",
-      "mallName": "네이월",
-      "productId": "82440011828",
+      "mallName": "댕댕이연구소",
+      "productId": "85755779066",
       "productType": "2",
-      "brand": "네이월",
-      "maker": "네이월",
+      "brand": "라이코스펫",
+      "maker": "골드오션",
       "category1": "생활/건강",
       "category2": "반려동물",
       "category3": "강아지 간식",
-      "category4": "수제간식"
+      "category4": "개껌"
     },
     {
       "title": "덴티페어리 <b>강아지 간식</b> 덴탈껌 양치 개껌 치약 치석제거 S",
@@ -129,20 +129,20 @@
       "category4": "개껌"
     },
     {
-      "title": "<b>강아지</b> 덴탈껌 가수분해 <b>간식</b> 츄 치석제거 껌 티덴브러쉬(피부)15+1",
-      "link": "https://smartstore.naver.com/main/products/8211278732",
-      "image": "https://shopping-phinf.pstatic.net/main_8575577/85755779066.jpg",
-      "lprice": "500",
+      "title": "강아지 수제간식 보양식 오리목뼈 100g+100g <b>애견간식</b> 대형견 반려견 노견 다이어트",
+      "link": "https://smartstore.naver.com/main/products/4895488272",
+      "image": "https://shopping-phinf.pstatic.net/main_8244001/82440011828.9.jpg",
+      "lprice": "4500",
       "hprice": "",
-      "mallName": "댕댕이연구소",
-      "productId": "85755779066",
+      "mallName": "네이월",
+      "productId": "82440011828",
       "productType": "2",
-      "brand": "라이코스펫",
-      "maker": "골드오션",
+      "brand": "네이월",
+      "maker": "네이월",
       "category1": "생활/건강",
       "category2": "반려동물",
       "category3": "강아지 간식",
-      "category4": "개껌"
+      "category4": "수제간식"
     },
     {
       "title": "<b>강아지</b> 가수분해 <b>간식</b> 연어야채 트릿 30g 노즈워크 저 알러지 훈련 용 <b>간식</b>",

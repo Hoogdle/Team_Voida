@@ -129,22 +129,6 @@
       "category4": ""
     },
     {
-      "title": "나이키 후드집업 <b>후드티</b> 기모 스우시",
-      "link": "https://smartstore.naver.com/main/products/5424915409",
-      "image": "https://shopping-phinf.pstatic.net/main_8296940/82969409229.2.jpg",
-      "lprice": "49000",
-      "hprice": "",
-      "mallName": "퀀텀플렉스",
-      "productId": "82969409229",
-      "productType": "2",
-      "brand": "나이키",
-      "maker": "나이키",
-      "category1": "패션의류",
-      "category2": "여성의류",
-      "category3": "티셔츠",
-      "category4": ""
-    },
-    {
       "title": "챔피온 길단 기모 <b>후드티</b> 후드집업 맨투맨",
       "link": "https://smartstore.naver.com/main/products/3604599962",
       "image": "https://shopping-phinf.pstatic.net/main_8114911/81149117313.3.jpg",
@@ -157,6 +141,22 @@
       "maker": "챔피온",
       "category1": "패션의류",
       "category2": "남성의류",
+      "category3": "티셔츠",
+      "category4": ""
+    },
+    {
+      "title": "나이키 후드집업 <b>후드티</b> 기모 스우시",
+      "link": "https://smartstore.naver.com/main/products/5424915409",
+      "image": "https://shopping-phinf.pstatic.net/main_8296940/82969409229.2.jpg",
+      "lprice": "49000",
+      "hprice": "",
+      "mallName": "퀀텀플렉스",
+      "productId": "82969409229",
+      "productType": "2",
+      "brand": "나이키",
+      "maker": "나이키",
+      "category1": "패션의류",
+      "category2": "여성의류",
       "category3": "티셔츠",
       "category4": ""
     },
