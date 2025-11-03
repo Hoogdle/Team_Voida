@@ -318,7 +318,7 @@ def d_call_ai(name, info, img, return_list, stop_event):
 @router.post("/ProductInfo", response_model=schemas.ProductDetail)
 def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db)):
     prod = db.query(models.Product).filter(models.Product.id == payload.product_id).first()
-    img = db.query(models.Image).filter(models.Image.product_id == payload.product_id).all()
+    img = db.query(models.Image).filter(models.Image.product_id == payload.product_id).first()
 
 
     # TODO 큰사이즈 사진 처리, 일단은 1장 처리하게 구현
@@ -355,7 +355,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
 @router.post("/ProductDetailedInfo", response_model=schemas.ProductDetail)
 def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db)):
     prod = db.query(models.Product).filter(models.Product.id == payload.product_id).first()
-    img = db.query(models.Image).filter(models.Image.product_id == payload.product_id).all()
+    img = db.query(models.Image).filter(models.Image.product_id == payload.product_id).first()
 
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
