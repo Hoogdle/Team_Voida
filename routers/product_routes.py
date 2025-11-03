@@ -398,7 +398,8 @@ def category_items(category: str, db: Session = Depends(get_db)):
             description = item.description,
             price = float(item.price),
             image_url = item.img,
-            category = item.category
+            category = item.category,
+            sector = 0
         )
         for item in results
     ]
