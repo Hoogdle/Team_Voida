@@ -475,19 +475,27 @@ fun BasketItemArrange(
 // 장바구니 결제 버튼 컴포저블
 @Composable
 fun BasketPaymentButton(
-    price: String,
+    price: MutableState<String>,
     isPayOne: MutableState<Boolean>,
     navController: NavController,
     isPayPage: MutableState<Boolean>,
 ){
+
+    var totalPrice = ""
+    if(price.value != ""){
+        val number = price.value
+        val tmpNum = number.toFloat()
+        totalPrice = "%,.0f".format(tmpNum)
+    }
+
     Row (
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
             .semantics(mergeDescendants = true){
                 if(isPayPage.value == false) {
-                    text = AnnotatedString("총 ${price}원을 결제합니다. 우측의 결제하기 버튼을 눌러 결제 페이지로 이동해주세요.")
+                    text = AnnotatedString("총 ${price.value}원을 결제합니다. 우측의 결제하기 버튼을 눌러 결제 페이지로 이동해주세요.")
                 } else {
-                    text = AnnotatedString("총 ${price}원을 결제합니다. 우측의 결제하기 버튼을 눌러 최종 결제를 진행해주세요.")
+                    text = AnnotatedString("총 ${price.value}원을 결제합니다. 우측의 결제하기 버튼을 눌러 최종 결제를 진행해주세요.")
                 }
             }
             .background(
@@ -507,7 +515,7 @@ fun BasketPaymentButton(
                     top = 10.5.dp
                 )
                 ,
-            text = "총액" + " " + price + "원",
+            text = "총액" + " " + totalPrice.toString() + "원",
             color = TextLittleDark,
             style = TextStyle(
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
@@ -522,11 +530,11 @@ fun BasketPaymentButton(
                 ,
             shape = RoundedCornerShape(15.dp),
             onClick = {
-                isPayOne.value = false
                 if(isPayPage.value == false) {
+                    isPayOne.value = false
                     navController.navigate("payment")
                 } else {
-                    navController.navigate("payResult")
+                    navController.navigate("payRegister")
                 }
             },
             colors = ButtonColors(

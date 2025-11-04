@@ -164,7 +164,7 @@ fun PayRegister(
             )
             Spacer(Modifier.height(25.dp))
 
-            PayFinishRow()
+            PayFinishRow(orderResponse)
 
 
         }
@@ -178,18 +178,14 @@ fun PayRegister(
 // 시간이 없어 모듈화는 생략함
 @Composable
 fun PayFinishRow(
-    paymentInfo: MutableState<PaymentInfo?>
+    orderedInfo: MutableState<OrderResponse?>
 ){
-
-
-
-    //
-    paymentInfo.value?.item?.forEachIndexed { index, item ->
+    orderedInfo.value?.item?.forEachIndexed { index, item ->
         Column {
             Row(
                 modifier = Modifier
                     .semantics(mergeDescendants = true){
-                        text = AnnotatedString("${item.name} 상품이 총 ${item.number} 개 담겨 있습니다. 상품 가격은 ${item.price.toInt()}원 입니다.")
+                        text = AnnotatedString("${item.name} 총 ${item.number} 개의 상품이 결제되었습니다. 결제된 상품 가격은 상품 가격은 ${item.price.toInt()}원 입니다.")
                     }
                     .padding(
                         start = 10.dp,

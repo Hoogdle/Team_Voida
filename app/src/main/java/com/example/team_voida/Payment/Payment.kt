@@ -84,7 +84,8 @@ fun Payment(
     isItemWhichPart: MutableState<Int>,
     isPayOne: MutableState<Boolean>,
     isPayPage: MutableState<Boolean>,
-    paymentUserInfo: MutableState<PaymentUserInfo>
+    paymentUserInfo: MutableState<PaymentUserInfo>,
+    dynamicTotalPrice: MutableState<String>
 ){
     val scrollState = rememberScrollState()
 
@@ -147,9 +148,20 @@ fun Payment(
         }
     }
 
+
+
+
     Log.e("payment",productID.value.toString())
     // 결제 정보를 받은 경우 결제 페이지 정보 제공
     if(paymentInfo.value != null){
+
+        var price = 0F
+
+        paymentInfo.value!!.item.forEach {
+            price += it.price
+        }
+        dynamicTotalPrice.value = price.toString()
+
 
         paymentUserInfo.value.address = paymentInfo.value!!.address
         paymentUserInfo.value.cell = paymentInfo.value!!.phone

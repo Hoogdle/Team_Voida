@@ -70,6 +70,7 @@ import com.example.team_voida.Home.HomePartList
 import com.example.team_voida.Home.HomePopularCall
 import com.example.team_voida.Home.Popular
 import com.example.team_voida.Login.Login
+import com.example.team_voida.Payment.PayRegister
 import com.example.team_voida.Payment.Payment
 import com.example.team_voida.Payment.PaymentUserInfo
 import com.example.team_voida.ProductInfo.ProductInfo
@@ -270,7 +271,7 @@ fun HomeNav(){
             Column {
                 if(basketFlag.value){
                     BasketPaymentButton(
-                        dynamicTotalPrice.value,
+                        dynamicTotalPrice,
                         isPayOne,
                         navController,
                         isPayPage
@@ -444,7 +445,7 @@ fun HomeNav(){
                         translationY = offsetY
                     },
                 navController = navController,
-                startDestination = "profile"
+                startDestination = "home"
             ) {
                 // HomeNav에서 갈 수 있는 모든 페이지의 네비게이션 등록
                 composable("home") {
@@ -485,7 +486,8 @@ fun HomeNav(){
                         productFlag = productFlag,
                         selectedIndex = selectedIndex,
                         productID = productID,
-                        isItemWhichPart = isItemWhichPart
+                        isItemWhichPart = isItemWhichPart,
+                        isPayPage = isPayPage
                     )
                 }
                 composable("productInfo") {
@@ -522,7 +524,8 @@ fun HomeNav(){
                         isItemWhichPart = isItemWhichPart,
                         isPayOne = isPayOne,
                         isPayPage = isPayPage,
-                        paymentUserInfo = paymentUserInfo
+                        paymentUserInfo = paymentUserInfo,
+                        dynamicTotalPrice = dynamicTotalPrice
                     )
                 }
 
@@ -604,6 +607,21 @@ fun HomeNav(){
                         productFlag = productFlag,
                         selectedIndex = selectedIndex,
                         orderNumber = orderNumber
+                    )
+                }
+
+                composable("payRegister"){
+                    PayRegister(
+                        navController = navController,
+                        basketFlag = basketFlag,
+                        homeNavFlag = homeNavFlag,
+                        productFlag = productFlag,
+                        selectedIndex = selectedIndex,
+                        productID = productID,
+                        isItemWhichPart = isItemWhichPart,
+                        isPayOne = isPayOne,
+                        isPayPage = isPayPage,
+                        paymentUserInfo = paymentUserInfo
                     )
                 }
             }
