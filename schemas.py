@@ -88,9 +88,10 @@ class BasketPayment(BaseModel):
 # -------------------- Order --------------------
 class OrderItemCreate(BaseModel):
     product_id: int
-    quantity: int
+    img: str  
+    name: str
     price: float
-
+    number: int
 
 class OrderCreate(BaseModel):
     session_id: str
@@ -98,7 +99,7 @@ class OrderCreate(BaseModel):
     phone: str
     email: str
     total_price: float
-    items: List[OrderItemCreate]
+    items: List[BasketItem]
 
 class OrderInfoRequest(BaseModel):
     session_id: str
@@ -107,8 +108,10 @@ class OrderInfoRequest(BaseModel):
 
 class OrderResponse(BaseModel):
     order_num: str
-    total_price: float
-    success: bool
+    address :str
+    email: str
+    cell: str
+    item: List[BasketItem]
 
     model_config = {
         "from_attributes": True
@@ -143,6 +146,7 @@ class SignUpRequest(BaseModel):
     pw: str
     cell: str
     un: str
+    address: str
 
 
 class LoginRequest(BaseModel):

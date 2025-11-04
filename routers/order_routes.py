@@ -36,17 +36,29 @@ def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
         db_item = models.OrderItem(
             order_id=db_order.id,
             product_id=item.product_id,
-            quantity=item.quantity,
+            quantity=item.number,
             price=item.price,
             is_cancel = False
         )
         db.add(db_item)
     db.commit()
 
+    
     return schemas.OrderResponse(
-        order_num = db_order.id,
-        total_price = db_order.total_price,
-        success = True
+        order_num = str(db_order.id),
+        address = order.address,
+        email = order.email,
+        cell = order.phone,
+        item = [
+            schemas.BasketItem(
+                product_id = item.product_id,
+                img = item.img,
+                name = item.name,
+                price = item.price,
+                number = item.number
+            )
+            for item in order.items
+            ]
     )
 
 

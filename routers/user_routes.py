@@ -31,7 +31,7 @@ def sign_up(payload: schemas.SignUpRequest, db: Session = Depends(get_db)):
         pw=hashed_pw.decode("utf-8"),
         cell=payload.cell,
 	    un=payload.un,
-        address=""
+        address=payload.address
     )
     db.add(new_user)
     db.commit()
