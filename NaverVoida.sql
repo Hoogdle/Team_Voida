@@ -54,6 +54,7 @@ CREATE TABLE "basket_items" (
 CREATE TABLE "orders" (
   "id" SERIAL PRIMARY KEY,
   "user_id" INTEGER,
+  "card_id" INTEGER,
   "total_price" BIGINT,
   "address" TEXT,
   "phone" TEXT,
@@ -75,9 +76,9 @@ CREATE TABLE "order_items" (
 CREATE TABLE "card" (
   "id" SERIAL PRIMARY KEY,
   "user_id" INTEGER,
-  "name" TEXT,
   "company" TEXT,
   "card_code" TEXT,
+  "card_cvv" TEXT,
   "date" Date
 );
 
@@ -126,3 +127,5 @@ ALTER TABLE "home" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");
 ALTER TABLE "basket_items" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");
 
 ALTER TABLE "review" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");
+
+ALTER TABLE "orders" ADD FOREIGN KEY ("card_id") REFERENCES "card" ("id");
