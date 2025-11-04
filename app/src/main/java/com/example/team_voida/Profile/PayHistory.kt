@@ -157,7 +157,7 @@ fun PaymentHistory(
     }
 
 
-    val payHistory: MutableState<PayHistory?> = remember { mutableStateOf<PayHistory?>(null) }
+    val payHistory: MutableState<PayHistoryList?> = remember { mutableStateOf<PayHistoryList?>(null) }
 
     // 서버에 장바구니 정보 요청
     if(payHistory.value == null){
@@ -221,15 +221,15 @@ fun PaymentHistory(
 
             Spacer(Modifier.height(20.dp))
 
-            tmpPaymentItemHistory.forEach {
+            payHistory.value!!.pay_list.forEach{
                 PaymentHistoryItem(
-                    year = it.year,
-                    month = it.month,
+                    year = it.date,
+                    month = it.date,
                     date = it.date,
-                    time = it.time,
-                    orderNum = it.orderNum,
-                    price = it.price,
-                    flag = it.flag,
+                    time = it.date,
+                    orderNum = it.order_num,
+                    price = it.price.toString(),
+                    isRefund = it.is_refund,
                     orderNumberSetter = orderNumber,
                     navController = navController
                 )
@@ -238,7 +238,7 @@ fun PaymentHistory(
 
         }
     } else {
-        LoaderSet(semantics = "결제내역을 불러오는 중입니다.")
+        LoaderSet(info = "결제내역을 불러오는 중입니다.", semantics = "결제내역을 불러오는 중입니다.")
     }
 }
 
@@ -250,7 +250,7 @@ fun PaymentHistoryItem(
     time: String,
     orderNum: String,
     price: String,
-    flag: Int,// 0 -> Buy, 1 -> Refund
+    isRefund: Boolean,// 0 -> Buy, 1 -> Refund
     orderNumberSetter: MutableState<String>,
     navController: NavController
 ){
@@ -272,7 +272,7 @@ fun PaymentHistoryItem(
                 80.dp
             )
             .clickable {
-                if (flag ==1){
+                if (!isRefund){
                 orderNumberSetter.value = orderNum
                 navController.navigate("paymentHistoryList")
                     }
@@ -284,7 +284,7 @@ fun PaymentHistoryItem(
         ){
             Image(
                 painter = painterResource(
-                    if(flag==1) R.drawable.buy
+                    if(!isRefund) R.drawable.buy
                     else R.drawable.refund
                 ),
                 contentDescription = "",

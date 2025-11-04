@@ -128,27 +128,6 @@ fun PaymentSetting(
                 cardInfo.value = CardListServer(session.sessionId.value)
             }
         }
-
-        cardInfo.value = listOf(
-            CardInfo(
-                card_id = 2,
-                company = "ibk",
-                card_code = "1234567812341111",
-                date = "12:24"
-            ),
-            CardInfo(
-                card_id = 3,
-                company = "bnk",
-                card_code = "1234567812341111",
-                date = "12:24"
-            ),
-            CardInfo(
-                card_id = 5,
-                company = "kb",
-                card_code = "1234567812341111",
-                date = "12:24"
-            )
-        )
     }
 
     if(cardInfo.value != null) {
@@ -518,7 +497,8 @@ fun CustomAlertDialog(
     onClickConfirm: () -> Unit,
     leftText: String = "취소",
     rightText: String = "삭제",
-    cardID: Int = -1
+    cardID: Int = -1,
+    orderNum: String = "",
 ) {
     Dialog(
         onDismissRequest = { onClickCancel() },

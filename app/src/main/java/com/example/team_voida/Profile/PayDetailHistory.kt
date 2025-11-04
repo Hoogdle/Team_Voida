@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
+import com.example.team_voida.Basket.Basket
 import com.example.team_voida.Basket.BasketInfo
 import com.example.team_voida.Basket.ComposableLifecycle
 import com.example.team_voida.Notification.Notification
@@ -41,10 +42,22 @@ import com.example.team_voida.Payment.PaymentContact
 import com.example.team_voida.Payment.PaymentInfo
 import com.example.team_voida.Payment.PaymentNum
 import com.example.team_voida.Payment.PaymentRow
+import com.example.team_voida.ProfileServer.CancelOrder
+import com.example.team_voida.ProfileServer.PayDetailHistory
+import com.example.team_voida.ProfileServer.PayDetailHistoryListServer
+import com.example.team_voida.ProfileServer.PayDetailItem
+import com.example.team_voida.ProfileServer.PayHistory
+import com.example.team_voida.ProfileServer.PayHistoryList
+import com.example.team_voida.ProfileServer.PayHistoryListServer
 import com.example.team_voida.R
+import com.example.team_voida.Tools.LoaderSet
+import com.example.team_voida.session
 import com.example.team_voida.ui.theme.CancelColor
 import com.example.team_voida.ui.theme.TextLittleDark
 import com.example.team_voida.ui.theme.TextWhite
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 
 @Composable
@@ -94,6 +107,8 @@ fun PaymentHistoryList(
             )
     )) }
 
+    val payDetailHistory: MutableState<PaymentInfo?> = remember { mutableStateOf<PaymentInfo?>(null) }
+
 
     val customAlertDialogState: MutableState<CustomAlertDialogState> = remember {mutableStateOf<CustomAlertDialogState>(
         CustomAlertDialogState()
@@ -139,79 +154,92 @@ fun PaymentHistoryList(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .verticalScroll(scrollState)
-
-    ) {
-        Notification("주문번호" + orderNumber.value  +" 상품 정보입니다. 아래에 주문하신 상품을 확인하시고, 주문 취소를 원하시는 경우 화면 하단에 '주문취소' 버튼을 눌러주세요.")
-
-        Spacer(Modifier.height(10.dp))
-
-        Text(
-            modifier = Modifier
-                .padding(
-                    start = 22.dp
-                )
-                .semantics(mergeDescendants = true){
-                    text = AnnotatedString("아래에 주문하신 상품 목록을 확인해주세요.")
-                }
-            ,
-            textAlign = TextAlign.Center,
-            text = "주문번호" + orderNumber.value,
-            color = TextLittleDark,
-            style = TextStyle(
-                fontSize = 25.sp,
-                fontFamily = FontFamily(Font(R.font.pretendard_bold)),
-            )
-        )
-
-        Spacer(Modifier.height(15.dp))
-
-        PaymentAddress(editable = false)
-
-        Spacer(Modifier.height(7.dp))
-
-        PaymentContact(editable = false)
-
-        paymentInfo.value?.item?.let { PaymentNum(it.size) }
-        Spacer(Modifier.height(7.dp))
-        PaymentRow(paymentInfo)
-
-        Button(
-            shape = RectangleShape,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = 18.dp,
-                    vertical = 10.dp
-                )
-                .height(50.dp)
-                .clip(shape = RoundedCornerShape(15.dp)),
-            onClick = {
-                Log.e("Button","1")
-                showCustomAlertDialog()
-                Log.e("Button","2")
-            },
-            colors = ButtonColors(
-                containerColor = CancelColor,
-                contentColor = TextWhite,
-                disabledContentColor = TextWhite,
-                disabledContainerColor = CancelColor
-            )
-        ) {
-            Text(
-                text = "주문취소",
-                textAlign = TextAlign.Center,
-                style = TextStyle(
-                    color = TextWhite,
-                    fontSize = 17.sp,
-                    fontFamily = FontFamily(Font(R.font.pretendard_regular))
-                )
-            )
+    // 서버에 장바구니 정보 요청
+    if(payDetailHistory.value == null){
+        runBlocking {
+            val job = GlobalScope.launch{
+                payDetailHistory.value = PayDetailHistoryListServer(session.sessionId.value, orderNumber.value)
+            }
         }
+    }
+
+    if(payDetailHistory.value != null) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White)
+                .verticalScroll(scrollState)
+
+        ) {
+            Notification("주문번호" + orderNumber.value + " 상품 정보입니다. 아래에 주문하신 상품을 확인하시고, 주문 취소를 원하시는 경우 화면 하단에 '주문취소' 버튼을 눌러주세요.")
+
+            Spacer(Modifier.height(10.dp))
+
+            Text(
+                modifier = Modifier
+                    .padding(
+                        start = 22.dp
+                    )
+                    .semantics(mergeDescendants = true) {
+                        text = AnnotatedString("아래에 주문하신 상품 목록을 확인해주세요.")
+                    },
+                textAlign = TextAlign.Center,
+                text = "주문번호" + orderNumber.value,
+                color = TextLittleDark,
+                style = TextStyle(
+                    fontSize = 25.sp,
+                    fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                )
+            )
+
+            Spacer(Modifier.height(15.dp))
+
+            PaymentAddress(editable = false)
+
+            Spacer(Modifier.height(7.dp))
+
+            PaymentContact(editable = false)
+
+            payDetailHistory.value?.item?.let { PaymentNum(it.size) }
+            Spacer(Modifier.height(7.dp))
+            PaymentRow(payDetailHistory)
+
+            Button(
+                shape = RectangleShape,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = 18.dp,
+                        vertical = 10.dp
+                    )
+                    .height(50.dp)
+                    .clip(shape = RoundedCornerShape(15.dp)),
+                onClick = {
+                    Log.e("Button", "1")
+                    showCustomAlertDialog()
+                    Log.e("Button", "2")
+                },
+                colors = ButtonColors(
+                    containerColor = CancelColor,
+                    contentColor = TextWhite,
+                    disabledContentColor = TextWhite,
+                    disabledContainerColor = CancelColor
+                )
+            ) {
+                Text(
+                    text = "주문취소",
+                    textAlign = TextAlign.Center,
+                    style = TextStyle(
+                        color = TextWhite,
+                        fontSize = 17.sp,
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular))
+                    )
+                )
+            }
+
+        }
+    } else {
+        LoaderSet(info = "결제 상품 정보를 불러오는 중입니다.", semantics = "결제 상품 정보를 불러오는 중입니다.")
 
     }
     if (customAlertDialogState.value.title.isNotBlank()) {
@@ -219,7 +247,15 @@ fun PaymentHistoryList(
             title = customAlertDialogState.value.title,
             description = customAlertDialogState.value.description,
             onClickCancel = { customAlertDialogState.value.onClickCancel() },
-            onClickConfirm = { customAlertDialogState.value.onClickConfirm() },
+            onClickConfirm = {
+                runBlocking {
+                    var result = false
+                    val job = GlobalScope.launch{
+                        result = CancelOrder(session_id = session.sessionId.value, order_num = orderNumber.value)
+                    }
+                }
+                customAlertDialogState.value.onClickConfirm()
+             },
             leftText = "뒤로가기",
             rightText = "주문취소"
         )

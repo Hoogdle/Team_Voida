@@ -26,6 +26,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,6 +55,7 @@ import com.example.team_voida.Basket.ComposableLifecycle
 import com.example.team_voida.Basket.basketSample
 import com.example.team_voida.Categories.cateSports
 import com.example.team_voida.Notification.Notification
+import com.example.team_voida.ProductInfo.CancelAI
 import com.example.team_voida.ProductInfo.Loader
 import com.example.team_voida.R
 import com.example.team_voida.Tools.LoaderSet
@@ -80,9 +82,21 @@ fun Payment(
     selectedIndex: MutableState<Int>,
     productID: MutableState<Int>,
     isItemWhichPart: MutableState<Int>,
-    isPayOne: MutableState<Boolean>
+    isPayOne: MutableState<Boolean>,
+    isPayPage: MutableState<Boolean>,
+    paymentUserInfo: MutableState<PaymentUserInfo>
 ){
     val scrollState = rememberScrollState()
+
+    DisposableEffect(Unit) {
+
+        // Component를 벗어날 때 수행
+        onDispose {
+            isPayPage.value = false
+        }
+    }
+
+    isPayPage.value = true
     // 결제 수단 리스트
     val tmpRegisteredPayMethod = remember { mutableListOf("신용카드", "모바일 페이", "계좌이체") }
 
@@ -123,19 +137,24 @@ fun Payment(
                     },
                     session_id = session.sessionId.value,
                     product_id = productID.value
+
                 )
             } else {
                 paymentInfo.value = PaymentServerMultiple(
                     session_id = session.sessionId.value
                 )
             }
-
         }
     }
 
     Log.e("payment",productID.value.toString())
     // 결제 정보를 받은 경우 결제 페이지 정보 제공
     if(paymentInfo.value != null){
+
+        paymentUserInfo.value.address = paymentInfo.value!!.address
+        paymentUserInfo.value.cell = paymentInfo.value!!.phone
+        paymentUserInfo.value.email = paymentInfo.value!!.email
+
         Column (
             modifier = Modifier
                 .fillMaxSize()
@@ -189,7 +208,7 @@ fun Payment(
             Spacer(Modifier.height(20.dp))
         }
     } else{
-        LoaderSet(semantics = "결제 정보를 불러오는 중입니다. 잠시만 기다려주세요.")
+        LoaderSet(info = "결제 중입니다",semantics = "결제 중입니다")
     }
 
 }

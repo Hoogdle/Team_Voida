@@ -71,6 +71,7 @@ import com.example.team_voida.Home.HomePopularCall
 import com.example.team_voida.Home.Popular
 import com.example.team_voida.Login.Login
 import com.example.team_voida.Payment.Payment
+import com.example.team_voida.Payment.PaymentUserInfo
 import com.example.team_voida.ProductInfo.ProductInfo
 import com.example.team_voida.ProductInfo.ProductInfoBottomBar
 import com.example.team_voida.ProductInfo.ProductInfoInfo
@@ -178,6 +179,9 @@ fun HomeNav(){
 
     val orderNumber = remember{ mutableStateOf("") }
 
+    val isPayPage = remember { mutableStateOf(false) }
+    val paymentUserInfo: MutableState<PaymentUserInfo> = remember { mutableStateOf(PaymentUserInfo("","","")) }
+
     val speechRecognizerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
         onResult = { result ->
@@ -268,7 +272,8 @@ fun HomeNav(){
                     BasketPaymentButton(
                         dynamicTotalPrice.value,
                         isPayOne,
-                        navController
+                        navController,
+                        isPayPage
                     )
                 }
                 if(productFlag.value){
@@ -515,7 +520,9 @@ fun HomeNav(){
                         selectedIndex = selectedIndex,
                         productID = productID,
                         isItemWhichPart = isItemWhichPart,
-                        isPayOne = isPayOne
+                        isPayOne = isPayOne,
+                        isPayPage = isPayPage,
+                        paymentUserInfo = paymentUserInfo
                     )
                 }
 
