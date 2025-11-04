@@ -179,10 +179,11 @@ class CancelAIRequest(BaseModel):
 
 
 class CardInfo(BaseModel):
-    name: str
+    card_id: int
     company: str
     card_code: str
     date: str
+    card_num: int
 
 class CardRegisterRequest(BaseModel):
     session_id: str

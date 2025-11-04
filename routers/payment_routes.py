@@ -78,7 +78,6 @@ def card_register(payload: schemas.CardRegisterRequest, db: Session = Depends(ge
 
     card = models.Card(
         user_id = user.id,
-        name = payload.name,
         company = payload.company,
         card_code = payload.hashed_code,
         date = payload.card_code
@@ -118,7 +117,6 @@ def card_del(payload: schemas.CardDeleteRequest, db: Session = Depends(get_db)):
     #TODO, card_code Decode
     return [
         schemas.CardInfo(
-            name = card.name,
             company = card.company,
             card_code = card.code,
             date = card.date
@@ -127,26 +125,37 @@ def card_del(payload: schemas.CardDeleteRequest, db: Session = Depends(get_db)):
     ]
 
 
-@router.post("/CardPage", response_model=schemas.CardDeleteResponse)
-def card_page(session_id: str, db: Session = Depends(get_db)):
+@router.post("/CardPage", response_model=list[schemas.CardInfo])
+def card_page(payload: schemas.CancelAIRequest, db: Session = Depends(get_db)):
 
-    user = check_session(db,session_id)
+    user = check_session(db,payload.session_id)
 
     if not user:
         raise HTTPException(status_code=404, detail="User profile not found")
 
-
+    print(user.id)
     card_list = db.query(models.Card).filter(models.Card.user_id == user.id).all()
+    print(card_list)
+
     if not card_list:
-        raise HTTPException(status_code=404, detail="Card Not Exits")
+        return [
+            schemas.CardInfo(
+                card_id = -1,
+                company = "",
+                card_code = "",
+                date = "",
+                card_num = 0
+            )
+        ]
 
     #TODO, card_code Decode
     return [
         schemas.CardInfo(
-            name = card.name,
+            card_id = card.id,
             company = card.company,
             card_code = card.code,
-            date = card.date
+            date = card.date,
+            card_num = len(card_list)
         )
         for card in card_list
     ]
