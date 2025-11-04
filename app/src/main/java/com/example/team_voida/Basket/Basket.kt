@@ -79,10 +79,13 @@ fun Basket(
     productFlag: MutableState<Boolean>,
     selectedIndex: MutableState<Int>,
     productID: MutableState<Int>,
-    isItemWhichPart: MutableState<Int>
+    isItemWhichPart: MutableState<Int>,
+    isPayPage: MutableState<Boolean>
 ){
     val scrollState = rememberScrollState()
-    
+
+    isPayPage.value = false
+
     // 장바구니 개수
     val cartNum = remember { mutableStateOf(0)}
 

@@ -139,15 +139,14 @@ suspend fun AddOneOrder(
     address: String,
     email: String,
     cell: String,
-    itemList: BasketInfo
-
+    productId: Int
 ): OrderResponse?{
     val jsonObject = JSONObject()
     jsonObject.put("session_id", session_id)
     jsonObject.put("address", address)
     jsonObject.put("email", email)
     jsonObject.put("cell", cell)
-    jsonObject.put("item_list", itemList)
+    jsonObject.put("product_id", productId)
 
     val jsonObjectString = jsonObject.toString()
 
