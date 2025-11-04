@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.team_voida.Basket.BasketInfo
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
@@ -195,20 +196,40 @@ suspend fun AddBaksetOrder(
     address: String,
     email: String,
     cell: String,
+    price: Float,
     itemList: List<BasketInfo>,
 
 ): OrderResponse?{
+
+
     val jsonObject = JSONObject()
     jsonObject.put("session_id", session_id)
     jsonObject.put("address", address)
+    jsonObject.put("phone", cell)
     jsonObject.put("email", email)
-    jsonObject.put("cell", cell)
-    jsonObject.put("item_list", itemList)
+    jsonObject.put("total_price", price)
+
+    val jsonArray = JSONArray()
+    itemList.forEach { item ->
+        val itemObj = JSONObject()
+        itemObj.put("product_id", item.product_id)
+        itemObj.put("img", item.img)
+        itemObj.put("name", item.name)
+        itemObj.put("price", item.price)
+        itemObj.put("number", item.number)
+
+        jsonArray.put(itemObj)
+    }
+
+    jsonObject.put("items", jsonArray)
+
+    Log.e("Order",jsonArray .toString())
+
 
     val jsonObjectString = jsonObject.toString()
 
     try {
-        val url = URL(" https://fluent-marmoset-immensely.ngrok-free.app/AddOrder") // edit1
+        val url = URL(" https://fluent-marmoset-immensely.ngrok-free.app/CreateOrder") // edit1
         val connection = url.openConnection() as java.net.HttpURLConnection
         connection.doOutput = true // 서버로 보내기 위해 doOutPut 옵션 활성화
         connection.doInput = true

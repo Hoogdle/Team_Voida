@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -103,41 +104,50 @@ fun PayRegister(
     }
 
 
-    // 서버로 부터 해당 계정의 결제정보를 요청
-    runBlocking {
-        val job = GlobalScope.launch {
-            if(isPayOne.value){
-                orderResponse.value = AddOneOrder(
-                    session_id = session.sessionId.value,
-                    address = paymentUserInfo.value.address,
-                    email = paymentUserInfo.value.email,
-                    cell = paymentUserInfo.value.cell,
-                    productId = productID.value
-                )
-            } else {
-                runBlocking {
-                    val job = GlobalScope.launch {
-                        basketInfo.value = BasketListServer(session_id = session.sessionId.value)
-                    }
-                }
-                Thread.sleep(2000L)
-
-                if(basketInfo.value != null) {
+    if(basketInfo.value == null){
+        runBlocking {
+            val job = GlobalScope.launch {
+                if(isPayOne.value){
+                    orderResponse.value = AddOneOrder(
+                        session_id = session.sessionId.value,
+                        address = paymentUserInfo.value.address,
+                        email = paymentUserInfo.value.email,
+                        cell = paymentUserInfo.value.cell,
+                        productId = productID.value
+                    )
+                } else {
                     runBlocking {
                         val job = GlobalScope.launch {
-                            orderResponse.value = AddBaksetOrder(
-                                session_id = session.sessionId.value,
-                                address = paymentUserInfo.value.address,
-                                email = paymentUserInfo.value.email,
-                                cell = paymentUserInfo.value.cell,
-                                itemList = basketInfo.value!!
-                            )
+                            basketInfo.value = BasketListServer(session_id = session.sessionId.value)
+                        }
+                    }
+                    Thread.sleep(2000L)
+
+
+                    if(basketInfo.value != null) {
+
+                        var total: Float = 0F
+                        basketInfo.value!!.forEach {
+                            total += it.price
+                        }
+                        runBlocking {
+                            val job = GlobalScope.launch {
+                                orderResponse.value = AddBaksetOrder(
+                                    session_id = session.sessionId.value,
+                                    address = paymentUserInfo.value.address,
+                                    email = paymentUserInfo.value.email,
+                                    cell = paymentUserInfo.value.cell,
+                                    itemList = basketInfo.value!!,
+                                    price = total
+                                )
+                            }
                         }
                     }
                 }
             }
         }
     }
+
 
     if(orderResponse.value != null){
         Column (
@@ -148,10 +158,19 @@ fun PayRegister(
             Notification("결제가 완료되었습니다. 아래에 주문 정보를 확인해주세요.")
             Spacer(Modifier.height(25.dp))
 
-            Image(
-                painter = painterResource(R.drawable.pay_success),
-                contentDescription = ""
-            )
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ){
+                Image(
+                    painter = painterResource(R.drawable.pay_success),
+                    contentDescription = "",
+                    modifier = Modifier.size(50.dp)
+
+                    )
+            }
+            Spacer(Modifier.height(15.dp))
+
             Text(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally),
