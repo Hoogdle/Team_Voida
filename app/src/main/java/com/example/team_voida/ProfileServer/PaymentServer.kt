@@ -14,7 +14,8 @@ data class CardInfo(
     val card_id: Int,
     val company: String,
     val card_code: String,
-    val date: String
+    val date: String,
+    val card_num: Int
 )
 
 suspend fun CardListServer(
@@ -23,11 +24,12 @@ suspend fun CardListServer(
 
     val jsonObject = JSONObject()
     jsonObject.put("session_id", session_id)
+    Log.e("Card",session_id)
 
     val jsonObjectString = jsonObject.toString()
 
     try {
-        val url = URL(" https://fluent-marmoset-immensely.ngrok-free.app/CardList") // edit1
+        val url = URL(" https://fluent-marmoset-immensely.ngrok-free.app/CardPage") // edit1
         val connection = url.openConnection() as java.net.HttpURLConnection
         connection.doOutput = true // 서버로 보내기 위해 doOutPut 옵션 활성화
         connection.doInput = true
@@ -52,12 +54,18 @@ suspend fun CardListServer(
         if (connection.responseCode == HttpURLConnection.HTTP_OK) {
             val inputStream = connection.inputStream.bufferedReader().use { it.readText() }
             val json = Json.decodeFromString<List<CardInfo>>(inputStream) // edit3
+
+            Log.e("Card",json.toString())
             return json
         } else {
+            Log.e("Card","!")
+
             Log.e("xxx","else")
             return  null
         }
     } catch (e: Exception) {
+        Log.e("Card","?")
+
         Log.e("xxx","catch")
 
         e.printStackTrace()

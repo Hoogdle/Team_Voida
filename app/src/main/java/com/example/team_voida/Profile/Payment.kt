@@ -186,17 +186,19 @@ fun PaymentSetting(
 
             Spacer(Modifier.height(15.dp))
 
-            cardInfo.value!!.forEach {
-                PaymentCard(
-                    cardID = it.card_id,
-                    company = it.company,
-                    paymentNumber = it.card_code,
-                    name = "",
-                    expiredMonth = it.date,
-                    expiredDate = it.date
-                )
+            if(cardInfo.value!![0].card_num > 0) {
+                cardInfo.value!!.forEach {
+                    PaymentCard(
+                        cardID = it.card_id,
+                        company = it.company,
+                        paymentNumber = it.card_code,
+                        name = "",
+                        expiredMonth = it.date,
+                        expiredDate = it.date
+                    )
 
-                Spacer(Modifier.height(10.dp))
+                    Spacer(Modifier.height(10.dp))
+                }
             }
         }
     } else{

@@ -1,6 +1,7 @@
 package com.example.team_voida.Payment
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,6 +20,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -29,7 +33,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.text
@@ -49,13 +55,16 @@ import com.example.team_voida.Basket.ComposableLifecycle
 import com.example.team_voida.Login.LogIntButton
 import com.example.team_voida.Login.LoginForgotPW
 import com.example.team_voida.Login.LoginPassWordField
+import com.example.team_voida.Login.LoginServer
 import com.example.team_voida.Login.LoginTextField
 import com.example.team_voida.Notification.Notification
 import com.example.team_voida.R
 import com.example.team_voida.Tools.LoaderSet
 import com.example.team_voida.session
+import com.example.team_voida.ui.theme.ButtonBlue
 import com.example.team_voida.ui.theme.Selected
 import com.example.team_voida.ui.theme.TextLittleDark
+import com.example.team_voida.ui.theme.TextWhite
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -93,7 +102,7 @@ fun PayRegister(
             Log.e("123","on_create")
         } else if(event == Lifecycle.Event.ON_START){
             Log.e("123","on_start")
-            basketFlag.value = true
+            basketFlag.value = false
             homeNavFlag.value = true
             productFlag.value = false
 
@@ -184,7 +193,8 @@ fun PayRegister(
             Spacer(Modifier.height(25.dp))
 
             PayFinishRow(orderResponse)
-
+            Spacer(Modifier.height(35.dp))
+            PayResultToHomeButton(navController = navController)
 
         }
     } else {
@@ -306,5 +316,47 @@ fun PayFinishRow(
             }
             Spacer(Modifier.height(5.dp))
         }
+    }
+}
+
+
+
+// 로그인 버튼 컴포저블
+@Composable
+fun PayResultToHomeButton(
+    navController: NavController
+){
+    val context = LocalContext.current
+
+    Button(
+        shape = RectangleShape,
+        modifier = Modifier
+            .padding(
+                start = 10.dp,
+                end = 10.dp
+            )
+            .fillMaxWidth()
+            .height(65.dp)
+            .clip(shape = RoundedCornerShape(15.dp))
+        ,
+        onClick = {
+            navController.navigate("home")
+        },
+        colors = ButtonColors(
+            containerColor = ButtonBlue,
+            contentColor = TextWhite,
+            disabledContentColor = TextWhite,
+            disabledContainerColor = ButtonBlue
+        )
+    ) {
+        Text(
+            text = "홈으로 이동",
+            textAlign = TextAlign.Center,
+            style = TextStyle(
+                color = TextWhite,
+                fontSize = 17.sp,
+                fontFamily = FontFamily(Font(R.font.pretendard_regular))
+            )
+        )
     }
 }
