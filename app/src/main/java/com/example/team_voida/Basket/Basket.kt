@@ -467,8 +467,10 @@ fun BasketItemArrange(
                 price = textPrice,
                 basketInfo = basketInfo
             )
+            Log.e("Basket", textPrice)
         }
-        dynamicTotalPrice.value = "%,d".format(totalPrice)
+        Log.e("Basket",totalPrice.toString())
+        dynamicTotalPrice.value = totalPrice.toFloat().toString()
     }
 }
 
