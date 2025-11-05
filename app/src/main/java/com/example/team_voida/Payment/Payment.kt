@@ -57,10 +57,15 @@ import com.example.team_voida.Categories.cateSports
 import com.example.team_voida.Notification.Notification
 import com.example.team_voida.ProductInfo.CancelAI
 import com.example.team_voida.ProductInfo.Loader
+import com.example.team_voida.Profile.CardDeleteDialog
+import com.example.team_voida.Profile.CustomAlertDialogState
+import com.example.team_voida.Profile.PaymentLogoSelector
+import com.example.team_voida.ProfileServer.CardInfo
 import com.example.team_voida.R
 import com.example.team_voida.Tools.LoaderSet
 import com.example.team_voida.session
 import com.example.team_voida.ui.theme.Selected
+import com.example.team_voida.ui.theme.TextColor
 import com.example.team_voida.ui.theme.TextLittleDark
 import com.example.team_voida.ui.theme.Unselected
 import com.example.team_voida.ui.theme.WishButton
@@ -688,5 +693,175 @@ fun PaymentMethodList(
             }
             Spacer(Modifier.width(7.dp))
         }
+    }
+}
+
+@Composable
+fun PaymentSmallCard(
+    cardID: Int,
+    company: String,
+    paymentNumber: String,
+    name: String,
+    expiredMonth: String,
+    expiredDate: String,
+    cardList: MutableState<List<CardInfo>?>
+){
+    val logo = PaymentLogoSelector(company)
+
+    val customAlertDialogState: MutableState<CustomAlertDialogState> = remember {mutableStateOf<CustomAlertDialogState>(
+        CustomAlertDialogState()
+    )}
+    // 출처: https://dev-inventory.com/27 [개발자가 들려주는 IT 이야기:티스토리]
+
+    fun resetDialogState() {
+        customAlertDialogState.value = CustomAlertDialogState()
+    }
+
+    fun showCustomAlertDialog() {
+        customAlertDialogState.value = CustomAlertDialogState(
+            title = "정말로 삭제하시겠습니까?",
+            description = "삭제하면 복구할 수 없습니다.",
+            onClickConfirm = {
+                resetDialogState()
+            },
+            onClickCancel = {
+                resetDialogState()
+            }
+        )
+    }
+    // 다이얼로그 상태 초기화
+
+//    출처: https://dev-inventory.com/27 [개발자가 들려주는 IT 이야기:티스토리]
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp)
+            .padding(
+                horizontal = 15.dp
+            )
+            .clip(
+                shape = RoundedCornerShape(15.dp)
+            )
+            .background(color= com.example.team_voida.ui.theme.PaymentCard)
+
+    ){
+        Column {
+
+            // Logo and Setting
+            Row (
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ){
+                Image(
+                    modifier = Modifier
+                        .width(200.dp)
+                        .padding(
+                            horizontal = 20.dp,
+                            vertical = 20.dp
+                        )
+                    ,
+                    painter = painterResource(logo),
+                    contentDescription = ""
+                )
+                Button(
+                    onClick = {
+                        showCustomAlertDialog()
+                    },
+                    modifier = Modifier
+                        .padding(
+                            all = 10.dp
+                        )
+                        .size(50.dp)
+                        .padding(
+                            all = 5.dp
+                        )
+                    ,
+                    colors = ButtonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = Color.Transparent,
+                        disabledContentColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent
+                    ),
+                    contentPadding = PaddingValues(0.dp)
+                ){
+
+                }
+            }
+
+            Spacer(Modifier.height(40.dp))
+
+            // Card Number
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround
+            ){
+                val lastNumber = paymentNumber.substring(12,16)
+
+                for(i in 1..3){
+                    Text(
+                        text = "* * * *",
+                        style = TextStyle(
+                            color = TextColor,
+                            fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                            fontSize = 20.sp
+                        )
+                    )
+                }
+
+                Text(
+                    text = lastNumber,
+                    style = TextStyle(
+                        color = TextColor,
+                        fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                        fontSize = 20.sp
+                    )
+                )
+            }
+
+            Spacer(Modifier.height(10.dp))
+
+            // Name and Expired
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ){
+                Text(
+                    modifier = Modifier
+                        .padding(horizontal = 23.dp),
+                    text = name,
+                    style = TextStyle(
+                        color = TextColor,
+                        fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                        fontSize = 15.sp
+                    )
+                )
+
+                Text(
+                    modifier = Modifier
+                        .padding(horizontal = 23.dp),
+                    text = expiredMonth + "/" + expiredDate,
+                    style = TextStyle(
+                        color = TextColor,
+                        fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                        fontSize = 15.sp
+                    )
+                )
+            }
+        }
+
+        if (customAlertDialogState.value.title.isNotBlank()) {
+            CardDeleteDialog(
+                title = customAlertDialogState.value.title,
+                description = customAlertDialogState.value.description,
+                onClickCancel = { customAlertDialogState.value.onClickCancel() },
+                onClickConfirm = { customAlertDialogState.value.onClickConfirm() },
+                cardID = cardID,
+                cardList = cardList
+            )
+        }
+//        출처: https://dev-inventory.com/27 [개발자가 들려주는 IT 이야기:티스토리]
     }
 }

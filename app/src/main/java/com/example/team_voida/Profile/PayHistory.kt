@@ -5,19 +5,26 @@ import android.widget.Space
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsEndWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +35,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.text
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -50,6 +60,7 @@ import com.example.team_voida.session
 import com.example.team_voida.ui.theme.Selected
 import com.example.team_voida.ui.theme.TextColor
 import com.example.team_voida.ui.theme.TextLittleDark
+import com.example.team_voida.ui.theme.Unselected
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -158,7 +169,7 @@ fun PaymentHistory(
     }
 
 
-    val payHistory: MutableState<PayHistoryList?> = remember { mutableStateOf<PayHistoryList?>(null) }
+    val payHistory: MutableState<List<PayHistoryList>?> = remember { mutableStateOf<List<PayHistoryList>?>(null) }
     val cardInfo: MutableState<List<CardInfo>?> = remember { mutableStateOf<List<CardInfo>?>(null) }
 
 
@@ -225,20 +236,20 @@ fun PaymentHistory(
 
             Spacer(Modifier.height(20.dp))
 
-            payHistory.value!!.pay_list.forEach{
-                PaymentHistoryItem(
-                    year = it.date,
-                    month = it.date,
-                    date = it.date,
-                    time = it.date,
-                    orderNum = it.order_num,
-                    price = it.price.toString(),
-                    isRefund = it.is_refund,
-                    orderNumberSetter = orderNumber,
-                    navController = navController
-                )
-                Spacer(Modifier.height(10.dp))
-            }
+//            payHistory.value!!.pay_list.forEach{
+//                PaymentHistoryItem(
+//                    year = it.date,
+//                    month = it.date,
+//                    date = it.date,
+//                    time = it.date,
+//                    orderNum = it.order_num,
+//                    price = it.price.toString(),
+//                    isRefund = it.is_refund,
+//                    orderNumberSetter = orderNumber,
+//                    navController = navController
+//                )
+//                Spacer(Modifier.height(10.dp))
+//            }
 
         }
     } else {
@@ -339,6 +350,34 @@ fun PaymentHistoryItem(
                     fontSize = 20.sp
                 )
             )
+        }
+    }
+}
+
+
+@Composable
+fun CardRowList(
+    cardList: List<CardInfo>
+){
+    val scrollState = rememberScrollState()
+    val selected = remember{ mutableStateOf(0) }
+    Row(
+        modifier = Modifier
+            .horizontalScroll(scrollState)
+            .padding(
+                start = 20.dp
+            )
+    ){
+        cardList.forEachIndexed { index, item ->
+//            PaymentCard(
+//                cardID = it.card_id,
+//                company = it.company,
+//                paymentNumber = it.card_code,
+//                name = "",
+//                expiredMonth = it.date.substring(0,2),
+//                expiredDate = it.date.substring(2,4),
+//                cardList = cardInfo
+//            )
         }
     }
 }

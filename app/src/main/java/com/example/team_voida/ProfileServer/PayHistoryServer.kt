@@ -16,7 +16,8 @@ data class PayHistoryList(
     val card_code: String,
     val card_date: String,
     val card_company: String,
-    val pay_list: List<PayHistory>
+    val pay_list: List<PayHistory>,
+    val card_num: Int
 )
 
 @Serializable
@@ -48,7 +49,7 @@ data class PayDetailHistory(
 
 suspend fun PayHistoryListServer(
     session_id: String
-): PayHistoryList?{
+): List<PayHistoryList>{
 
     val jsonObject = JSONObject()
     jsonObject.put("session_id", session_id)
@@ -80,17 +81,49 @@ suspend fun PayHistoryListServer(
 
         if (connection.responseCode == HttpURLConnection.HTTP_OK) {
             val inputStream = connection.inputStream.bufferedReader().use { it.readText() }
-            val json = Json.decodeFromString<PayHistoryList>(inputStream) // edit3
+            val json = Json.decodeFromString<List<PayHistoryList>>(inputStream) // edit3
             return json
         } else {
             Log.e("xxx","else")
-            return  null
+            return listOf(
+                PayHistoryList(
+                    card_id = -1,
+                    card_code = "",
+                    card_date = "",
+                    card_company = "",
+                    card_num = 0,
+                    pay_list = listOf(
+                        PayHistory(
+                            is_refund = false,
+                            date = "",
+                            order_num = "",
+                            price = 0
+                        )
+                    )
+                )
+            )
         }
     } catch (e: Exception) {
         Log.e("xxx","catch")
 
         e.printStackTrace()
-        return  null
+        return listOf(
+            PayHistoryList(
+                card_id = -1,
+                card_code = "",
+                card_date = "",
+                card_company = "",
+                card_num = 0,
+                pay_list = listOf(
+                    PayHistory(
+                        is_refund = false,
+                        date = "",
+                        order_num = "",
+                        price = 0
+                    )
+                )
+            )
+        )
     }
 }
 

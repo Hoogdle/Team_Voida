@@ -2,6 +2,7 @@ package com.example.team_voida.Payment
 
 import android.util.Log
 import com.example.team_voida.Basket.BasketInfo
+import com.example.team_voida.ProfileServer.CardInfo
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.json.JSONArray
@@ -23,7 +24,8 @@ data class PaymentInfo(
     val address: String,
     val phone: String,
     val email: String,
-    val item: List<BasketInfo>
+    val item: List<BasketInfo>,
+    val card_list: List<CardInfo>
 )
 
 @Serializable

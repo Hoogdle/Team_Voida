@@ -43,6 +43,7 @@ import com.example.team_voida.Payment.PaymentInfo
 import com.example.team_voida.Payment.PaymentNum
 import com.example.team_voida.Payment.PaymentRow
 import com.example.team_voida.ProfileServer.CancelOrder
+import com.example.team_voida.ProfileServer.CardInfo
 import com.example.team_voida.ProfileServer.PayDetailHistory
 import com.example.team_voida.ProfileServer.PayDetailHistoryListServer
 import com.example.team_voida.ProfileServer.PayDetailItem
@@ -102,9 +103,16 @@ fun PaymentHistoryList(
                 price = 3990F,
                 number = 1
             ),
-
-
+            ),
+        card_list = listOf(
+            CardInfo(
+                card_id = -1,
+                company = "",
+                card_code = "",
+                date = "",
+                card_num = 0
             )
+        )
     )) }
 
     val payDetailHistory: MutableState<PaymentInfo?> = remember { mutableStateOf<PaymentInfo?>(null) }
