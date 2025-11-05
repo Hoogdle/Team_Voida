@@ -194,7 +194,8 @@ fun PaymentSetting(
                         paymentNumber = it.card_code,
                         name = "",
                         expiredMonth = it.date.substring(0,2),
-                        expiredDate = it.date.substring(2,4)
+                        expiredDate = it.date.substring(2,4),
+                        cardList = cardInfo
                     )
 
                     Spacer(Modifier.height(10.dp))
@@ -502,7 +503,7 @@ fun CustomAlertDialog(
     leftText: String = "취소",
     rightText: String = "삭제",
     cardID: Int = -1,
-    orderNum: String = "",
+    orderNum: String = ""
 ) {
     Dialog(
         onDismissRequest = { onClickCancel() },
@@ -595,19 +596,7 @@ fun CustomAlertDialog(
 
                     Button(
                         onClick = {
-                            var result: Boolean = false
-
-                            runBlocking {
-                                val job = GlobalScope.launch {
-                                    result = CardDel(
-                                        session_id = session.sessionId.value,
-                                        card_id = cardID
-                                    )
-                                }
-                            }
-                            Thread.sleep(2000L)
-
-                            // TODO, 삭제 알림
+                            onClickConfirm()
                         },
                         shape = RectangleShape,
                         modifier = Modifier
@@ -637,6 +626,150 @@ fun CustomAlertDialog(
 // 출처: https://dev-inventory.com/27 [개발자가 들려주는 IT 이야기:티스토리]
 
 
+@Composable
+fun CardDeleteDialog(
+    title: String,
+    description: String,
+    onClickCancel: () -> Unit,
+    onClickConfirm: () -> Unit,
+    leftText: String = "취소",
+    rightText: String = "삭제",
+    cardID: Int = -1,
+    orderNum: String = "",
+    cardList: MutableState<List<CardInfo>?>
+) {
+    Dialog(
+        onDismissRequest = { onClickCancel() },
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true,
+        )
+    ) {
+        Card(
+            shape = RoundedCornerShape(8.dp), // Card의 모든 꼭지점에 8.dp의 둥근 모서리 적용
+        )
+        {
+            Column(
+                modifier = Modifier
+                    .width(300.dp)
+                    .wrapContentHeight()
+                    .background(
+                        color = Color.White,
+                    ),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+
+                Spacer(modifier = Modifier.height(40.dp))
+
+                Text(
+                    text = title,
+                    textAlign = TextAlign.Center,
+                    style = TextStyle(
+                        color = Color.Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    text = description,
+                    textAlign = TextAlign.Center,
+                    style = TextStyle(
+                        color = Color.LightGray,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(40.dp))
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(color = Color.LightGray)
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Min) // Row의 높이를 내부 컴포넌트에 맞춤
+                ) {
+                    Button(
+                        onClick = { onClickCancel() },
+                        shape = RectangleShape,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White, // 버튼 배경색상
+                            contentColor = Color.Black, // 버튼 텍스트 색상
+                            disabledContainerColor = Color.Gray, // 버튼 비활성화 배경 색상
+                            disabledContentColor = Color.White, // 버튼 비활성화 텍스트 색상
+                        ),
+
+                        ) {
+                        Text(
+                            text = leftText,
+                            textAlign = TextAlign.Center,
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Normal
+                            )
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .width(1.dp)
+                            .background(color = Color.LightGray)
+                    )
+
+                    Button(
+                        onClick = {
+
+                            runBlocking {
+                                val job = GlobalScope.launch {
+                                    cardList.value = CardDel(
+                                        session_id = session.sessionId.value,
+                                        card_id = cardID
+                                    )
+                                }
+                            }
+                            Thread.sleep(2000L)
+                            onClickConfirm()
+
+                            // TODO, 삭제 알림
+                        },
+                        shape = RectangleShape,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White, // 버튼 배경색상
+                            contentColor = Color.Red, // 버튼 텍스트 색상
+                            disabledContainerColor = Color.Gray, // 버튼 비활성화 배경 색상
+                            disabledContentColor = Color.White, // 버튼 비활성화 텍스트 색상
+                        ),
+                    ) {
+                        Text(
+                            text = rightText,
+                            textAlign = TextAlign.Center,
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 
 // CustomAlertDialogState.kt
 data class CustomAlertDialogState(
@@ -655,7 +788,8 @@ fun PaymentCard(
     paymentNumber: String,
     name: String,
     expiredMonth: String,
-    expiredDate: String
+    expiredDate: String,
+    cardList: MutableState<List<CardInfo>?>
 ){
     val logo = PaymentLogoSelector(company)
 
@@ -814,12 +948,13 @@ fun PaymentCard(
         }
 
         if (customAlertDialogState.value.title.isNotBlank()) {
-            CustomAlertDialog(
+            CardDeleteDialog(
                 title = customAlertDialogState.value.title,
                 description = customAlertDialogState.value.description,
                 onClickCancel = { customAlertDialogState.value.onClickCancel() },
                 onClickConfirm = { customAlertDialogState.value.onClickConfirm() },
-                cardID = cardID
+                cardID = cardID,
+                cardList = cardList
             )
         }
 //        출처: https://dev-inventory.com/27 [개발자가 들려주는 IT 이야기:티스토리]

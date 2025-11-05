@@ -40,6 +40,7 @@ import com.example.team_voida.Basket.BasketInfo
 import com.example.team_voida.Basket.BasketListServer
 import com.example.team_voida.Basket.ComposableLifecycle
 import com.example.team_voida.Notification.Notification
+import com.example.team_voida.ProfileServer.CardInfo
 import com.example.team_voida.ProfileServer.PayHistory
 import com.example.team_voida.ProfileServer.PayHistoryList
 import com.example.team_voida.ProfileServer.PayHistoryListServer
@@ -158,6 +159,8 @@ fun PaymentHistory(
 
 
     val payHistory: MutableState<PayHistoryList?> = remember { mutableStateOf<PayHistoryList?>(null) }
+    val cardInfo: MutableState<List<CardInfo>?> = remember { mutableStateOf<List<CardInfo>?>(null) }
+
 
     // 서버에 장바구니 정보 요청
     if(payHistory.value == null){
@@ -216,7 +219,8 @@ fun PaymentHistory(
                 paymentNumber = "1111222233334444",
                 name = "Travis",
                 expiredMonth = "12",
-                expiredDate = "10"
+                expiredDate = "10",
+                cardList = cardInfo
             )
 
             Spacer(Modifier.height(20.dp))

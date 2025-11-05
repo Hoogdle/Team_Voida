@@ -134,7 +134,7 @@ suspend fun CardAdd(
 suspend fun CardDel(
     session_id: String,
     card_id: Int
-): Boolean{
+): List<CardInfo>{
 
     val jsonObject = JSONObject()
     jsonObject.put("session_id", session_id)
@@ -167,16 +167,32 @@ suspend fun CardDel(
 
         if (connection.responseCode == HttpURLConnection.HTTP_OK) {
             val inputStream = connection.inputStream.bufferedReader().use { it.readText() }
-            val json = Json.decodeFromString<Boolean>(inputStream) // edit3
+            val json = Json.decodeFromString<List<CardInfo>>(inputStream) // edit3
             return json
         } else {
             Log.e("xxx","else")
-            return  false
+            return  listOf(
+                CardInfo(
+                    card_id = -1,
+                    company = "",
+                    card_code = "",
+                    date = "",
+                    card_num = 0
+                )
+            )
         }
     } catch (e: Exception) {
         Log.e("xxx","catch")
 
         e.printStackTrace()
-        return  false
+        return  listOf(
+            CardInfo(
+                card_id = -1,
+                company = "",
+                card_code = "",
+                date = "",
+                card_num = 0
+            )
+        )
     }
 }
