@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -21,11 +22,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.team_voida.Notification.Notification
+import com.example.team_voida.Payment.PaymentUserInfo
 import com.example.team_voida.R
 import com.example.team_voida.ui.theme.TextLittleDark
 
 @Composable
 fun ForgotPw2(
+    userId: MutableState<Int>,
     navController: NavController
 ){
     val pw = remember{ mutableStateOf("") }
@@ -57,7 +60,7 @@ fun ForgotPw2(
         LoginPassWordField(rePw,"비밀번호 확인", rePwVisibility)
 
         Spacer(Modifier.height(165.dp))
-        ResetPwButton(pw, rePw, navController)
+        ResetPwButton(userId, pw, rePw, navController)
         Spacer(Modifier.height(15.dp))
 
         Text(

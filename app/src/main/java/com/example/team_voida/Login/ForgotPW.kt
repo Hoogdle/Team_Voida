@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -26,6 +27,7 @@ import com.example.team_voida.ui.theme.TextLittleDark
 
 @Composable
 fun ForgotPw(
+    userId: MutableState<Int>,
     navController: NavController
 ){
     val email = remember{ mutableStateOf("") }
@@ -54,7 +56,7 @@ fun ForgotPw(
         LoginTextField(cell,"전화번호")
 
         Spacer(Modifier.height(165.dp))
-        FindPwButton(email, cell, navController)
+        FindPwButton(email, cell, userId, navController)
         Spacer(Modifier.height(15.dp))
 
         Text(

@@ -63,6 +63,8 @@ fun StartNav(){
     val pw = remember { mutableStateOf("") }
     val rePw = remember { mutableStateOf("") }
 
+    val userId = remember { mutableStateOf(-1) }
+
     val pwVisibility = remember { mutableStateOf(false) }
     val rePwVisibility = remember { mutableStateOf(false) }
 
@@ -86,8 +88,8 @@ fun StartNav(){
             )
         }
         composable("login"){ Login(navController = navController) }
-        composable("forgotpw1"){ ForgotPw(navController = navController) }
-        composable("pwReset"){ ForgotPw2(navController = navController) }
+        composable("forgotpw1"){ ForgotPw(userId = userId,navController = navController) }
+        composable("pwReset"){ ForgotPw2(userId = userId, navController = navController) }
 
         composable("naming") { CreateAccountNaming(
             email = email.value,

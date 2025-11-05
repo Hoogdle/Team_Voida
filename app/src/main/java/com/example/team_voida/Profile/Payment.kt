@@ -193,8 +193,8 @@ fun PaymentSetting(
                         company = it.company,
                         paymentNumber = it.card_code,
                         name = "",
-                        expiredMonth = it.date,
-                        expiredDate = it.date
+                        expiredMonth = it.date.substring(0,2),
+                        expiredDate = it.date.substring(2,4)
                     )
 
                     Spacer(Modifier.height(10.dp))
@@ -376,6 +376,8 @@ fun PaymentAdd(
     val whichBank = remember { mutableStateOf(-1) }
     val tmpRegisteredPayMethod = remember { mutableListOf("신용카드", "모바일 페이") }
     val bankList = remember { mutableListOf("우리은행","신한은행","기업은행","국민은행","농협은행","새마을금고","하나은행","SC 제일은행","신협은행","부산은행","광주은행","대구은행",) }
+    val bankForServer = remember { mutableListOf("woorie","sinhan","ibk","kb","nh","mg","hana","sc","shinhup","bnk","gj","dgb",) }
+
 
     Notification("아래에 정보를 입력하여 결제수단을 등록해주세요.", top = 5.dp, bottom = 5.dp)
 
@@ -473,9 +475,9 @@ fun PaymentAdd(
                         Spacer(Modifier.height(10.dp))
                         PaymentRegisterLastButton(
                             pw.value, lastCheck = lastCheck, isAdding,
-                            cardCompany = bankList[whichBank.value],
+                            cardCompany = bankForServer[whichBank.value],
                             cardNum = cardNum.value,
-                            cardDate = expiredDate.value,
+                            cardDate = expiredMonth.value+expiredDate.value,
                             cardCvv = cvv.value,
                             cardList = cardList
                             )

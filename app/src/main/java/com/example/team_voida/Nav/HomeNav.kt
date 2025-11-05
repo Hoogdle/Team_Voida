@@ -114,7 +114,7 @@ val navItemList = listOf(
     BottomNav(
         unSelected = R.drawable.logo,
         selected = R.drawable.logo,
-        notify = "Ai Assitant 활성화"
+        notify = "AI Assitant 활성화"
     ),
     BottomNav(
         unSelected = R.drawable.bottom_cart,
@@ -384,7 +384,7 @@ fun HomeNav(){
         }
     ){ inner ->
         if(isAssistantWorking.value){
-            LoaderSet(info = "AI Asssitant", semantics = "AI Assistant가 정보를 분석하는 중입니다. 잠시만 기다려주세요.")
+            LoaderSet(info = "AI Asssitant", semantics = "A I Assistant가 정보를 분석하는 중입니다. 잠시만 기다려주세요.")
         }else {
             NavHost(
                 modifier = Modifier

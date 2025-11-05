@@ -21,6 +21,12 @@ data class LoginSession(
     val session_id: String
 )
 
+@Serializable
+data class ResetPW1Response(
+    val is_user: Boolean,
+    val user_id: Int
+)
+
 suspend fun LoginServer(
     email: String,
     pw: String
@@ -74,10 +80,12 @@ suspend fun LoginServer(
 
 
 suspend fun ResetPW2(
+    userId: Int,
     pw: String
-): String?{
+): Boolean{
 
     val jsonObject = JSONObject()
+    jsonObject.put("user_id",userId)
     jsonObject.put("pw", pw)
 
     var result: String? = ""
@@ -108,17 +116,17 @@ suspend fun ResetPW2(
 
         if (connection.responseCode == HttpURLConnection.HTTP_OK) {
             val inputStream = connection.inputStream.bufferedReader().use { it.readText() }
-            val json = Json.decodeFromString<LoginSession>(inputStream) // edit3
-            return json.session_id
+            val json = Json.decodeFromString<Boolean>(inputStream) // edit3
+            return true
         } else {
             Log.e("xxx","else")
-            return null
+            return false
         }
     } catch (e: Exception) {
         Log.e("xxx","catch")
 
         e.printStackTrace()
-        return null
+        return false
     }
 }
 
@@ -126,7 +134,7 @@ suspend fun ResetPW2(
 suspend fun ResetPW1(
     email: String,
     cell: String
-): String?{
+): ResetPW1Response{
 
     val jsonObject = JSONObject()
     jsonObject.put("email", email)
@@ -160,16 +168,22 @@ suspend fun ResetPW1(
 
         if (connection.responseCode == HttpURLConnection.HTTP_OK) {
             val inputStream = connection.inputStream.bufferedReader().use { it.readText() }
-            val json = Json.decodeFromString<LoginSession>(inputStream) // edit3
-            return json.session_id
+            val json = Json.decodeFromString<ResetPW1Response>(inputStream) // edit3
+            return json
         } else {
             Log.e("xxx","else")
-            return null
+            return ResetPW1Response(
+                is_user = false,
+                user_id = -1
+            )
         }
     } catch (e: Exception) {
         Log.e("xxx","catch")
 
         e.printStackTrace()
-        return null
+        return ResetPW1Response(
+            is_user = false,
+            user_id = -1
+        )
     }
 }

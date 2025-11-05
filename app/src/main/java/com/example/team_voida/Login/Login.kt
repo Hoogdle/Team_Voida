@@ -376,6 +376,7 @@ fun LogIntButton(
 fun FindPwButton(
     email: MutableState<String>,
     cell: MutableState<String>,
+    userId: MutableState<Int>,
     navController: NavController
 ){
     val context = LocalContext.current
@@ -393,7 +394,7 @@ fun FindPwButton(
         ,
         onClick = {
             
-            var result: String? = null
+            lateinit var result: ResetPW1Response
 
             runBlocking {
                 val job = GlobalScope.launch {
@@ -404,7 +405,8 @@ fun FindPwButton(
                 }
             }
             Thread.sleep(2000L)
-            if(result != null){
+            if(result.is_user){
+                userId.value = result.user_id
                 navController.navigate("pwReset")
             } else{
                 Toast.makeText(context, "이메일과 전화번호를 확인해주세요.", Toast.LENGTH_SHORT).show()
@@ -433,6 +435,7 @@ fun FindPwButton(
 // 로그인 버튼 컴포저블
 @Composable
 fun ResetPwButton(
+    userId: MutableState<Int>,
     pw: MutableState<String>,
     rePw: MutableState<String>,
     navController: NavController
@@ -451,17 +454,18 @@ fun ResetPwButton(
             .clip(shape = RoundedCornerShape(15.dp))
         ,
         onClick = {
-            var result: String? = null
+            var result: Boolean = false
 
             runBlocking {
                 val job = GlobalScope.launch {
                     result = ResetPW2(
+                        userId = userId.value,
                         pw = pw.value
                     )
                 }
             }
             Thread.sleep(2000L)
-            if(result != null){
+            if(result == true){
                 Toast.makeText(context, "로그인 페이지로 이동합니다.", Toast.LENGTH_SHORT).show()
                 navController.navigate("login")
             } else{

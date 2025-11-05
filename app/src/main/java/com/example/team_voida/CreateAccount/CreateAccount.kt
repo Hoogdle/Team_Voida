@@ -445,7 +445,7 @@ fun CreateAccountButton(
                     }
                 }
                 Thread.sleep(1500L)
-
+                Log.e("Create",tmp.toString())
                 if(tmp == true){
                     navController.navigate("naming")
                 }
