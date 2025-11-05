@@ -84,14 +84,16 @@ def get_order(payload: schemas.OrderInfoRequest, db: Session = Depends(get_db)):
 
 
 # 계정 설정에서 얻는 주문목록
-@router.get("/PayHistoryList", response_model=schemas.PayHistoryList)
+@router.post("/PayHistoryList", response_model=schemas.PayHistoryList)
 def get_order(payload: schemas.OrderListRequest, db: Session = Depends(get_db)):
 
     user = check_session(db, payload.session_id)
+    cards = db.query(models.Card).filter(models.Card.user_id == user.id).all()
+    orders = [(card.id, db.query(models.Order).filter(models.Order.user_id == user.id, models.Order.card_id == card.id)) for card in cards]
+    print(orders)
 
-    order = db.query(models.Order).filter(models.Order.user_id == user.id).all()
 
-    if not order:
+    if not orders:
         raise HTTPException(status_code=404, detail="Order not found")
 
     return [

@@ -139,7 +139,6 @@ class PayHistoryList(BaseModel):
     pay_list: List[PayHistory]
     card_num: int
 
-class OrderListResponse(BaseModel):
     
 
 class TodaySaleItemResponse(BaseModel):
