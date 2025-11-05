@@ -161,6 +161,20 @@ class LoginResponse(BaseModel):
 class UserNameRequest(BaseModel):
     un: str
 
+class ResetRequestStep1(BaseModel):
+    email: str
+    cell: str
+
+class ResetStep1Response(BaseModel):
+    is_user: bool
+    user_id: int
+
+class ResetStep2Response(BaseModel):
+    user_id: int
+    pw: str
+
+
+#=============================
 class ReviewRequest(BaseModel):
     product_id: int
     session_id: str
@@ -187,17 +201,14 @@ class CardInfo(BaseModel):
 
 class CardRegisterRequest(BaseModel):
     session_id: str
-    name: str
-    company: str
+    card_company: str
     card_code: str
-    date: str # TODO, type
-
-class CardRegisterResponse(BaseModel):
-    is_registered: bool
+    card_date: str
+    card_cvv: str
 
 class CardDeleteRequest(BaseModel):
     session_id: str
-    card_code: str
+    card_id: int
 
 class CardDeleteResponse(BaseModel):
     card_list: List[CardInfo]

@@ -152,10 +152,10 @@ class Card(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
-    name = Column(Text)
     company = Column(Text)
     card_code = Column(Text)
-    date = Column(Date)
+    card_cvv =Column(Text)
+    date = Column(Text)
 
     user = relationship("User", back_populates="cards")
 

@@ -80,3 +80,42 @@ def set_user_name(
     db.commit()
 
     return schemas.LoginResponse(session_id=session_id)
+
+
+
+@router.post("/ResetPW1", response_model=schemas.ResetStep1Response)
+def set_user_name(
+        payload: schemas.ResetRequestStep1,
+        db: Session = Depends(get_db)
+):
+    user = db.query(models.User).filter(models.User.email == payload.email, models.User.cell == payload.cell).first()
+    if user:
+        return schemas.ResetStep1Response(
+                    is_user = True,
+                    user_id = user.id
+                )
+    else:
+        return schemas.ResetStep1Response(
+                    is_user = False,
+                    user_id = 0
+                )
+
+@router.post("/ResetPW2", response_model=bool)
+def set_user_name(
+        payload: schemas.ResetStep2Response,
+        db: Session = Depends(get_db)
+):
+    user = db.query(models.User).filter(models.User.id == payload.user_id).first()
+
+    if not user:
+        return False
+    
+    hashed_pw = bcrypt.hashpw(payload.pw.encode("utf-8"), bcrypt.gensalt())
+    new_pw = hashed_pw.decode("utf-8")
+
+    user.pw = new_pw
+    db.commit()
+
+    if user:
+        return True
+    
