@@ -125,8 +125,22 @@ class OrderList(BaseModel):
 class OrderListRequest(BaseModel):
     session_id: str
 
+class PayHistory(BaseModel):
+    is_refund: bool
+    date: str
+    order_num: str
+    price: int
+
+class PayHistoryList(BaseModel):
+    card_id: int
+    card_code: str
+    card_date: str
+    card_company: str
+    pay_list: List[PayHistory]
+    card_num: int
+
 class OrderListResponse(BaseModel):
-    order_list: List[OrderList]
+    
 
 class TodaySaleItemResponse(BaseModel):
     id: int
@@ -213,3 +227,5 @@ class CardDeleteRequest(BaseModel):
 class CardDeleteResponse(BaseModel):
     card_list: List[CardInfo]
 
+
+#

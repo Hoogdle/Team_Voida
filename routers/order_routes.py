@@ -84,7 +84,7 @@ def get_order(payload: schemas.OrderInfoRequest, db: Session = Depends(get_db)):
 
 
 # 계정 설정에서 얻는 주문목록
-@router.get("/OrderList", response_model=schemas.OrderListResponse)
+@router.get("/PayHistoryList", response_model=schemas.PayHistoryList)
 def get_order(payload: schemas.OrderListRequest, db: Session = Depends(get_db)):
 
     user = check_session(db, payload.session_id)
