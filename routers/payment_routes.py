@@ -120,6 +120,9 @@ def card_del(payload: schemas.CardDeleteRequest, db: Session = Depends(get_db)):
 
     cards = db.query(models.Card).filter(models.Card.user_id == user.id).all()
 
+    if not cards:
+        raise HTTPException(status_code=404, detail="Card Not Exits")
+
     #TODO, card_code Decode
 
     return [
