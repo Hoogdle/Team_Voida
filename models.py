@@ -115,6 +115,7 @@ class Order(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"))
+    card_id = Column(Integer)
     total_price = Column(BigInteger)
     address = Column(Text)
     phone = Column(Text)

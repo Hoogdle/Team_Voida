@@ -110,6 +110,7 @@ class OrderCreate(BaseModel):
     email: str
     total_price: float
     items: List[BasketItem]
+    card_id: int
 
 class OrderInfoRequest(BaseModel):
     session_id: str

@@ -20,7 +20,8 @@ def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
     user = check_session(db, order.session_id)
 
     db_order = models.Order(
-        user_id=user.id,
+       	user_id=user.id,
+        card_id=order.card_id,
         total_price=order.total_price,
         address = user.address,
         phone = user.cell,
