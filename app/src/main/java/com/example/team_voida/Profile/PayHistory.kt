@@ -68,6 +68,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 
@@ -242,10 +244,7 @@ fun PaymentHistory(
                 if(it.card_id == selectedCardId.value){
                     it.pay_list.forEach {
                         PaymentHistoryItem(
-                            year = it.date,
-                            month = it.date,
                             date = it.date,
-                            time = it.date,
                             orderNum = it.order_num,
                             price = it.price.toString(),
                             isRefund = it.is_refund,
@@ -262,12 +261,27 @@ fun PaymentHistory(
     }
 }
 
+fun monthToNumber(month: String): Int {
+    return when (month) {
+        "JANUARY", "JAN" -> 1
+        "FEBRUARY", "FEB" -> 2
+        "MARCH", "MAR" -> 3
+        "APRIL", "APR" -> 4
+        "MAY" -> 5
+        "JUNE", "JUN" -> 6
+        "JULY", "JUL" -> 7
+        "AUGUST", "AUG" -> 8
+        "SEPTEMBER", "SEP" -> 9
+        "OCTOBER", "OCT" -> 10
+        "NOVEMBER", "NOV" -> 11
+        "DECEMBER", "DEC" -> 12
+        else -> throw IllegalArgumentException("Invalid month: $month")
+    }
+}
+
 @Composable
 fun PaymentHistoryItem(
-    year: String,
-    month: String,
     date: String,
-    time: String,
     orderNum: String,
     price: String,
     isRefund: Boolean,// 0 -> Buy, 1 -> Refund
@@ -276,6 +290,15 @@ fun PaymentHistoryItem(
 ){
     val floatPrice = price.toFloat()
     val textPrice = DecimalFormat("#,###", DecimalFormatSymbols(Locale.US)).format(floatPrice)
+
+    val formatter = DateTimeFormatter.ISO_DATE_TIME
+    val localDateTime = LocalDateTime.parse(date, formatter)
+
+    val year = localDateTime.year
+    val month = monthToNumber(localDateTime.month.toString())
+    val day = localDateTime.dayOfMonth
+
+    val time = localDateTime.hour.toString() + ":" + localDateTime.minute.toString() + ":" + localDateTime.second.toString()
 
     Box(
         modifier = Modifier
@@ -320,7 +343,7 @@ fun PaymentHistoryItem(
                         .padding(
                             top = 21.dp
                         ),
-                    text = year + "년 " + month + "월 " + date + "일 " + time,
+                    text = year.toString() + "년 " + month.toString() + "월 " + day.toString() + "일 " + time,
                     style = TextStyle(
                         color = TextColor,
                         fontFamily = FontFamily(Font(R.font.roboto_regular)),
@@ -332,7 +355,7 @@ fun PaymentHistoryItem(
                         .padding(
                             bottom = 15.dp
                         ),
-                    text = orderNum,
+                    text = "#" + orderNum.padStart(7,'0'),
                     style = TextStyle(
                         color = TextColor,
                         fontFamily = FontFamily(Font(R.font.roboto_semibold)),
