@@ -138,7 +138,7 @@ class OrderListRequest(BaseModel):
 
 class PayHistory(BaseModel):
     is_refund: bool
-    date: str
+    date: datetime
     order_num: str
     price: int
 
@@ -147,8 +147,8 @@ class PayHistoryList(BaseModel):
     card_code: str
     card_date: str
     card_company: str
-    pay_list: List[PayHistory]
     card_num: int
+    pay_list: List[PayHistory]
 
     
 

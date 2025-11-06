@@ -85,24 +85,37 @@ def get_order(payload: schemas.OrderInfoRequest, db: Session = Depends(get_db)):
 
 
 # 계정 설정에서 얻는 주문목록
-@router.post("/PayHistoryList", response_model=schemas.PayHistoryList)
+@router.post("/PayHistoryList", response_model=list[schemas.PayHistoryList])
 def get_order(payload: schemas.OrderListRequest, db: Session = Depends(get_db)):
 
     user = check_session(db, payload.session_id)
     cards = db.query(models.Card).filter(models.Card.user_id == user.id).all()
-    orders = [(card.id, db.query(models.Order).filter(models.Order.user_id == user.id, models.Order.card_id == card.id)) for card in cards]
+    orders = [(card.id, card.card_code, card.date, card.company, len(cards), db.query(models.Order).filter(models.Order.user_id == user.id, models.Order.card_id == card.id)) for card in cards]
     print(orders)
+	# (card_id, card_code, card_date, card_company, card_num, orders)
 
 
     if not orders:
         raise HTTPException(status_code=404, detail="Order not found")
 
     return [
-        schemas.OrderList(
-            order_num = order.id,
-            order_date = order.created_at,
-            price = order.total_price
-        )
+       schemas.PayHistoryList(
+			card_id = order[0],
+			card_code = order[1],
+			card_date = order[2],
+			card_company = order[3],
+			card_num = order[4],
+			pay_list = [
+				schemas.PayHistory(
+					is_refund = inner_order.is_cancel,
+					date = inner_order.created_at,
+					order_num = str(inner_order.id),
+					price = int(inner_order.total_price)
+				)
+				for inner_order in order[5]
+			]
+		)
+		for order in orders
     ]
 
 
