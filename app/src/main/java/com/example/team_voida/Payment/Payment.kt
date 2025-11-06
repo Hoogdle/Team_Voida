@@ -31,7 +31,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -776,7 +775,8 @@ fun PaymentSmallCard(
             .background(color= com.example.team_voida.ui.theme.PaymentCard)
             .clickable {
                 selectedCardId.value = cardID
-            },
+            }
+
     ){
         Column (
             modifier = Modifier.fillMaxWidth()
@@ -799,6 +799,28 @@ fun PaymentSmallCard(
                     painter = painterResource(logo),
                     contentDescription = ""
                 )
+                Button(
+                    onClick = {
+                    },
+                    modifier = Modifier
+                        .padding(
+                            all = 10.dp
+                        )
+                        .size(50.dp)
+                        .padding(
+                            all = 5.dp
+                        )
+                    ,
+                    colors = ButtonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = Color.Transparent,
+                        disabledContentColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent
+                    ),
+                    contentPadding = PaddingValues(0.dp)
+                ){
+
+                }
             }
 
             Spacer(Modifier.height(30.dp))
