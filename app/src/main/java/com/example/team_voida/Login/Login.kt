@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,6 +38,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -63,6 +66,7 @@ fun Login(
 ){
     val email = remember{ mutableStateOf("") }
     val pw = remember{ mutableStateOf("") }
+    val passwordVisibility = remember { mutableStateOf(false) }
 
     Column (
         modifier = Modifier
@@ -84,7 +88,7 @@ fun Login(
         Spacer(Modifier.height(165.dp))
         LoginTextField(email,"이메일 또는 전화번호")
         Spacer(Modifier.height(15.dp))
-        LoginPassWordField(pw,"비밀번호")
+        LoginPassWordField(pw,"비밀번호", passwordVisibility)
         Spacer(Modifier.height(10.dp))
         LoginForgotPW(navController)
         Spacer(Modifier.height(165.dp))
@@ -190,7 +194,8 @@ fun LoginTextField(
 @Composable
 fun LoginPassWordField(
     input: MutableState<String>,
-    placeholder: String
+    placeholder: String,
+    passwordVisibility: MutableState<Boolean>
 ){
     val interactionSource = remember{ MutableInteractionSource() }
 
@@ -230,6 +235,8 @@ fun LoginPassWordField(
                 fontSize = 14.sp
             ),
 
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            visualTransformation = if (passwordVisibility.value) VisualTransformation.None else PasswordVisualTransformation(),
             decorationBox = @Composable{ innerTextField ->
                 TextFieldDefaults.DecorationBox(
                     placeholder = {
@@ -265,6 +272,9 @@ fun LoginPassWordField(
         )
         Icon(
             modifier = Modifier
+                .clickable {
+                    passwordVisibility.value != passwordVisibility.value
+                }
                 .size(20.dp)
                 .offset(
                     x = 330.dp,
@@ -287,7 +297,7 @@ fun LoginForgotPW(
         Text(
             modifier = Modifier
                 .align(alignment = Alignment.CenterHorizontally)
-                .clickable {navController.navigate("start")},
+                .clickable {navController.navigate("forgotpw1")},
             text = "비밀번호를 잊어버렸나요?",
             textAlign = TextAlign.Center,
             style = TextStyle(
@@ -350,6 +360,127 @@ fun LogIntButton(
     ) {
         Text(
             text = "로그인",
+            textAlign = TextAlign.Center,
+            style = TextStyle(
+                color = TextWhite,
+                fontSize = 17.sp,
+                fontFamily = FontFamily(Font(R.font.pretendard_regular))
+            )
+        )
+    }
+}
+
+
+// 로그인 버튼 컴포저블
+@Composable
+fun FindPwButton(
+    email: MutableState<String>,
+    cell: MutableState<String>,
+    userId: MutableState<Int>,
+    navController: NavController
+){
+    val context = LocalContext.current
+
+    Button(
+        shape = RectangleShape,
+        modifier = Modifier
+            .padding(
+                start = 10.dp,
+                end = 10.dp
+            )
+            .fillMaxWidth()
+            .height(65.dp)
+            .clip(shape = RoundedCornerShape(15.dp))
+        ,
+        onClick = {
+            
+            lateinit var result: ResetPW1Response
+
+            runBlocking {
+                val job = GlobalScope.launch {
+                    result = ResetPW1(
+                        email = email.value,
+                        cell = cell.value
+                    )
+                }
+            }
+            Thread.sleep(2000L)
+            if(result.is_user){
+                userId.value = result.user_id
+                navController.navigate("pwReset")
+            } else{
+                Toast.makeText(context, "이메일과 전화번호를 확인해주세요.", Toast.LENGTH_SHORT).show()
+            }
+        },
+        colors = ButtonColors(
+            containerColor = ButtonBlue,
+            contentColor = TextWhite,
+            disabledContentColor = TextWhite,
+            disabledContainerColor = ButtonBlue
+        )
+    ) {
+        Text(
+            text = "비밀번호 찾기",
+            textAlign = TextAlign.Center,
+            style = TextStyle(
+                color = TextWhite,
+                fontSize = 17.sp,
+                fontFamily = FontFamily(Font(R.font.pretendard_regular))
+            )
+        )
+    }
+}
+
+
+// 로그인 버튼 컴포저블
+@Composable
+fun ResetPwButton(
+    userId: MutableState<Int>,
+    pw: MutableState<String>,
+    rePw: MutableState<String>,
+    navController: NavController
+){
+    val context = LocalContext.current
+
+    Button(
+        shape = RectangleShape,
+        modifier = Modifier
+            .padding(
+                start = 10.dp,
+                end = 10.dp
+            )
+            .fillMaxWidth()
+            .height(65.dp)
+            .clip(shape = RoundedCornerShape(15.dp))
+        ,
+        onClick = {
+            var result: Boolean = false
+
+            runBlocking {
+                val job = GlobalScope.launch {
+                    result = ResetPW2(
+                        userId = userId.value,
+                        pw = pw.value
+                    )
+                }
+            }
+            Thread.sleep(2000L)
+            if(result == true){
+                Toast.makeText(context, "로그인 페이지로 이동합니다.", Toast.LENGTH_SHORT).show()
+                navController.navigate("login")
+            } else{
+                Toast.makeText(context, "", Toast.LENGTH_SHORT).show()
+            }
+        },
+        colors = ButtonColors(
+            containerColor = ButtonBlue,
+            contentColor = TextWhite,
+            disabledContentColor = TextWhite,
+            disabledContainerColor = ButtonBlue
+        )
+    ) {
+        Text(
+            text = "비밀번호 설정",
             textAlign = TextAlign.Center,
             style = TextStyle(
                 color = TextWhite,

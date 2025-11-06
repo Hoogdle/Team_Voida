@@ -209,7 +209,7 @@ fun SearchBar(
                             RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
                         )
                         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
-                        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "음성인식 중..")
+                        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Voida Assistance가 음성을 인식합니다.")
                         speechRecognizerLauncher.launch(intent)
                     } else {
                         ActivityCompat.requestPermissions(

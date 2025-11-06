@@ -76,6 +76,8 @@ fun SearchResult(
     barPrice: MutableState<Float>
 ){
 
+    isItemWhichPart.value = 0
+
     ComposableLifecycle { source, event ->
         if (event == Lifecycle.Event.ON_PAUSE) {
             Log.e("123","on_pause")
@@ -149,6 +151,7 @@ fun RealSearchProducts(
 
     var count: Int? = null
 
+    isItemWhichPart.value = 0
     // represent {index * 2} items
     val index = remember { mutableStateOf(5) } // 보여 주고자 하는 상품의 개수
 
@@ -256,6 +259,7 @@ fun SearchProducts(
 ){
 
     var count: Int? = null
+
 
     // represent {index * 2} items
     val index = remember { mutableStateOf(5) }
@@ -389,7 +393,6 @@ fun SearchCard(
             .clickable {
                 barPrice.value = price
                 productID.value = id
-                isItemWhichPart.value = 0
                 navController.navigate("productInfo")
             }
     ){

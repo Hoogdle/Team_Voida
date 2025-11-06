@@ -17,7 +17,8 @@ data class SearchResultItem(
     val description: String,
     val price: Float,
     val image_url: String,
-    val category: String
+    val category: String,
+    val sector: Int
 )
 suspend fun SearchResultServer(
     productName: String
@@ -54,14 +55,15 @@ suspend fun SearchResultServer(
         if (connection.responseCode == HttpURLConnection.HTTP_OK) {
             val inputStream = connection.inputStream.bufferedReader().use { it.readText() }
             val json = Json.decodeFromString<List<SearchResultItem>?>(inputStream) // edit3
+            Log.e("Search","O")
             return json
         } else {
-            Log.e("xxx","else")
+            Log.e("Search","!")
+
             return  null
         }
     } catch (e: Exception) {
-        Log.e("xxx","catch")
-
+        Log.e("Search","?")
         e.printStackTrace()
         return  null
     }

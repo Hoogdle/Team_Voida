@@ -9,5 +9,6 @@ data class Popular(
     val description: String,
     val price: Float,
     val image_url: String,
-    val category: String
+    val category: String,
+    val sector: Int
 )

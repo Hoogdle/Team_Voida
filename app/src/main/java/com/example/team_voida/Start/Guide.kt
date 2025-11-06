@@ -223,7 +223,7 @@ fun Guide2(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally),
                     textAlign = TextAlign.Center,
-                    text = "음량 상하키로 음성검색",
+                    text = "AI Assistant",
                     color = TextLittleDark,
                     style = TextStyle(
                         fontSize = 25.sp,
@@ -235,7 +235,7 @@ fun Guide2(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally),
                     textAlign = TextAlign.Center,
-                    text = "더 이상 검색 버튼을 찾지 못하는 문제는 없을 겁니다! 음량 상하 버튼을 동시에 눌러 음성 검색 기능을 활성화하세요!",
+                    text = "오직 음성만으로 쇼핑을 즐길 수 있습니다! 화면 최하단 중앙부에 AI Assistant 버튼을 누른 뒤, 원하는 기능을 말해보세요!",
                     color = Color.Black,
                     style = TextStyle(
                         fontSize = 15.sp,
