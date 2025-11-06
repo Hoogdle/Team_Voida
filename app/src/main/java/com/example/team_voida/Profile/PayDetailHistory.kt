@@ -1,13 +1,23 @@
 package com.example.team_voida.Profile
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -22,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
@@ -54,6 +65,8 @@ import com.example.team_voida.R
 import com.example.team_voida.Tools.LoaderSet
 import com.example.team_voida.session
 import com.example.team_voida.ui.theme.CancelColor
+import com.example.team_voida.ui.theme.IconBlue
+import com.example.team_voida.ui.theme.TextColor
 import com.example.team_voida.ui.theme.TextLittleDark
 import com.example.team_voida.ui.theme.TextWhite
 import kotlinx.coroutines.GlobalScope
@@ -121,7 +134,6 @@ fun PaymentHistoryList(
     val customAlertDialogState: MutableState<CustomAlertDialogState> = remember {mutableStateOf<CustomAlertDialogState>(
         CustomAlertDialogState()
     )}
-    // 출처: https://dev-inventory.com/27 [개발자가 들려주는 IT 이야기:티스토리]
 
     fun resetDialogState() {
         customAlertDialogState.value = CustomAlertDialogState()
@@ -172,6 +184,7 @@ fun PaymentHistoryList(
     }
 
     if(payDetailHistory.value != null) {
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -276,4 +289,6 @@ fun PaymentHistoryList(
         )
     }
 }
+
+
 

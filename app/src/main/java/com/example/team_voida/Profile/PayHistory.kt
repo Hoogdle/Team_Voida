@@ -4,6 +4,7 @@ import android.util.Log
 import android.widget.Space
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -57,6 +58,7 @@ import com.example.team_voida.ProfileServer.PayHistoryListServer
 import com.example.team_voida.R
 import com.example.team_voida.Tools.LoaderSet
 import com.example.team_voida.session
+import com.example.team_voida.ui.theme.IconBlue
 import com.example.team_voida.ui.theme.Selected
 import com.example.team_voida.ui.theme.TextColor
 import com.example.team_voida.ui.theme.TextLittleDark
@@ -168,6 +170,7 @@ fun PaymentHistory(
         }
     }
 
+    val selectedCardId: MutableState<Int> = remember { mutableStateOf(-1)}
 
     val payHistory: MutableState<List<PayHistoryList>?> = remember { mutableStateOf<List<PayHistoryList>?>(null) }
     val cardInfo: MutableState<List<CardInfo>?> = remember { mutableStateOf<List<CardInfo>?>(null) }
@@ -183,6 +186,10 @@ fun PaymentHistory(
     }
 
     if(payHistory.value != null) {
+        if(selectedCardId.value == -1) {
+            selectedCardId.value = payHistory.value!![0].card_id
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -224,33 +231,31 @@ fun PaymentHistory(
 
             Spacer(Modifier.height(15.dp))
 
-            PaymentCard(
-                cardID = 1,
-                company = "ibk",
-                paymentNumber = "1111222233334444",
-                name = "Travis",
-                expiredMonth = "12",
-                expiredDate = "10",
-                cardList = cardInfo
+            HistoryCardList(
+                selectedCardId = selectedCardId,
+                cardList = payHistory.value!!
             )
 
             Spacer(Modifier.height(20.dp))
 
-//            payHistory.value!!.pay_list.forEach{
-//                PaymentHistoryItem(
-//                    year = it.date,
-//                    month = it.date,
-//                    date = it.date,
-//                    time = it.date,
-//                    orderNum = it.order_num,
-//                    price = it.price.toString(),
-//                    isRefund = it.is_refund,
-//                    orderNumberSetter = orderNumber,
-//                    navController = navController
-//                )
-//                Spacer(Modifier.height(10.dp))
-//            }
-
+            payHistory.value!!.forEach {
+                if(it.card_id == selectedCardId.value){
+                    it.pay_list.forEach {
+                        PaymentHistoryItem(
+                            year = it.date,
+                            month = it.date,
+                            date = it.date,
+                            time = it.date,
+                            orderNum = it.order_num,
+                            price = it.price.toString(),
+                            isRefund = it.is_refund,
+                            orderNumberSetter = orderNumber,
+                            navController = navController
+                        )
+                        Spacer(Modifier.height(10.dp))
+                    }
+                }
+            }
         }
     } else {
         LoaderSet(info = "결제내역을 불러오는 중입니다.", semantics = "결제내역을 불러오는 중입니다.")
@@ -355,12 +360,15 @@ fun PaymentHistoryItem(
 }
 
 
+
 @Composable
-fun CardRowList(
-    cardList: List<CardInfo>
+fun HistoryCardList(
+    selectedCardId: MutableState<Int>,
+    cardList: List<PayHistoryList>
 ){
     val scrollState = rememberScrollState()
-    val selected = remember{ mutableStateOf(0) }
+
+
     Row(
         modifier = Modifier
             .horizontalScroll(scrollState)
@@ -369,15 +377,157 @@ fun CardRowList(
             )
     ){
         cardList.forEachIndexed { index, item ->
-//            PaymentCard(
-//                cardID = it.card_id,
-//                company = it.company,
-//                paymentNumber = it.card_code,
-//                name = "",
-//                expiredMonth = it.date.substring(0,2),
-//                expiredDate = it.date.substring(2,4),
-//                cardList = cardInfo
-//            )
+
+            HistoryPaymentCard(
+                cardID = item.card_id,
+                company = item.card_company,
+                paymentNumber = item.card_code,
+                name = "",
+                expiredMonth = item.card_date.substring(0,2),
+                expiredDate = item.card_date.substring(2,4),
+                selectedCardId = selectedCardId
+            )
+            Spacer(Modifier.width(2.dp))
+        }
+    }
+}
+@Composable
+fun HistoryPaymentCard(
+    cardID: Int,
+    company: String,
+    paymentNumber: String,
+    name: String,
+    expiredMonth: String,
+    expiredDate: String,
+    selectedCardId: MutableState<Int>
+){
+    val logo = PaymentLogoSelector(company)
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp)
+            .padding(
+                horizontal = 3.dp
+            )
+            .border(
+                width = if(selectedCardId.value == cardID){
+                    2.dp
+                } else {
+                    0.dp
+                },
+                color = IconBlue,
+                shape = RoundedCornerShape(15.dp)
+            )
+            .clip(
+                shape = RoundedCornerShape(15.dp)
+            )
+            .background(color= com.example.team_voida.ui.theme.PaymentCard)
+            .clickable {
+                selectedCardId.value = cardID
+            }
+
+    ){
+        Column (
+            modifier = Modifier.fillMaxWidth()
+        ){
+
+            // Logo and Setting
+            Row (
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ){
+                Image(
+                    modifier = Modifier
+                        .width(140.dp)
+                        .padding(
+                            horizontal = 20.dp,
+                            vertical = 20.dp
+                        )
+                    ,
+                    painter = painterResource(logo),
+                    contentDescription = ""
+                )
+                Button(
+                    onClick = {
+                    },
+                    modifier = Modifier
+                        .padding(
+                            all = 10.dp
+                        )
+                        .size(50.dp)
+                        .padding(
+                            all = 5.dp
+                        )
+                    ,
+                    colors = ButtonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = Color.Transparent,
+                        disabledContentColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent
+                    ),
+                    contentPadding = PaddingValues(0.dp)
+                ){
+
+                }
+            }
+
+            Spacer(Modifier.height(30.dp))
+
+            // Card Number
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ){
+                Spacer(Modifier.width(35.dp))
+                val lastNumber = paymentNumber.substring(12,16)
+
+                for(i in 1..3){
+                    Text(
+                        text = "****  ",
+                        style = TextStyle(
+                            color = TextColor,
+                            fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                            fontSize = 15.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    )
+                }
+                Text(
+                    text = lastNumber,
+                    style = TextStyle(
+                        color = TextColor,
+                        fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                        fontSize = 15.sp,
+                        textAlign = TextAlign.Center
+                    )
+                )
+                Spacer(Modifier.width(10.dp))
+            }
+
+            Spacer(Modifier.height(15.dp))
+
+            // Name and Expired
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ){
+                Spacer(Modifier.width(130.dp))
+
+                Spacer(Modifier.weight(1f))
+
+                Text(
+                    text = expiredMonth + "/" + expiredDate,
+                    style = TextStyle(
+                        color = TextColor,
+                        fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                        fontSize = 12.sp
+                    )
+                )
+            }
         }
     }
 }
