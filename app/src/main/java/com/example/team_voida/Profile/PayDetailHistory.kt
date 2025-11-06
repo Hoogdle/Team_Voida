@@ -202,11 +202,18 @@ fun PaymentHistoryList(
 
             Spacer(Modifier.height(15.dp))
 
-            PaymentAddress(editable = false)
+            PaymentAddress(
+                address = "",
+                editable = false
+            )
 
             Spacer(Modifier.height(7.dp))
 
-            PaymentContact(editable = false)
+            PaymentContact(
+                cell = "",
+                email = "",
+                editable = false
+            )
 
             payDetailHistory.value?.item?.let { PaymentNum(it.size) }
             Spacer(Modifier.height(7.dp))

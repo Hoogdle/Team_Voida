@@ -183,6 +183,8 @@ fun HomeNav(){
     val isPayPage = remember { mutableStateOf(false) }
     val paymentUserInfo: MutableState<PaymentUserInfo> = remember { mutableStateOf(PaymentUserInfo("","","")) }
 
+    val cardId: MutableState<Int> = remember { mutableStateOf(-1) }
+
     val speechRecognizerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
         onResult = { result ->
@@ -525,7 +527,8 @@ fun HomeNav(){
                         isPayOne = isPayOne,
                         isPayPage = isPayPage,
                         paymentUserInfo = paymentUserInfo,
-                        dynamicTotalPrice = dynamicTotalPrice
+                        dynamicTotalPrice = dynamicTotalPrice,
+                        cardID = cardId
                     )
                 }
 
@@ -621,7 +624,8 @@ fun HomeNav(){
                         isItemWhichPart = isItemWhichPart,
                         isPayOne = isPayOne,
                         isPayPage = isPayPage,
-                        paymentUserInfo = paymentUserInfo
+                        paymentUserInfo = paymentUserInfo,
+                        cardId = cardId
                     )
                 }
             }

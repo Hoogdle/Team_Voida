@@ -92,7 +92,8 @@ fun Payment(
     isPayOne: MutableState<Boolean>,
     isPayPage: MutableState<Boolean>,
     paymentUserInfo: MutableState<PaymentUserInfo>,
-    dynamicTotalPrice: MutableState<String>
+    dynamicTotalPrice: MutableState<String>,
+    cardID: MutableState<Int>
 ){
     val scrollState = rememberScrollState()
 
@@ -110,7 +111,7 @@ fun Payment(
 
     // 결제 화면 하단 네비 Flag bit 설정 
     val paymentInfo:MutableState<PaymentInfo?> = remember { mutableStateOf<PaymentInfo?>(null) }
-    val selectedCardId = remember{ mutableStateOf(-1) }
+    val selectedCardId = cardID
 
     ComposableLifecycle { source, event ->
         if (event == Lifecycle.Event.ON_PAUSE) {
@@ -213,10 +214,13 @@ fun Payment(
             Spacer(Modifier.height(15.dp))
 
             PaymentAddress(
+                address = paymentInfo.value!!.address,
                 editable = true
             )
             Spacer(Modifier.height(7.dp))
             PaymentContact(
+                cell = paymentInfo.value!!.phone,
+                email = paymentInfo.value!!.email,
                 editable = true
             )
             Spacer(Modifier.height(15.dp))
@@ -248,6 +252,7 @@ fun Payment(
 // 배송지 주소 컴포저블
 @Composable
 fun PaymentAddress(
+    address: String,
     editable: Boolean
 ){
     Column(
@@ -299,7 +304,7 @@ fun PaymentAddress(
                     .fillMaxWidth()
                     .weight(8f)
                 ,
-                text = "서울특별시 서대문구 독립문로 129-1 가나다 아파트세상 203동 1104호",
+                text = address,
                 color = TextLittleDark,
                 style = TextStyle(
                     fontSize = 16.sp,
@@ -340,6 +345,8 @@ fun PaymentAddress(
 // 연락처 정보 컴포저블
 @Composable
 fun PaymentContact(
+    cell: String,
+    email: String,
     editable: Boolean
 ){
     Column(
@@ -391,7 +398,7 @@ fun PaymentContact(
                     .fillMaxWidth()
                     .weight(8f)
                 ,
-                text = "010-1234-5678"+"\n"+"123456@gmail.com",
+                text = cell+"\n"+email,
                 color = TextLittleDark,
                 style = TextStyle(
                     fontSize = 16.sp,
@@ -627,30 +634,6 @@ fun PaymentMethod(){
                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
             )
         )
-        Button(
-            onClick = {},
-            modifier = Modifier
-                .size(30.dp)
-                .width(1.dp)
-                .offset(
-                    x = -10.dp,
-                )
-            ,
-            colors = ButtonColors(
-                containerColor = Color.Transparent,
-                contentColor = Color.Transparent,
-                disabledContentColor = Color.Transparent,
-                disabledContainerColor = Color.Transparent
-            ),
-            contentPadding = PaddingValues(0.dp)
-        ) {
-            Image(
-                painter = painterResource(R.drawable.payment_edit),
-                contentDescription = "결제 방법 변경 버튼",
-                modifier = Modifier
-
-            )
-        }
     }
 }
 
@@ -831,6 +814,7 @@ fun PaymentSmallCard(
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ){
+                Spacer(Modifier.width(35.dp))
                 val lastNumber = paymentNumber.substring(12,16)
 
                 for(i in 1..3){
@@ -844,7 +828,6 @@ fun PaymentSmallCard(
                         )
                     )
                 }
-
                 Text(
                     text = lastNumber,
                     style = TextStyle(
@@ -854,9 +837,10 @@ fun PaymentSmallCard(
                         textAlign = TextAlign.Center
                     )
                 )
+                Spacer(Modifier.width(10.dp))
             }
 
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(15.dp))
 
             // Name and Expired
             Row(
@@ -864,6 +848,10 @@ fun PaymentSmallCard(
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ){
+                Spacer(Modifier.width(130.dp))
+
+                Spacer(Modifier.weight(1f))
+
                 Text(
                     text = expiredMonth + "/" + expiredDate,
                     style = TextStyle(

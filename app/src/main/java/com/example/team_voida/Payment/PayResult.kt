@@ -83,7 +83,8 @@ fun PayRegister(
     isItemWhichPart: MutableState<Int>,
     isPayOne: MutableState<Boolean>,
     isPayPage: MutableState<Boolean>,
-    paymentUserInfo: MutableState<PaymentUserInfo>
+    paymentUserInfo: MutableState<PaymentUserInfo>,
+    cardId: MutableState<Int>
 ){
     val scrollState = rememberScrollState()
     val orderResponse: MutableState<OrderResponse?> = remember { mutableStateOf(null) }
@@ -147,7 +148,8 @@ fun PayRegister(
                                     email = paymentUserInfo.value.email,
                                     cell = paymentUserInfo.value.cell,
                                     itemList = basketInfo.value!!,
-                                    price = total
+                                    price = total,
+                                    card_id = cardId.value
                                 )
                             }
                         }

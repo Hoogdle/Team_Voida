@@ -203,7 +203,7 @@ suspend fun AddBaksetOrder(
     cell: String,
     price: Float,
     itemList: List<BasketInfo>,
-
+    card_id: Int
 ): OrderResponse?{
 
 
@@ -213,6 +213,7 @@ suspend fun AddBaksetOrder(
     jsonObject.put("phone", cell)
     jsonObject.put("email", email)
     jsonObject.put("total_price", price)
+    jsonObject.put("card_id", card_id)
 
     val jsonArray = JSONArray()
     itemList.forEach { item ->
