@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +31,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -64,6 +66,7 @@ import com.example.team_voida.ProfileServer.CardInfo
 import com.example.team_voida.R
 import com.example.team_voida.Tools.LoaderSet
 import com.example.team_voida.session
+import com.example.team_voida.ui.theme.IconBlue
 import com.example.team_voida.ui.theme.Selected
 import com.example.team_voida.ui.theme.TextColor
 import com.example.team_voida.ui.theme.TextLittleDark
@@ -108,6 +111,8 @@ fun Payment(
 
     // 결제 화면 하단 네비 Flag bit 설정 
     val paymentInfo:MutableState<PaymentInfo?> = remember { mutableStateOf<PaymentInfo?>(null) }
+    val selectedCardId = remember{ mutableStateOf(-1) }
+
     ComposableLifecycle { source, event ->
         if (event == Lifecycle.Event.ON_PAUSE) {
             Log.e("123","on_pause")
@@ -149,6 +154,12 @@ fun Payment(
                 paymentInfo.value = PaymentServerMultiple(
                     session_id = session.sessionId.value
                 )
+
+                if(!paymentInfo.value!!.cards.isEmpty()){
+                    selectedCardId.value = paymentInfo.value!!.cards[0].card_id
+                }
+
+                Log.e("BasketPay",paymentInfo.value.toString())
             }
         }
     }
@@ -222,7 +233,12 @@ fun Payment(
             PaymentMethod()
             Spacer(Modifier.height(5.dp))
             PaymentMethodList(tmpRegisteredPayMethod)
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(10.dp))
+            PaymentCardList(
+                selectedCardId = selectedCardId,
+                cardList = paymentInfo.value!!.cards
+            )
+            Spacer(Modifier.height(10.dp))
         }
     } else{
         LoaderSet(info = "결제 중입니다",semantics = "결제 중입니다")
@@ -696,6 +712,36 @@ fun PaymentMethodList(
     }
 }
 
+
+@Composable
+fun PaymentCardList(
+    selectedCardId: MutableState<Int>,
+    cardList: List<CardInfo>
+){
+    val scrollState = rememberScrollState()
+
+
+    Row(
+        modifier = Modifier
+            .horizontalScroll(scrollState)
+            .padding(
+                start = 20.dp
+            )
+    ){
+        cardList.forEachIndexed { index, item ->
+            PaymentSmallCard(
+                cardID = item.card_id,
+                company = item.company,
+                paymentNumber = item.card_code,
+                name = "",
+                expiredMonth = item.date.substring(0,2),
+                expiredDate = item.date.substring(2,4),
+                selectedCardId = selectedCardId
+            )
+            Spacer(Modifier.width(2.dp))
+        }
+    }
+}
 @Composable
 fun PaymentSmallCard(
     cardID: Int,
@@ -704,48 +750,37 @@ fun PaymentSmallCard(
     name: String,
     expiredMonth: String,
     expiredDate: String,
-    cardList: MutableState<List<CardInfo>?>
+    selectedCardId: MutableState<Int>
 ){
     val logo = PaymentLogoSelector(company)
 
-    val customAlertDialogState: MutableState<CustomAlertDialogState> = remember {mutableStateOf<CustomAlertDialogState>(
-        CustomAlertDialogState()
-    )}
-    // 출처: https://dev-inventory.com/27 [개발자가 들려주는 IT 이야기:티스토리]
-
-    fun resetDialogState() {
-        customAlertDialogState.value = CustomAlertDialogState()
-    }
-
-    fun showCustomAlertDialog() {
-        customAlertDialogState.value = CustomAlertDialogState(
-            title = "정말로 삭제하시겠습니까?",
-            description = "삭제하면 복구할 수 없습니다.",
-            onClickConfirm = {
-                resetDialogState()
-            },
-            onClickCancel = {
-                resetDialogState()
-            }
-        )
-    }
-    // 다이얼로그 상태 초기화
-
-//    출처: https://dev-inventory.com/27 [개발자가 들려주는 IT 이야기:티스토리]
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(200.dp)
             .padding(
-                horizontal = 15.dp
+                horizontal = 3.dp
+            )
+            .border(
+                width = if(selectedCardId.value == cardID){
+                    2.dp
+                } else {
+                    0.dp
+                },
+                color = IconBlue,
+                shape = RoundedCornerShape(15.dp)
             )
             .clip(
                 shape = RoundedCornerShape(15.dp)
             )
             .background(color= com.example.team_voida.ui.theme.PaymentCard)
-
+            .clickable {
+                selectedCardId.value = cardID
+            },
     ){
-        Column {
+        Column (
+            modifier = Modifier.fillMaxWidth()
+        ){
 
             // Logo and Setting
             Row (
@@ -755,7 +790,7 @@ fun PaymentSmallCard(
             ){
                 Image(
                     modifier = Modifier
-                        .width(200.dp)
+                        .width(140.dp)
                         .padding(
                             horizontal = 20.dp,
                             vertical = 20.dp
@@ -764,48 +799,26 @@ fun PaymentSmallCard(
                     painter = painterResource(logo),
                     contentDescription = ""
                 )
-                Button(
-                    onClick = {
-                        showCustomAlertDialog()
-                    },
-                    modifier = Modifier
-                        .padding(
-                            all = 10.dp
-                        )
-                        .size(50.dp)
-                        .padding(
-                            all = 5.dp
-                        )
-                    ,
-                    colors = ButtonColors(
-                        containerColor = Color.Transparent,
-                        contentColor = Color.Transparent,
-                        disabledContentColor = Color.Transparent,
-                        disabledContainerColor = Color.Transparent
-                    ),
-                    contentPadding = PaddingValues(0.dp)
-                ){
-
-                }
             }
 
-            Spacer(Modifier.height(40.dp))
+            Spacer(Modifier.height(30.dp))
 
             // Card Number
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround
+                horizontalArrangement = Arrangement.Center
             ){
                 val lastNumber = paymentNumber.substring(12,16)
 
                 for(i in 1..3){
                     Text(
-                        text = "* * * *",
+                        text = "****  ",
                         style = TextStyle(
                             color = TextColor,
                             fontFamily = FontFamily(Font(R.font.roboto_regular)),
-                            fontSize = 20.sp
+                            fontSize = 15.sp,
+                            textAlign = TextAlign.Center
                         )
                     )
                 }
@@ -815,7 +828,8 @@ fun PaymentSmallCard(
                     style = TextStyle(
                         color = TextColor,
                         fontFamily = FontFamily(Font(R.font.roboto_regular)),
-                        fontSize = 20.sp
+                        fontSize = 15.sp,
+                        textAlign = TextAlign.Center
                     )
                 )
             }
@@ -826,42 +840,17 @@ fun PaymentSmallCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.End
             ){
                 Text(
-                    modifier = Modifier
-                        .padding(horizontal = 23.dp),
-                    text = name,
-                    style = TextStyle(
-                        color = TextColor,
-                        fontFamily = FontFamily(Font(R.font.roboto_regular)),
-                        fontSize = 15.sp
-                    )
-                )
-
-                Text(
-                    modifier = Modifier
-                        .padding(horizontal = 23.dp),
                     text = expiredMonth + "/" + expiredDate,
                     style = TextStyle(
                         color = TextColor,
                         fontFamily = FontFamily(Font(R.font.roboto_regular)),
-                        fontSize = 15.sp
+                        fontSize = 12.sp
                     )
                 )
             }
         }
-
-        if (customAlertDialogState.value.title.isNotBlank()) {
-            CardDeleteDialog(
-                title = customAlertDialogState.value.title,
-                description = customAlertDialogState.value.description,
-                onClickCancel = { customAlertDialogState.value.onClickCancel() },
-                onClickConfirm = { customAlertDialogState.value.onClickConfirm() },
-                cardID = cardID,
-                cardList = cardList
-            )
-        }
-//        출처: https://dev-inventory.com/27 [개발자가 들려주는 IT 이야기:티스토리]
     }
 }

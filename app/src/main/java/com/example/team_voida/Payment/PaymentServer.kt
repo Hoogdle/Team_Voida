@@ -25,7 +25,7 @@ data class PaymentInfo(
     val phone: String,
     val email: String,
     val item: List<BasketInfo>,
-    val card_list: List<CardInfo>
+    val cards: List<CardInfo>
 )
 
 @Serializable
@@ -125,12 +125,15 @@ suspend fun PaymentServerMultiple(
             val inputStream = connection.inputStream.bufferedReader().use { it.readText() }
             val json = Json.decodeFromString<PaymentInfo>(inputStream) // edit3
             return json
+            Log.e("BasketPay",json.toString())
         } else {
             Log.e("xxx","else")
+            Log.e("BasketPay","?")
             return  null
         }
     } catch (e: Exception) {
         Log.e("xxx","catch")
+        Log.e("BasketPay","!")
 
         e.printStackTrace()
         return  null

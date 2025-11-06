@@ -104,7 +104,7 @@ fun PaymentHistoryList(
                 number = 1
             ),
             ),
-        card_list = listOf(
+        cards = listOf(
             CardInfo(
                 card_id = -1,
                 company = "",
