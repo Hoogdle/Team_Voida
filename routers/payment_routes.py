@@ -17,6 +17,8 @@ def basket_payment(payload: schemas.BasketPayment, db: Session = Depends(get_db)
     basket_items = db.query(models.BasketItem).filter(models.BasketItem.user_id == user.id).all()
     basket_items.sort(key = lambda x : x.created_at, reverse = True)
 
+    cards = db.query(models.Card).filter(models.Card.user_id == user.id).all()
+
     if not basket_items:
         raise HTTPException(status_code=404, detail="No items in basket")
 
@@ -31,12 +33,24 @@ def basket_payment(payload: schemas.BasketPayment, db: Session = Depends(get_db)
         for item in basket_items
     ]
 
+    card_list = [
+        schemas.CardInfo(
+            card_id = card.id,
+            company = card.company,
+            card_code = card.card_code,
+            date = card.date,
+            card_num = len(cards)
+        )
+        for card in cards
+     ]
+
     # TODO, apply user info
     return schemas.PaymentResponse(
-        address= "서울특별시 서대문구 북아현로 12",
-        phone= "010-1234-5678",
-        email= "xodud7737@gmail.com",
-        item=items
+        address= user.address,
+        phone= user.cell,
+        email= user.email,
+        item=items,
+        cards = card_list
     )
 
 # 상품 정보 페이지에서 결제요청시 사용되는 함수

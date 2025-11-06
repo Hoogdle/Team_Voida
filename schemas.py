@@ -69,12 +69,22 @@ class OneItemRequest(BaseModel):
     product_id: int
 
 
+class CardInfo(BaseModel):
+    card_id: int
+    company: str
+    card_code: str
+    date: str
+    card_num: int
+
+
+
 # -------------------- Payment --------------------
 class PaymentResponse(BaseModel):
     address: Optional[str] = None
     phone: Optional[str] = None
     email: str
     item: List[BasketItem]
+    cards: List[CardInfo]
 
 
 class OneItemPaymentResponse(BaseModel):
@@ -204,13 +214,6 @@ class AssistantSearch(BaseModel):
 class CancelAIRequest(BaseModel):
     session_id: str
 
-
-class CardInfo(BaseModel):
-    card_id: int
-    company: str
-    card_code: str
-    date: str
-    card_num: int
 
 class CardRegisterRequest(BaseModel):
     session_id: str
