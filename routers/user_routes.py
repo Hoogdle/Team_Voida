@@ -31,13 +31,22 @@ def sign_up(payload: schemas.SignUpRequest, db: Session = Depends(get_db)):
         pw=hashed_pw.decode("utf-8"),
         cell=payload.cell,
 	    un=payload.un,
-        address=payload.address
     )
+
     db.add(new_user)
     db.commit()
 
     user = db.query(models.User).filter(models.User.email == payload.email).first()
-    
+
+    new_address = models.Address(
+        user_id = user.id,
+        address = payload.address,
+        flag = True
+    )	
+
+    db.add(new_address)
+    db.commit()
+  
     new_session = models.Session(
         session_id = session_id,
         user_id = user.id,

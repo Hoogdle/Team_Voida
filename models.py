@@ -62,7 +62,6 @@ class User(Base):
     pw = Column(Text, nullable=False)
     cell = Column(Text)
     un = Column(Text)
-    address = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow)
 
@@ -71,6 +70,7 @@ class User(Base):
     orders = relationship("Order", back_populates="user")
     cards = relationship("Card", back_populates="user")
     pays = relationship("Pay", back_populates="user")
+    address = relationship("Address", back_populates="user")
 
 
 # --------------------------
@@ -203,3 +203,12 @@ class Review(Base):
 
     product = relationship("Product", back_populates="review")
 
+class Address(Base):
+	__tablename__ = "address"
+	
+	id = Column(Integer, primary_key=True, index=True)
+	user_id = Column(Integer, ForeignKey("users.id"))
+	address = Column(Text)
+	flag = Column(Boolean)
+
+	user = relationship("User", back_populates="address")
