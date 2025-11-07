@@ -103,6 +103,15 @@ class OrderItemCreate(BaseModel):
     price: float
     number: int
 
+
+class OrderDetailHistory(BaseModel):
+	order_num: str
+	address: str
+	cell: str
+	email: str
+	items: List[BasketItem]
+
+
 class OrderCreate(BaseModel):
     session_id: str
     address: str

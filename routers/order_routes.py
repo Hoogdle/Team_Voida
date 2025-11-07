@@ -64,7 +64,7 @@ def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
 
 
 
-@router.get("/CancelOrder", response_model=schemas.OrderInfoRequest)
+@router.post("/CancelOrder", response_model=bool)
 def get_order(payload: schemas.OrderInfoRequest, db: Session = Depends(get_db)):
     order = db.query(models.Order).filter(models.Order.id == payload.order_num).first()
     order_list = db.query(models.OrderItem).filter(models.OrderItem.order_id == payload.order_num).all()
@@ -77,12 +77,9 @@ def get_order(payload: schemas.OrderInfoRequest, db: Session = Depends(get_db)):
 
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
-
-    return schemas.OrderInfoRequest(
-        session_id = "",
-        order_num = order.id
-    )
-
+  
+    return True
+ 
 
 # 계정 설정에서 얻는 주문목록
 @router.post("/PayHistoryList", response_model=list[schemas.PayHistoryList])
@@ -91,7 +88,6 @@ def get_order(payload: schemas.OrderListRequest, db: Session = Depends(get_db)):
     user = check_session(db, payload.session_id)
     cards = db.query(models.Card).filter(models.Card.user_id == user.id).all()
     orders = [(card.id, card.card_code, card.date, card.company, len(cards), db.query(models.Order).filter(models.Order.user_id == user.id, models.Order.card_id == card.id)) for card in cards]
-    print(orders)
 	# (card_id, card_code, card_date, card_company, card_num, orders)
 
 
@@ -120,25 +116,25 @@ def get_order(payload: schemas.OrderListRequest, db: Session = Depends(get_db)):
 
 
 # 계정 설정 안에 상세 주문 목록에서 얻는 주문 정보
-@router.get("/GetOrderedInfo", response_model=schemas.OrderCreate)
+@router.post("/PayDetailHistoryList", response_model=schemas.OrderDetailHistory)
 def get_orders(payload: schemas.OrderInfoRequest, db: Session = Depends(get_db)):
     order_info = db.query(models.Order).filter(models.Order.id == payload.order_num).first()
     order_list = db.query(models.OrderItem).filter(models.OrderItem.order_id == payload.order_num).all()
-
-    order_list = [
-        schemas.OrderItemCreate(
-            product_id = item.product_id,
-            quantity = item.quantity,
-            price = item.price
-        )
-        for item in order_list
-    ]
-
-    return schemas.OrderCreate(
-        session_id = "",
+ 
+    return schemas.OrderDetailHistory(
+        order_num = str(order_info.id),
         address = order_info.address,
-        phone = order_info.phone,
+        cell = order_info.phone,
         email = order_info.email,
         total_price = order_info.total_price,
-        items = order_list
+        items = [
+                schemas.BasketItem(
+                    product_id = item.product_id,
+                    img = item.product.img,
+                    name = item.product.title,
+                    price = item.product.price,
+                    number = item.quantity
+            )
+            for item in order_list
+        ]
     )
