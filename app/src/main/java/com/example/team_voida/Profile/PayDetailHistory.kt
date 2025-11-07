@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -71,6 +72,7 @@ import com.example.team_voida.ui.theme.IconBlue
 import com.example.team_voida.ui.theme.TextColor
 import com.example.team_voida.ui.theme.TextLittleDark
 import com.example.team_voida.ui.theme.TextWhite
+import com.example.team_voida.ui.theme.WishButton
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -217,7 +219,7 @@ fun PaymentHistoryList(
 
             Spacer(Modifier.height(15.dp))
 
-            PaymentAddress(
+            PaymentDetailPageAddress(
                 address = payDetailHistory.value!!.address,
                 editable = false
             )
@@ -292,5 +294,99 @@ fun PaymentHistoryList(
     }
 }
 
+
+// 배송지 주소 컴포저블
+@Composable
+fun PaymentDetailPageAddress(
+    address: String,
+    editable: Boolean,
+){
+    Column(
+        modifier = Modifier
+            .semantics(mergeDescendants = true){
+                text = AnnotatedString("배송지 주소는 서울특별시 서대문구 독립문로 129-1 가나다 아파트세상 203동 1104호 입니다. 배송지를 수정하시려면 다음에 나오는 배송지 수정 버튼을 눌러주세요.")
+            }
+            .fillMaxWidth()
+            .padding(
+                start = 10.dp,
+                end = 10.dp
+            )
+            .clip(RoundedCornerShape(7.dp))
+            .background(
+                color = WishButton
+            )
+
+
+    ){
+        Text(
+            modifier = Modifier
+                .padding(
+                    start = 5.dp
+                )
+                .padding(
+                    start = 13.dp,
+                    top = 13.dp,
+                    end = 13.dp
+                )
+            ,
+            textAlign = TextAlign.Center,
+            text = "배송 주소",
+            color = TextLittleDark,
+            style = TextStyle(
+                fontSize = 20.sp,
+                fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+            )
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ){
+            Text(
+                modifier = Modifier
+                    .padding(
+                        start = 5.dp
+                    )
+                    .padding(13.dp)
+                    .fillMaxWidth()
+                    .weight(8f)
+                ,
+                text = address,
+                color = TextLittleDark,
+                style = TextStyle(
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                )
+            )
+            if(editable){
+                Button(
+                    onClick = {},
+                    modifier = Modifier
+                        .size(30.dp)
+                        .width(1.dp)
+                        .offset(
+                            x = -10.dp,
+                            y = 20.dp
+                        )
+                    ,
+                    colors = ButtonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = Color.Transparent,
+                        disabledContentColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent
+                    ),
+                    contentPadding = PaddingValues(0.dp)
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.payment_edit),
+                        contentDescription = "배송지 수정 버튼",
+                        modifier = Modifier
+
+                    )
+                }
+            }
+        }
+    }
+}
 
 

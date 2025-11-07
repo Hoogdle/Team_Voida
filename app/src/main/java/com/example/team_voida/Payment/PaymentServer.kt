@@ -28,6 +28,22 @@ data class PaymentInfo(
     val cards: List<CardInfo>
 )
 
+@Serializable
+data class Address(
+    val address_id: Int,
+    val address_text: String,
+    val flag: Boolean
+)
+
+@Serializable
+data class PaymentPageInfo(
+    val address: List<Address>,
+    val phone: String,
+    val email: String,
+    val item: List<BasketInfo>,
+    val cards: List<CardInfo>
+)
+
 
 
 @Serializable
@@ -43,7 +59,7 @@ suspend fun PaymentServerOne(
     action: String="",
     session_id: String,
     product_id: Int
-): PaymentInfo?{
+): PaymentPageInfo?{
 
     val jsonObject = JSONObject()
     jsonObject.put("session_id", session_id)
@@ -77,7 +93,7 @@ suspend fun PaymentServerOne(
 
         if (connection.responseCode == HttpURLConnection.HTTP_OK) {
             val inputStream = connection.inputStream.bufferedReader().use { it.readText() }
-            val json = Json.decodeFromString<PaymentInfo>(inputStream) // edit3
+            val json = Json.decodeFromString<PaymentPageInfo>(inputStream) // edit3
             return json
         } else {
             Log.e("xxx","else")
@@ -93,7 +109,7 @@ suspend fun PaymentServerOne(
 
 suspend fun PaymentServerMultiple(
     session_id: String
-): PaymentInfo?{
+): PaymentPageInfo?{
     val jsonObject = JSONObject()
     jsonObject.put("session_id", session_id)
 
@@ -125,7 +141,7 @@ suspend fun PaymentServerMultiple(
 
         if (connection.responseCode == HttpURLConnection.HTTP_OK) {
             val inputStream = connection.inputStream.bufferedReader().use { it.readText() }
-            val json = Json.decodeFromString<PaymentInfo>(inputStream) // edit3
+            val json = Json.decodeFromString<PaymentPageInfo>(inputStream) // edit3
             return json
             Log.e("BasketPay",json.toString())
         } else {

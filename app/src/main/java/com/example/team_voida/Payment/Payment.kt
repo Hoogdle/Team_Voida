@@ -50,6 +50,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.example.team_voida.Basket.BasketCartNum
+import com.example.team_voida.Basket.BasketInfo
 import com.example.team_voida.Basket.BasketItemArrange
 import com.example.team_voida.Basket.BasketProduct
 import com.example.team_voida.Basket.ComposableLifecycle
@@ -60,6 +61,7 @@ import com.example.team_voida.ProductInfo.CancelAI
 import com.example.team_voida.ProductInfo.Loader
 import com.example.team_voida.Profile.CardDeleteDialog
 import com.example.team_voida.Profile.CustomAlertDialogState
+import com.example.team_voida.Profile.PaymentAdd
 import com.example.team_voida.Profile.PaymentLogoSelector
 import com.example.team_voida.ProfileServer.CardInfo
 import com.example.team_voida.ProfileServer.PayDetailHistory
@@ -112,8 +114,9 @@ fun Payment(
     val tmpRegisteredPayMethod = remember { mutableListOf("신용카드", "모바일 페이", "계좌이체") }
 
     // 결제 화면 하단 네비 Flag bit 설정 
-    val paymentInfo:MutableState<PaymentInfo?> = remember { mutableStateOf<PaymentInfo?>(null) }
+    val paymentInfo:MutableState<PaymentPageInfo?> = remember { mutableStateOf<PaymentPageInfo?>(null) }
     val selectedCardId = cardID
+    val whichAddress:MutableState<Int> = remember { mutableStateOf(-1) }
 
     ComposableLifecycle { source, event ->
         if (event == Lifecycle.Event.ON_PAUSE) {
@@ -181,7 +184,11 @@ fun Payment(
         dynamicTotalPrice.value = price.toString()
 
 
-        paymentUserInfo.value.address = paymentInfo.value!!.address
+        paymentInfo.value!!.address.forEach {
+            if(it.flag){
+                paymentUserInfo.value.address = it.address_text
+            }
+        }
         paymentUserInfo.value.cell = paymentInfo.value!!.phone
         paymentUserInfo.value.email = paymentInfo.value!!.email
 
@@ -215,10 +222,11 @@ fun Payment(
 
             Spacer(Modifier.height(15.dp))
 
-            PaymentAddress(
-                address = paymentInfo.value!!.address,
-                editable = true
+            PaymentAddressList(
+                addressList = paymentInfo.value!!.address,
+                whichAddress = whichAddress
             )
+
             Spacer(Modifier.height(7.dp))
             PaymentContact(
                 cell = paymentInfo.value!!.phone,
@@ -233,7 +241,7 @@ fun Payment(
             }
             PaymentNum(num)
             Spacer(Modifier.height(7.dp))
-            PaymentRow(paymentInfo)
+            PaymentRow(paymentInfo.value!!.item)
             Spacer(Modifier.height(15.dp))
             PaymentMethod()
             Spacer(Modifier.height(5.dp))
@@ -254,23 +262,38 @@ fun Payment(
 // 배송지 주소 컴포저블
 @Composable
 fun PaymentAddress(
+    addressId: Int,
     address: String,
-    editable: Boolean
+    editable: Boolean,
+    whichAddress: MutableState<Int>
 ){
     Column(
         modifier = Modifier
             .semantics(mergeDescendants = true){
                 text = AnnotatedString("배송지 주소는 서울특별시 서대문구 독립문로 129-1 가나다 아파트세상 203동 1104호 입니다. 배송지를 수정하시려면 다음에 나오는 배송지 수정 버튼을 눌러주세요.")
             }
-            .fillMaxWidth()
+            .width(370.dp)
+            .height(110.dp)
             .padding(
                 start = 10.dp,
                 end = 10.dp
             )
             .clip(RoundedCornerShape(7.dp))
+            .border(
+                width = if(whichAddress.value == addressId){
+                    2.dp
+                } else {
+                    0.dp
+                },
+                color = IconBlue,
+                shape = RoundedCornerShape(7.dp)
+            )
             .background(
                 color = WishButton
             )
+            .clickable {
+                whichAddress.value = addressId
+            }
 
     ){
         Text(
@@ -493,13 +516,13 @@ fun PaymentNum(
 // 시간이 없어 모듈화는 생략함
 @Composable
 fun PaymentRow(
-    paymentInfo: MutableState<PaymentInfo?>
+    paymentInfo: List<BasketInfo>
 ){
 
 
 
     //
-    paymentInfo.value?.item?.forEachIndexed { index, item ->
+    paymentInfo.forEachIndexed { index, item ->
         Column {
             Row(
                 modifier = Modifier
@@ -983,6 +1006,31 @@ fun PaymentSmallCard(
                     )
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun PaymentAddressList(
+    addressList: List<Address>,
+    whichAddress: MutableState<Int> = mutableStateOf(0)
+){
+    val scrollState = rememberScrollState()
+    val selected = remember{ mutableStateOf(0) }
+    Row(
+        modifier = Modifier
+            .horizontalScroll(scrollState)
+            .padding(
+            )
+    ){
+        addressList.forEachIndexed { index, item ->
+            PaymentAddress(
+                addressId = item.address_id,
+                address = item.address_text,
+                editable = true,
+                whichAddress = whichAddress
+            )
+            Spacer(Modifier.width(7.dp))
         }
     }
 }
