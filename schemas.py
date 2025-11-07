@@ -34,6 +34,10 @@ class ProductDetail(BaseModel):
     class Config:
         from_attributes = True
 
+class Address(BaseModel):
+	address_id: int
+	address_text: str
+	flag: bool
 
 # -------------------- Search --------------------
 class SearchRequest(BaseModel):
@@ -80,7 +84,7 @@ class CardInfo(BaseModel):
 
 # -------------------- Payment --------------------
 class PaymentResponse(BaseModel):
-    address: Optional[str] = None
+    address: List[Address]
     phone: Optional[str] = None
     email: str
     item: List[BasketItem]

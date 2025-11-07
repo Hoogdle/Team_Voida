@@ -15,6 +15,8 @@ def basket_payment(payload: schemas.BasketPayment, db: Session = Depends(get_db)
     # 세션 아이디를 통해 유저 정보확인
     user = check_session(db,payload.session_id)
     basket_items = db.query(models.BasketItem).filter(models.BasketItem.user_id == user.id).all()
+    address_list = db.query(models.Address).filter(models.Address.user_id == user.id).all()
+
     basket_items.sort(key = lambda x : x.created_at, reverse = True)
 
     cards = db.query(models.Card).filter(models.Card.user_id == user.id).all()
@@ -33,6 +35,14 @@ def basket_payment(payload: schemas.BasketPayment, db: Session = Depends(get_db)
         for item in basket_items
     ]
 
+    address = [
+        schemas.Address(
+            address_id = item.id,
+            address_text = item.address,
+            flag = item.flag
+        )
+        for item in address_list
+    ]
     card_list = [
         schemas.CardInfo(
             card_id = card.id,
@@ -46,7 +56,7 @@ def basket_payment(payload: schemas.BasketPayment, db: Session = Depends(get_db)
 
     # TODO, apply user info
     return schemas.PaymentResponse(
-        address= user.address,
+        address= address,
         phone= user.cell,
         email= user.email,
         item=items,
