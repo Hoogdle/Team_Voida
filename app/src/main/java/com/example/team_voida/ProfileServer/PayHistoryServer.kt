@@ -48,6 +48,15 @@ data class PayDetailHistory(
     val item_list: List<BasketInfo>
 )
 
+@Serializable
+data class PaymentDetailInfo(
+    val order_num: String,
+    val address: String,
+    val cell: String,
+    val email: String,
+    val items: List<BasketInfo>
+)
+
 
 suspend fun PayHistoryListServer(
     session_id: String
@@ -133,7 +142,7 @@ suspend fun PayHistoryListServer(
 suspend fun PayDetailHistoryListServer(
     session_id: String,
     order_num: String
-): PaymentInfo?{
+): PaymentDetailInfo?{
 
     val jsonObject = JSONObject()
     jsonObject.put("session_id", session_id)
@@ -166,7 +175,7 @@ suspend fun PayDetailHistoryListServer(
 
         if (connection.responseCode == HttpURLConnection.HTTP_OK) {
             val inputStream = connection.inputStream.bufferedReader().use { it.readText() }
-            val json = Json.decodeFromString<PaymentInfo?>(inputStream) // edit3
+            val json = Json.decodeFromString<PaymentDetailInfo>(inputStream) // edit3
             return json
         } else {
             Log.e("xxx","else")

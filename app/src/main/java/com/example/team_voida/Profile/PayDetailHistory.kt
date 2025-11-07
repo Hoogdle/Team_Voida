@@ -48,6 +48,7 @@ import com.example.team_voida.Basket.Basket
 import com.example.team_voida.Basket.BasketInfo
 import com.example.team_voida.Basket.ComposableLifecycle
 import com.example.team_voida.Notification.Notification
+import com.example.team_voida.Payment.PayDetailHistoryRow
 import com.example.team_voida.Payment.PaymentAddress
 import com.example.team_voida.Payment.PaymentContact
 import com.example.team_voida.Payment.PaymentInfo
@@ -61,6 +62,7 @@ import com.example.team_voida.ProfileServer.PayDetailItem
 import com.example.team_voida.ProfileServer.PayHistory
 import com.example.team_voida.ProfileServer.PayHistoryList
 import com.example.team_voida.ProfileServer.PayHistoryListServer
+import com.example.team_voida.ProfileServer.PaymentDetailInfo
 import com.example.team_voida.R
 import com.example.team_voida.Tools.LoaderSet
 import com.example.team_voida.session
@@ -128,7 +130,7 @@ fun PaymentHistoryList(
         )
     )) }
 
-    val payDetailHistory: MutableState<PaymentInfo?> = remember { mutableStateOf<PaymentInfo?>(null) }
+    val payDetailHistory: MutableState<PaymentDetailInfo?> = remember { mutableStateOf<PaymentDetailInfo?>(null) }
 
 
     val customAlertDialogState: MutableState<CustomAlertDialogState> = remember {mutableStateOf<CustomAlertDialogState>(
@@ -205,7 +207,7 @@ fun PaymentHistoryList(
                         text = AnnotatedString("아래에 주문하신 상품 목록을 확인해주세요.")
                     },
                 textAlign = TextAlign.Center,
-                text = "주문번호" + orderNumber.value,
+                text = "주문번호 " + "#" + orderNumber.value.padStart(7,'0'),
                 color = TextLittleDark,
                 style = TextStyle(
                     fontSize = 25.sp,
@@ -216,21 +218,21 @@ fun PaymentHistoryList(
             Spacer(Modifier.height(15.dp))
 
             PaymentAddress(
-                address = "",
+                address = payDetailHistory.value!!.address,
                 editable = false
             )
 
             Spacer(Modifier.height(7.dp))
 
             PaymentContact(
-                cell = "",
-                email = "",
+                cell = payDetailHistory.value!!.cell,
+                email = payDetailHistory.value!!.email,
                 editable = false
             )
 
-            payDetailHistory.value?.item?.let { PaymentNum(it.size) }
+            payDetailHistory.value?.items?.let { PaymentNum(it.size) }
             Spacer(Modifier.height(7.dp))
-            PaymentRow(payDetailHistory)
+            PayDetailHistoryRow(payDetailHistory)
 
             Button(
                 shape = RectangleShape,

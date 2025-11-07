@@ -28,6 +28,8 @@ data class PaymentInfo(
     val cards: List<CardInfo>
 )
 
+
+
 @Serializable
 data class OrderResponse(
     val order_num: String,

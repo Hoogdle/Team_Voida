@@ -62,6 +62,8 @@ import com.example.team_voida.Profile.CardDeleteDialog
 import com.example.team_voida.Profile.CustomAlertDialogState
 import com.example.team_voida.Profile.PaymentLogoSelector
 import com.example.team_voida.ProfileServer.CardInfo
+import com.example.team_voida.ProfileServer.PayDetailHistory
+import com.example.team_voida.ProfileServer.PaymentDetailInfo
 import com.example.team_voida.R
 import com.example.team_voida.Tools.LoaderSet
 import com.example.team_voida.session
@@ -498,6 +500,126 @@ fun PaymentRow(
 
     //
     paymentInfo.value?.item?.forEachIndexed { index, item ->
+        Column {
+            Row(
+                modifier = Modifier
+                    .semantics(mergeDescendants = true){
+                        text = AnnotatedString("${item.name} 상품이 총 ${item.number} 개 담겨 있습니다. 상품 가격은 ${item.price.toInt()}원 입니다.")
+                    }
+                    .padding(
+                        start = 10.dp,
+                        end = 10.dp
+                    )
+                ,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ){
+                Box(){
+                    AsyncImage(
+                        model = if(item.img[0]=='\"'){item.img.substring(1,item.img.length-1)} else{item.img},
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(86.dp)
+                            .shadow(
+                                elevation = 5.dp,
+                                shape = CircleShape
+                            )
+                            .clip(CircleShape)
+
+                            .border(
+                                width = 5.dp,
+                                color = Color.White,
+                                shape = CircleShape
+                            )
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .offset(
+                                x = 60.dp,
+                                y = 11.dp
+                            )
+                    ){
+                        Text(
+                            modifier = Modifier
+                                .clip(shape = CircleShape)
+                                .background(
+                                    color = Selected
+                                )
+                                .width(30.dp)
+                                .height(30.dp)
+                                .border(
+                                    width = 3.dp,
+                                    color = Color.White,
+                                    shape = CircleShape
+                                )
+                                .offset(
+                                    y = 5.dp
+                                )
+                            ,
+                            textAlign = TextAlign.Center,
+                            text = item.number.toString(),
+                            color = TextLittleDark,
+                            style = TextStyle(
+                                fontSize = 15.sp,
+                                fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                            )
+                        )
+                    }
+                }
+                Text(
+                    modifier = Modifier
+                        .padding(
+                            start = 5.dp
+                        )
+                        .padding(13.dp)
+                        .weight(7f)
+                        .padding(top = 10.dp)
+                    ,
+                    text = item.name,
+                    color = TextLittleDark,
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        fontFamily = FontFamily(Font(R.font.pretendard_regular)),
+                    )
+                )
+
+                val textPrice = DecimalFormat("#,###", DecimalFormatSymbols(Locale.US)).format(item.price)
+
+                Text(
+                    modifier = Modifier
+                        .padding(
+                            start = 5.dp
+                        )
+                        .padding(13.dp)
+                        .weight(4f)
+                        .padding(top = 17.dp)
+
+                    ,
+                    text = textPrice + "원",
+                    color = TextLittleDark,
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                    )
+                )
+            }
+            Spacer(Modifier.height(5.dp))
+        }
+    }
+}
+
+// 결제 정보 목록 컴포저블
+// 시간이 없어 모듈화는 생략함
+@Composable
+fun PayDetailHistoryRow(
+    paymentInfo: MutableState<PaymentDetailInfo?>
+){
+
+
+
+    //
+    paymentInfo.value?.items?.forEachIndexed { index, item ->
         Column {
             Row(
                 modifier = Modifier
