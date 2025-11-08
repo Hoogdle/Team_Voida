@@ -201,11 +201,14 @@ async def search_items(request: SearchRequest, db: Session = Depends(get_db)):
     keyword = request.search.lower()
     results = db.query(Product).filter(Product.title.ilike(f"%{keyword}%")).all()
 
+    if not results:
+        raise HTTPException(status_code=404, detail="No Items for given keyword")
+
     result = [
         schemas.ProductSummary(
             id = item.id,
             name = item.title,
-            description=item.description,
+            description= str(item.description),
             price=item.price,
             image_url=item.img,
             category=str(item.category),
@@ -213,4 +216,7 @@ async def search_items(request: SearchRequest, db: Session = Depends(get_db)):
         )
         for item in results
     ]
+    print(results)
+    print(result)
+
     return result
