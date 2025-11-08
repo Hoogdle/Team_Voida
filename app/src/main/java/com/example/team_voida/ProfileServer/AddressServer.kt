@@ -1,4 +1,4 @@
-package com.example.team_voida.SearchResult
+package com.example.team_voida.ProfileServer
 
 import android.util.Log
 import com.example.team_voida.Basket.BasketInfo
@@ -9,28 +9,25 @@ import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
 import java.net.URL
 
-
 @Serializable
-data class SearchResultItem(
-    val id: Int,
-    val name: String,
-    val description: String,
-    val price: Float,
-    val image_url: String,
-    val category: String,
-    val sector: Int
+data class Address(
+    val address_id: Int,
+    val address_text: String,
+    val flag: Boolean,
 )
-suspend fun SearchResultServer(
-    productName: String
-): List<SearchResultItem>?{
+
+
+suspend fun AddressList(
+    session_id: String
+): List<Address>?{
 
     val jsonObject = JSONObject()
-    jsonObject.put("search", productName)
+    jsonObject.put("session_id", session_id)
 
     val jsonObjectString = jsonObject.toString()
 
     try {
-        val url = URL(" https://fluent-marmoset-immensely.ngrok-free.app/SearchItems") // edit1
+        val url = URL(" https://fluent-marmoset-immensely.ngrok-free.app/AddressList") // edit1
         val connection = url.openConnection() as java.net.HttpURLConnection
         connection.doOutput = true // 서버로 보내기 위해 doOutPut 옵션 활성화
         connection.doInput = true
@@ -54,17 +51,12 @@ suspend fun SearchResultServer(
 
         if (connection.responseCode == HttpURLConnection.HTTP_OK) {
             val inputStream = connection.inputStream.bufferedReader().use { it.readText() }
-            val json = Json.decodeFromString<List<SearchResultItem>?>(inputStream) // edit3
-            Log.e("Search",json.toString())
+            val json = Json.decodeFromString<List<Address>>(inputStream) // edit3
             return json
         } else {
-            Log.e("Search","!")
-
-            return  null
+            return null
         }
     } catch (e: Exception) {
-        Log.e("Search","?")
-        e.printStackTrace()
-        return  null
+        return null
     }
 }

@@ -78,6 +78,7 @@ import com.example.team_voida.ProductInfo.ProductInfoBottomBar
 import com.example.team_voida.ProductInfo.ProductInfoInfo
 import com.example.team_voida.ProductInfo.sampleProductInfoData
 import com.example.team_voida.Profile.Account
+import com.example.team_voida.Profile.Address
 import com.example.team_voida.Profile.PaymentHistory
 import com.example.team_voida.Profile.PaymentHistoryList
 import com.example.team_voida.Profile.PaymentSetting
@@ -626,6 +627,15 @@ fun HomeNav(){
                         isPayPage = isPayPage,
                         paymentUserInfo = paymentUserInfo,
                         cardId = cardId
+                    )
+                }
+
+                composable("address") {
+                    Address(
+                        navController = navController,
+                        basketFlag = basketFlag,
+                        homeNavFlag = homeNavFlag,
+                        productFlag = productFlag
                     )
                 }
             }
