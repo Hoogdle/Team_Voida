@@ -243,5 +243,5 @@ class CardDeleteRequest(BaseModel):
 class CardDeleteResponse(BaseModel):
     card_list: List[CardInfo]
 
-
-#
+class RequestWithSession(BaseModel):
+	session_id: str

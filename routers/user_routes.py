@@ -5,6 +5,7 @@ import models, schemas
 import uuid
 import bcrypt
 from utils.session_check import get_current_user
+from utils.session_check import *
 
 router = APIRouter(prefix="", tags=["User"])
 
@@ -127,4 +128,28 @@ def set_user_name(
 
     if user:
         return True
-    
+
+
+
+# Address List
+@router.post("/AddressList", response_model=list[schemas.Address])
+def set_user_name(
+        payload: schemas.RequestWithSession,
+        db: Session = Depends(get_db)
+):
+
+	user = check_session(db,payload.session_id)
+	address_list = db.query(models.Address).filter(models.Address.user_id == user.id).all()
+	
+	for index, item in enumerate(address_list):
+		if item.flag:
+			address_list[0], address_list[index] = address_list[index], address_list[0]
+		
+	return [
+		schemas.Address(
+			address_id = item.id,
+			address_text = item.address,
+			flag = item.flag
+		)
+		for item in address_list
+	]	

@@ -216,7 +216,5 @@ async def search_items(request: SearchRequest, db: Session = Depends(get_db)):
         )
         for item in results
     ]
-    print(results)
-    print(result)
 
     return result
