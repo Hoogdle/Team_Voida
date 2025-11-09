@@ -272,11 +272,10 @@ fun PaymentAddress(
             .semantics(mergeDescendants = true){
                 text = AnnotatedString("배송지 주소는 서울특별시 서대문구 독립문로 129-1 가나다 아파트세상 203동 1104호 입니다. 배송지를 수정하시려면 다음에 나오는 배송지 수정 버튼을 눌러주세요.")
             }
-            .width(370.dp)
-            .height(110.dp)
+            .width(270.dp)
+            .height(100.dp)
             .padding(
-                start = 10.dp,
-                end = 10.dp
+                end = 3.dp
             )
             .clip(RoundedCornerShape(7.dp))
             .border(
@@ -1021,6 +1020,7 @@ fun PaymentAddressList(
         modifier = Modifier
             .horizontalScroll(scrollState)
             .padding(
+                start = 10.dp
             )
     ){
         addressList.forEachIndexed { index, item ->
@@ -1030,7 +1030,7 @@ fun PaymentAddressList(
                 editable = true,
                 whichAddress = whichAddress
             )
-            Spacer(Modifier.width(7.dp))
+            Spacer(Modifier.width(3.dp))
         }
     }
 }

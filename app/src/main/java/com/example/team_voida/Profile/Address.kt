@@ -59,8 +59,11 @@ import com.example.team_voida.Payment.PaymentAddress
 import com.example.team_voida.ProfileServer.AddAddress
 import com.example.team_voida.ProfileServer.Address
 import com.example.team_voida.ProfileServer.AddressList
+import com.example.team_voida.ProfileServer.CancelOrder
 import com.example.team_voida.ProfileServer.CardAdd
 import com.example.team_voida.ProfileServer.CardInfo
+import com.example.team_voida.ProfileServer.DelAddress
+import com.example.team_voida.ProfileServer.EditAddress
 import com.example.team_voida.ProfileServer.PayHistoryList
 import com.example.team_voida.ProfileServer.PayHistoryListServer
 import com.example.team_voida.R
@@ -92,6 +95,7 @@ fun Address(
     val addressList: MutableState<List<Address>?> = remember { mutableStateOf<List<Address>?>(null) }
     val whichAddress: MutableState<Int> = remember { mutableStateOf(-1) }
     val addAddressText: MutableState<String> = remember { mutableStateOf("") }
+    val editAddressId: MutableState<Int> = remember { mutableStateOf(-1) }
 
     val customTextFieldDialogState: MutableState<AddressDialogState> = remember {
         mutableStateOf(
@@ -102,6 +106,36 @@ fun Address(
         )
     }
 
+    val editAddressDialog: MutableState<AddressDialogState> = remember {
+        mutableStateOf(
+            AddressDialogState(
+                text = "",
+                isShowDialog = false,
+            )
+        )
+    }
+
+
+    val customAlertDialogState: MutableState<CustomAlertDialogState> = remember {mutableStateOf<CustomAlertDialogState>(
+        CustomAlertDialogState()
+    )}
+
+    fun resetDialogState() {
+        customAlertDialogState.value = CustomAlertDialogState()
+    }
+
+    fun showCustomAlertDialog() {
+        customAlertDialogState.value = CustomAlertDialogState(
+            title = "배송지를 삭제하시겠습니까?",
+            description = "",
+            onClickConfirm = {
+                resetDialogState()
+            },
+            onClickCancel = {
+                resetDialogState()
+            }
+        )
+    }
 
     // 유저 정보 페이지에 해당하는 하단 네비 Flag Bit 활성화
     ComposableLifecycle { source, event ->
@@ -130,7 +164,6 @@ fun Address(
     if(addressList.value != null) {
 
         if (customTextFieldDialogState.value.isShowDialog) {
-            Log.e("Address", "Wow!")
 
             AddressDialog(
                 introduction = "배송지 추가 팝업 입니다. 아래에 새로운 배송지를 입력해주세요.",
@@ -154,6 +187,62 @@ fun Address(
                         customTextFieldDialogState.value = customTextFieldDialogState.value.copy(isShowDialog = false)
                     }
                 }
+            )
+        }
+
+        if (editAddressDialog.value.isShowDialog) {
+
+            addressList.value!!.forEach {
+                if(it.address_id == editAddressId.value){
+                    addAddressText.value = it.address_text
+                }
+            }
+
+            AddressDialog(
+                introduction = "배송지 수정 팝업 입니다. 아래에 입력란에서 기존 배송지를 수정해주세요.",
+                address = addAddressText,
+                onClickCancel = {editAddressDialog.value = customTextFieldDialogState.value.copy(isShowDialog = false)},
+                onClickConfirm = {
+
+                    runBlocking {
+                        val job = GlobalScope.launch{
+                            addressList.value = EditAddress(
+                                session_id = session.sessionId.value,
+                                address_id = editAddressId.value,
+                                address = addAddressText.value
+                            )
+                        }
+                    }
+
+                    Thread.sleep(2000L)
+
+                    if(addressList.value!![0].address_id != -1){
+                        Toast.makeText(context, "주소가 변경되었습니다.", Toast.LENGTH_SHORT).show()
+                        editAddressDialog.value = customTextFieldDialogState.value.copy(isShowDialog = false)
+                    }
+                }
+            )
+        }
+
+        if (customAlertDialogState.value.title.isNotBlank()) {
+            CustomAlertDialog(
+                title = customAlertDialogState.value.title,
+                description = customAlertDialogState.value.description,
+                onClickCancel = { customAlertDialogState.value.onClickCancel() },
+                onClickConfirm = {
+                    runBlocking {
+                        val job = GlobalScope.launch{
+                            addressList.value = DelAddress(session_id = session.sessionId.value, address_id = editAddressId.value)
+                        }
+                    }
+
+                    if(addressList.value!![0].address_id != -1){
+                        customAlertDialogState.value.onClickConfirm()
+                        Toast.makeText(context, "배송지가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
+                    }
+                },
+                leftText = "뒤로",
+                rightText = "삭제"
             )
         }
 
@@ -190,7 +279,21 @@ fun Address(
                     address = it.address_text,
                     editable = true,
                     whichAddress = whichAddress,
-                    flag = it.flag
+                    flag = it.flag,
+                    editAddressId = editAddressId,
+                    editAddressDialogState = editAddressDialog,
+                    delHelper = {
+                        customAlertDialogState.value = CustomAlertDialogState(
+                            title = "배송지를 삭제하시겠습니까?",
+                            description = "",
+                            onClickConfirm = {
+                                resetDialogState()
+                            },
+                            onClickCancel = {
+                                resetDialogState()
+                            }
+                        )
+                    }
                 )
 
                 Spacer(Modifier.height(10.dp))
@@ -241,7 +344,10 @@ fun SettingAddress(
     address: String,
     editable: Boolean,
     flag: Boolean,
-    whichAddress: MutableState<Int>
+    whichAddress: MutableState<Int>,
+    editAddressId: MutableState<Int>,
+    editAddressDialogState: MutableState<AddressDialogState>,
+    delHelper: ()->Unit
 ){
     Column(
         modifier = Modifier
@@ -310,7 +416,39 @@ fun SettingAddress(
             )
             if(editable){
                 Button(
-                    onClick = {},
+                    onClick = {
+                        editAddressId.value = addressId
+                        delHelper()
+                    },
+                    modifier = Modifier
+                        .size(30.dp)
+                        .width(1.dp)
+                        .offset(
+                            x = -10.dp,
+                            y = 20.dp
+                        )
+                    ,
+                    colors = ButtonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = Color.Transparent,
+                        disabledContentColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent
+                    ),
+                    contentPadding = PaddingValues(0.dp)
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.basket_del),
+                        contentDescription = "배송지 삭제 버튼",
+                        modifier = Modifier
+
+                    )
+                }
+                Spacer(Modifier.width(5.dp))
+                Button(
+                    onClick = {
+                        editAddressId.value = addressId
+                        editAddressDialogState.value = editAddressDialogState.value.copy(isShowDialog = true)
+                    },
                     modifier = Modifier
                         .size(30.dp)
                         .width(1.dp)
