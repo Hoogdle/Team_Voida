@@ -245,3 +245,8 @@ class CardDeleteResponse(BaseModel):
 
 class RequestWithSession(BaseModel):
 	session_id: str
+
+
+class RequestWithSessionAndAddress(BaseModel):
+	session_id: str
+	address: str
