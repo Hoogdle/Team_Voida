@@ -125,6 +125,16 @@ class OrderCreate(BaseModel):
     items: List[BasketItem]
     card_id: int
 
+class OneOrderCreate(BaseModel):
+	session_id: str
+	address: str
+	phone: str
+	email: str
+	total_price: float
+	product_id: int
+	card_id: int
+
+
 class OrderInfoRequest(BaseModel):
     session_id: str
     order_num: str
@@ -250,3 +260,12 @@ class RequestWithSession(BaseModel):
 class RequestWithSessionAndAddress(BaseModel):
 	session_id: str
 	address: str
+
+class RequestWithSessionAndAddressAndId(BaseModel):
+	session_id: str
+	address_id: int
+	address: str
+
+class PayOneHelperRequest(BaseModel):
+	product_id: int
+

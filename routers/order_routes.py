@@ -23,8 +23,8 @@ def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
        	user_id=user.id,
         card_id=order.card_id,
         total_price=order.total_price,
-        address = user.address,
-        phone = user.cell,
+        address = order.address,
+        phone = order.phone,
         email = user.email,
         is_cancel = False
     )
@@ -62,6 +62,65 @@ def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
             ]
     )
 
+# 주문 페이지 정보제공 
+# TODO, 주문 실패 예외처리
+@router.post("/PayOneHelper", response_model=float)
+def create_order(order: schemas.PayOneHelperRequest, db: Session = Depends(get_db)):
+
+    product = db.query(models.Product).filter(models.Product.id == order.product_id).first()
+
+    return float(product.price) 
+
+
+# 주문 페이지 정보제공 
+# TODO, 주문 실패 예외처리
+@router.post("/CreateOneOrder", response_model=schemas.OrderResponse)
+def create_order(order: schemas.OneOrderCreate, db: Session = Depends(get_db)):
+
+    user = check_session(db, order.session_id)
+    product = db.query(models.Product).filter(models.Product.id == order.product_id).first()
+
+    db_order = models.Order(
+       	user_id=user.id,
+        card_id=order.card_id,
+        total_price=order.total_price,
+        address = order.address,
+        phone = order.phone,
+        email = user.email,
+        is_cancel = False
+    )
+
+    db.add(db_order)
+    db.commit()
+    db.refresh(db_order)
+
+
+    db_item = models.OrderItem(
+        order_id=db_order.id,
+        product_id=product.id,
+        quantity=1,
+        price=product.price,
+        is_cancel = False
+    )
+    db.add(db_item)
+    db.commit()
+
+    
+    return schemas.OrderResponse(
+        order_num = str(db_order.id),
+        address = order.address,
+        email = order.email,
+        cell = order.phone,
+        item = [
+            schemas.BasketItem(
+                product_id = product.id,
+                img = product.img,
+                name = product.title,
+                price = product.price,
+                number = 1
+            )
+        ]
+    )
 
 
 @router.post("/CancelOrder", response_model=bool)

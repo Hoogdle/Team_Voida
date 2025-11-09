@@ -189,3 +189,64 @@ def set_user_name(
 		)
 		for item in address_list
 	]	
+
+
+
+# Address List
+@router.post("/EditAddress", response_model=list[schemas.Address])
+def set_user_name(
+        payload: schemas.RequestWithSessionAndAddressAndId,
+        db: Session = Depends(get_db)
+):
+
+	user = check_session(db,payload.session_id)
+
+	address = db.query(models.Address).filter(models.Address.id == payload.address_id).first()
+
+	address.address = payload.address	
+	db.commit()
+
+	address_list = db.query(models.Address).filter(models.Address.user_id == user.id).all()
+
+	for index, item in enumerate(address_list):
+		if item.flag:
+			address_list[0], address_list[index] = address_list[index], address_list[0]
+
+
+	return [
+		schemas.Address(
+			address_id = item.id,
+			address_text = item.address,
+			flag = item.flag
+		)
+		for item in address_list
+	]	
+
+@router.post("/DelAddress", response_model=list[schemas.Address])
+def set_user_name(
+        payload: schemas.RequestWithSessionAndAddressAndId,
+        db: Session = Depends(get_db)
+):
+
+	user = check_session(db,payload.session_id)
+
+	address = db.query(models.Address).filter(models.Address.id == payload.address_id).first()
+
+	db.delete(address)
+	db.commit()
+
+	address_list = db.query(models.Address).filter(models.Address.user_id == user.id).all()
+
+	for index, item in enumerate(address_list):
+		if item.flag:
+			address_list[0], address_list[index] = address_list[index], address_list[0]
+
+
+	return [
+		schemas.Address(
+			address_id = item.id,
+			address_text = item.address,
+			flag = item.flag
+		)
+		for item in address_list
+	]	

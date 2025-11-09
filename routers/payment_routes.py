@@ -63,31 +63,62 @@ def basket_payment(payload: schemas.BasketPayment, db: Session = Depends(get_db)
         cards = card_list
     )
 
-# 상품 정보 페이지에서 결제요청시 사용되는 함수
-@router.post("/OneItemPayment", response_model=schemas.OneItemPaymentResponse)
-def one_item_payment(payload: schemas.OneItemRequest, db: Session = Depends(get_db)):
 
+# 장바구니에 결제 시도시 상품 정보를 제공하는 함수
+@router.post("/OneItemPayment", response_model=schemas.PaymentResponse)
+def basket_payment(payload: schemas.OneItemRequest, db: Session = Depends(get_db)):
+
+    # 세션 아이디를 통해 유저 정보확인
     user = check_session(db,payload.session_id)
+    product = db.query(models.Product).filter(models.Product.id == payload.product_id).first()
+    address_list = db.query(models.Address).filter(models.Address.user_id == user.id).all()
 
-    if not user:
-        raise HTTPException(status_code=404, detail="User profile not found")
 
-    prod = db.query(models.Product).get(payload.product_id)
-    if not prod:
-        raise HTTPException(status_code=404, detail="Product not found")
+    cards = db.query(models.Card).filter(models.Card.user_id == user.id).all()
 
-    return schemas.OneItemPaymentResponse(
-        address="서울특별시 서대문구 북아현로 12" ,
-        phone="010-1234-5678" ,
-        email="xodud7737@gmail.com",
-        item=[schemas.BasketItem(
-            product_id=prod.id,
-            img=prod.img,
-            name=prod.title,
-            price=prod.price,
+    if not product:
+        raise HTTPException(status_code=404, detail="No items such Product")
+
+    items = [
+        schemas.BasketItem(
+            product_id=product.id,
+            img=product.img,
+            name=product.title,
+            price=product.price,
             number=1
-        )]
+        )
+    ]
+
+    address = [
+        schemas.Address(
+            address_id = item.id,
+            address_text = item.address,
+            flag = item.flag
+        )
+        for item in address_list
+    ]
+    card_list = [
+        schemas.CardInfo(
+            card_id = card.id,
+            company = card.company,
+            card_code = card.card_code,
+            date = card.date,
+            card_num = len(cards)
+        )
+        for card in cards
+     ]
+
+    print(items)
+
+    # TODO, apply user info
+    return schemas.PaymentResponse(
+        address= address,
+        phone= user.cell,
+        email= user.email,
+        item=items,
+        cards = card_list
     )
+
 
 @router.post("/CardAdd", response_model=list[schemas.CardInfo])
 def card_register(payload: schemas.CardRegisterRequest, db: Session = Depends(get_db)):
