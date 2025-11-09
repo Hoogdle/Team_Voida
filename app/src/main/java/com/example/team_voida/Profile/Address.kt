@@ -67,6 +67,7 @@ import com.example.team_voida.Tools.LoaderSet
 import com.example.team_voida.session
 import com.example.team_voida.ui.theme.ButtonBlue
 import com.example.team_voida.ui.theme.IconBlue
+import com.example.team_voida.ui.theme.Selected
 import com.example.team_voida.ui.theme.TextLittleDark
 import com.example.team_voida.ui.theme.TextWhite
 import com.example.team_voida.ui.theme.WishButton
@@ -81,54 +82,35 @@ fun Address(
     homeNavFlag: MutableState<Boolean>,
     productFlag: MutableState<Boolean>,
 ){
+    Log.e("Address", "Recycle")
 
     val scrollState = rememberScrollState()
 
     val addressList: MutableState<List<Address>?> = remember { mutableStateOf<List<Address>?>(null) }
     val whichAddress: MutableState<Int> = remember { mutableStateOf(-1) }
 
-    val customTextFieldDialogState: MutableState<AddressDialogState?> = remember { mutableStateOf(null)}
-
-    fun showTextFieldDialog() {
-        Log.e("Address","Hi")
-        customTextFieldDialogState.value =
-            customTextFieldDialogState.value?.copy(isShowDialog = true)
-        Log.e("Address", customTextFieldDialogState.value.toString())
-    }
-
-    customTextFieldDialogState.value = AddressDialogState(
-        onClickConfirm = { text ->
-            customTextFieldDialogState.value = customTextFieldDialogState.value?.copy(
+    val customTextFieldDialogState: MutableState<AddressDialogState> = remember {
+        mutableStateOf(
+            AddressDialogState(
+                text = "",
                 isShowDialog = false,
-                text = text
             )
-        },
-        onClickCancel = {
-            customTextFieldDialogState.value = customTextFieldDialogState.value?.copy(
-                isShowDialog = false
-            )
-        }
-    )
+        )
+    }
 
 
     // 유저 정보 페이지에 해당하는 하단 네비 Flag Bit 활성화
     ComposableLifecycle { source, event ->
         if (event == Lifecycle.Event.ON_PAUSE) {
-            Log.e("123", "on_pause")
         } else if (event == Lifecycle.Event.ON_STOP) {
-            Log.e("123", "on_stop")
         } else if (event == Lifecycle.Event.ON_DESTROY) {
-            Log.e("123", "on_destroy")
         } else if (event == Lifecycle.Event.ON_CREATE) {
-            Log.e("123", "on_create")
         } else if (event == Lifecycle.Event.ON_START) {
-            Log.e("123", "on_start")
             basketFlag.value = false
             homeNavFlag.value = true
             productFlag.value = false
 
         } else if (event == Lifecycle.Event.ON_RESUME) {
-            Log.e("123", "on_resume")
         }
     }
 
@@ -142,6 +124,18 @@ fun Address(
     }
 
     if(addressList.value != null) {
+
+        if (customTextFieldDialogState.value.isShowDialog) {
+            Log.e("Address", "Wow!")
+
+            AddressDialog(
+                introduction = "배송지 추가 팝업 입니다. 아래에 새로운 배송지를 입력해주세요.",
+                initialText = customTextFieldDialogState.value.text,
+                onClickCancel = {customTextFieldDialogState.value = customTextFieldDialogState.value.copy(isShowDialog = false)},
+                onClickConfirm = {}
+            )
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -194,7 +188,7 @@ fun Address(
 
                 ,
                 onClick = {
-                    showTextFieldDialog()
+                    customTextFieldDialogState.value = customTextFieldDialogState.value.copy(isShowDialog = true)
                 }
             ) {
                 Text(
@@ -214,17 +208,6 @@ fun Address(
     } else {
         LoaderSet(info = "배송지 로딩중", semantics = "배송지 로딩중")
     }
-
-    Log.e("Address", "Here!")
-    if (customTextFieldDialogState.value!!.isShowDialog == true) {
-        Log.e("Address", "Wow!")
-
-        AddressDialog(
-            initialText = customTextFieldDialogState.value!!.text,
-            onClickCancel = customTextFieldDialogState.value!!.onClickCancel,
-            onClickConfirm = customTextFieldDialogState.value!!.onClickConfirm
-        )
-    }
 }
 
 
@@ -239,7 +222,7 @@ fun SettingAddress(
 ){
     Column(
         modifier = Modifier
-            .semantics(mergeDescendants = true){
+            .semantics(mergeDescendants = true) {
                 text = AnnotatedString("")
             }
             .fillMaxWidth()
@@ -250,7 +233,7 @@ fun SettingAddress(
             )
             .clip(RoundedCornerShape(7.dp))
             .border(
-                width = if(flag){
+                width = if (flag) {
                     2.dp
                 } else {
                     0.dp
@@ -337,12 +320,13 @@ fun SettingAddress(
 data class AddressDialogState(
     var text: String? = null,
     var isShowDialog: Boolean = false,
-    val onClickConfirm: (text: String) -> Unit,
-    val onClickCancel: () -> Unit,
+    val onClickConfirm: (text: String) -> Unit = {},
+    val onClickCancel: () -> Unit = {},
 )
 
 @Composable
 fun AddressDialog(
+    introduction: String,
     initialText: String?,
     onClickCancel: () -> Unit,
     onClickConfirm: (text: String) -> Unit
@@ -367,9 +351,17 @@ fun AddressDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
 
-                Text(text = "후기를 입력해주세요.")
+                Text(
+                    text = introduction,
+                    textAlign = TextAlign.Center,
+                    color = TextLittleDark,
+                    style = TextStyle(
+                        fontSize = 13.sp,
+                        fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                    )
+                )
 
-                Spacer(modifier = Modifier.height(15.dp))
+                Spacer(modifier = Modifier.height(25.dp))
 
                 // TextField
                 BasicTextField(
@@ -386,7 +378,7 @@ fun AddressDialog(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(
-                                    color = Color(0xFFBAE5F5),
+                                    color = Selected,
                                     shape = RoundedCornerShape(size = 16.dp)
                                 )
                                 .padding(all = 16.dp),
@@ -403,24 +395,60 @@ fun AddressDialog(
                     },
                 )
 
-                Spacer(modifier = Modifier.height(15.dp))
+                Spacer(modifier = Modifier.height(25.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
                 ) {
-                    Button(onClick = {
-                        onClickCancel()
-                    }) {
-                        Text(text = "취소")
+                    Button(
+                        contentPadding = PaddingValues(0.dp),
+                        onClick = {
+                            onClickCancel()
+                        },
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonColors(
+                            disabledContentColor = IconBlue,
+                            disabledContainerColor = IconBlue,
+                            contentColor = IconBlue,
+                            containerColor = IconBlue
+                        )
+                    ) {
+                        Text(
+                            text = "취소",
+                            textAlign = TextAlign.Center,
+                            color = Color.White,
+                            style = TextStyle(
+                                fontSize = 13.sp,
+                                fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                            )
+                        )
                     }
 
-                    Spacer(modifier = Modifier.width(5.dp))
+                    Spacer(modifier = Modifier.width(15.dp))
 
-                    Button(onClick = {
+                    Button(
+                        contentPadding = PaddingValues(0.dp),
+                        onClick = {
                         onClickConfirm(text.value)
-                    }) {
-                        Text(text = "확인")
+                        },
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonColors(
+                            disabledContentColor = IconBlue,
+                            disabledContainerColor = IconBlue,
+                            contentColor = IconBlue,
+                            containerColor = IconBlue
+                        )
+                    ) {
+                        Text(
+                            text = "확인",
+                            textAlign = TextAlign.Center,
+                            color = Color.White,
+                            style = TextStyle(
+                                fontSize = 13.sp,
+                                fontFamily = FontFamily(Font(R.font.pretendard_bold)),
+                            )
+                        )
                     }
                 }
             }
