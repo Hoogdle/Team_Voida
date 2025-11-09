@@ -31,7 +31,7 @@ data class PaymentInfo(
 @Serializable
 data class Address(
     val address_id: Int,
-    val address_text: String,
+    var address_text: String,
     val flag: Boolean
 )
 

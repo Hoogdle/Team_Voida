@@ -1,6 +1,7 @@
 package com.example.team_voida.Payment
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -59,11 +60,14 @@ import com.example.team_voida.Categories.cateSports
 import com.example.team_voida.Notification.Notification
 import com.example.team_voida.ProductInfo.CancelAI
 import com.example.team_voida.ProductInfo.Loader
+import com.example.team_voida.Profile.AddressDialog
+import com.example.team_voida.Profile.AddressDialogState
 import com.example.team_voida.Profile.CardDeleteDialog
 import com.example.team_voida.Profile.CustomAlertDialogState
 import com.example.team_voida.Profile.PaymentAdd
 import com.example.team_voida.Profile.PaymentLogoSelector
 import com.example.team_voida.ProfileServer.CardInfo
+import com.example.team_voida.ProfileServer.EditAddress
 import com.example.team_voida.ProfileServer.PayDetailHistory
 import com.example.team_voida.ProfileServer.PaymentDetailInfo
 import com.example.team_voida.R
@@ -112,6 +116,9 @@ fun Payment(
     isPayPage.value = true
     // 결제 수단 리스트
     val tmpRegisteredPayMethod = remember { mutableListOf("신용카드", "모바일 페이", "계좌이체") }
+    val addAddressText: MutableState<String> = remember { mutableStateOf("") }
+    val editAddressId: MutableState<Int> = remember { mutableStateOf(-1) }
+
 
     // 결제 화면 하단 네비 Flag bit 설정 
     val paymentInfo:MutableState<PaymentPageInfo?> = remember { mutableStateOf<PaymentPageInfo?>(null) }
@@ -139,32 +146,45 @@ fun Payment(
         }
     }
 
+
+    val editAddressDialog: MutableState<AddressDialogState> = remember {
+        mutableStateOf(
+            AddressDialogState(
+                text = "",
+                isShowDialog = false,
+            )
+        )
+    }
+
+
     // 서버로 부터 해당 계정의 결제정보를 요청
     runBlocking {
-        val job = GlobalScope.launch {
-            if(isPayOne.value){
-                paymentInfo.value = PaymentServerOne(
-                    action = when (isItemWhichPart.value) {
-                        1 -> ""
-                        2 -> ""
-                        3 -> ""
-                        4 -> ""
-                        else -> ""
-                    },
-                    session_id = session.sessionId.value,
-                    product_id = productID.value
+        if(paymentInfo.value == null) {
+            val job = GlobalScope.launch {
+                if (isPayOne.value) {
+                    paymentInfo.value = PaymentServerOne(
+                        action = when (isItemWhichPart.value) {
+                            1 -> ""
+                            2 -> ""
+                            3 -> ""
+                            4 -> ""
+                            else -> ""
+                        },
+                        session_id = session.sessionId.value,
+                        product_id = productID.value
 
-                )
-            } else {
-                paymentInfo.value = PaymentServerMultiple(
-                    session_id = session.sessionId.value
-                )
+                    )
+                } else {
+                    paymentInfo.value = PaymentServerMultiple(
+                        session_id = session.sessionId.value
+                    )
 
-                if(!paymentInfo.value!!.cards.isEmpty()){
-                    selectedCardId.value = paymentInfo.value!!.cards[0].card_id
+                    if (!paymentInfo.value!!.cards.isEmpty()) {
+                        selectedCardId.value = paymentInfo.value!!.cards[0].card_id
+                    }
+
+                    Log.e("BasketPay", paymentInfo.value.toString())
                 }
-
-                Log.e("BasketPay",paymentInfo.value.toString())
             }
         }
     }
@@ -175,6 +195,39 @@ fun Payment(
     Log.e("payment",productID.value.toString())
     // 결제 정보를 받은 경우 결제 페이지 정보 제공
     if(paymentInfo.value != null){
+
+        if (editAddressDialog.value.isShowDialog) {
+
+            paymentInfo.value!!.address.forEach{
+                if(it.address_id == editAddressId.value){
+                    addAddressText.value = it.address_text
+                }
+            }
+
+
+            AddressDialog(
+                introduction = "배송지 수정 팝업 입니다. 아래에 입력란에서 기존 배송지를 수정해주세요.",
+                address = addAddressText,
+                onClickCancel = {editAddressDialog.value = editAddressDialog.value.copy(isShowDialog = false)},
+                onClickConfirm = {
+                    // Create a new list with updated address
+                    val updatedAddressList = paymentInfo.value!!.address.map { address ->
+                        if (address.address_id == editAddressId.value) {
+                            // Create a new Address object with updated text
+                            address.copy(address_text = addAddressText.value)
+                        } else {
+                            address
+                        }
+                    }
+
+                    // Update paymentInfo with the new list
+                    paymentInfo.value = paymentInfo.value!!.copy(address = updatedAddressList)
+
+                    editAddressDialog.value = editAddressDialog.value.copy(isShowDialog = false)
+                }
+            )
+        }
+
 
         var price = 0F
 
@@ -224,7 +277,9 @@ fun Payment(
 
             PaymentAddressList(
                 addressList = paymentInfo.value!!.address,
-                whichAddress = whichAddress
+                whichAddress = whichAddress,
+                editAddressId = editAddressId,
+                editState = editAddressDialog
             )
 
             Spacer(Modifier.height(7.dp))
@@ -234,6 +289,7 @@ fun Payment(
                 editable = true
             )
             Spacer(Modifier.height(15.dp))
+
 
             var num = 0
             paymentInfo.value!!.item.forEach { item ->
@@ -265,7 +321,9 @@ fun PaymentAddress(
     addressId: Int,
     address: String,
     editable: Boolean,
-    whichAddress: MutableState<Int>
+    whichAddress: MutableState<Int>,
+    editAddressId: MutableState<Int>,
+    editState: MutableState<AddressDialogState>
 ){
     Column(
         modifier = Modifier
@@ -337,7 +395,10 @@ fun PaymentAddress(
             )
             if(editable){
                 Button(
-                    onClick = {},
+                    onClick = {
+                        editAddressId.value = addressId
+                        editState.value = editState.value.copy(isShowDialog = true)
+                    },
                     modifier = Modifier
                         .size(30.dp)
                         .width(1.dp)
@@ -1012,7 +1073,9 @@ fun PaymentSmallCard(
 @Composable
 fun PaymentAddressList(
     addressList: List<Address>,
-    whichAddress: MutableState<Int> = mutableStateOf(0)
+    editAddressId: MutableState<Int>,
+    whichAddress: MutableState<Int> = mutableStateOf(0),
+    editState: MutableState<AddressDialogState>
 ){
     val scrollState = rememberScrollState()
     val selected = remember{ mutableStateOf(0) }
@@ -1028,7 +1091,9 @@ fun PaymentAddressList(
                 addressId = item.address_id,
                 address = item.address_text,
                 editable = true,
-                whichAddress = whichAddress
+                whichAddress = whichAddress,
+                editAddressId = editAddressId,
+                editState = editState
             )
             Spacer(Modifier.width(3.dp))
         }
