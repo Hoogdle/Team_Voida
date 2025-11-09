@@ -233,25 +233,28 @@ fun PaymentHistory(
 
             Spacer(Modifier.height(15.dp))
 
-            HistoryCardList(
-                selectedCardId = selectedCardId,
-                cardList = payHistory.value!!
-            )
+            if(payHistory.value!![0].card_id != -1) {
 
-            Spacer(Modifier.height(20.dp))
+                HistoryCardList(
+                    selectedCardId = selectedCardId,
+                    cardList = payHistory.value!!
+                )
 
-            payHistory.value!!.forEach {
-                if(it.card_id == selectedCardId.value){
-                    it.pay_list.forEach {
-                        PaymentHistoryItem(
-                            date = it.date,
-                            orderNum = it.order_num,
-                            price = it.price.toString(),
-                            isRefund = it.is_refund,
-                            orderNumberSetter = orderNumber,
-                            navController = navController
-                        )
-                        Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(20.dp))
+
+                payHistory.value!!.forEach {
+                    if (it.card_id == selectedCardId.value) {
+                        it.pay_list.forEach {
+                            PaymentHistoryItem(
+                                date = it.date,
+                                orderNum = it.order_num,
+                                price = it.price.toString(),
+                                isRefund = it.is_refund,
+                                orderNumberSetter = orderNumber,
+                                navController = navController
+                            )
+                            Spacer(Modifier.height(10.dp))
+                        }
                     }
                 }
             }

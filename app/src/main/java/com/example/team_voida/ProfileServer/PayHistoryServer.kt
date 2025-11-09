@@ -68,7 +68,7 @@ suspend fun PayHistoryListServer(
     val jsonObjectString = jsonObject.toString()
 
     try {
-        val url = URL(" https://fluent-marmoset-immensely.ngrok-free.app/PayHistoryList") // edit1
+        val url = URL("https://fluent-marmoset-immensely.ngrok-free.app/PayHistoryList") // edit1
         val connection = url.openConnection() as java.net.HttpURLConnection
         connection.doOutput = true // 서버로 보내기 위해 doOutPut 옵션 활성화
         connection.doInput = true
@@ -95,7 +95,7 @@ suspend fun PayHistoryListServer(
             val json = Json.decodeFromString<List<PayHistoryList>>(inputStream) // edit3
             return json
         } else {
-            Log.e("xxx","else")
+            Log.e("PayInfo","else")
             return listOf(
                 PayHistoryList(
                     card_id = -1,
@@ -115,7 +115,7 @@ suspend fun PayHistoryListServer(
             )
         }
     } catch (e: Exception) {
-        Log.e("xxx","catch")
+        Log.e("PayInfo","catch")
 
         e.printStackTrace()
         return listOf(

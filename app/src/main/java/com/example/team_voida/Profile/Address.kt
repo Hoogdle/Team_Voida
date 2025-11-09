@@ -18,16 +18,23 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -39,9 +46,11 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
 import com.example.team_voida.Basket.ComposableLifecycle
@@ -77,6 +86,30 @@ fun Address(
 
     val addressList: MutableState<List<Address>?> = remember { mutableStateOf<List<Address>?>(null) }
     val whichAddress: MutableState<Int> = remember { mutableStateOf(-1) }
+
+    val customTextFieldDialogState: MutableState<AddressDialogState?> = remember { mutableStateOf(null)}
+
+    fun showTextFieldDialog() {
+        Log.e("Address","Hi")
+        customTextFieldDialogState.value =
+            customTextFieldDialogState.value?.copy(isShowDialog = true)
+        Log.e("Address", customTextFieldDialogState.value.toString())
+    }
+
+    customTextFieldDialogState.value = AddressDialogState(
+        onClickConfirm = { text ->
+            customTextFieldDialogState.value = customTextFieldDialogState.value?.copy(
+                isShowDialog = false,
+                text = text
+            )
+        },
+        onClickCancel = {
+            customTextFieldDialogState.value = customTextFieldDialogState.value?.copy(
+                isShowDialog = false
+            )
+        }
+    )
+
 
     // 유저 정보 페이지에 해당하는 하단 네비 Flag Bit 활성화
     ComposableLifecycle { source, event ->
@@ -134,12 +167,15 @@ fun Address(
                 )
             )
 
+            Spacer(Modifier.height(15.dp))
+
             addressList.value!!.forEach {
-                PaymentAddress(
+                SettingAddress(
                     addressId = it.address_id,
                     address = it.address_text,
                     editable = true,
-                    whichAddress = whichAddress
+                    whichAddress = whichAddress,
+                    flag = it.flag
                 )
             }
 
@@ -158,7 +194,7 @@ fun Address(
 
                 ,
                 onClick = {
-
+                    showTextFieldDialog()
                 }
             ) {
                 Text(
@@ -178,6 +214,17 @@ fun Address(
     } else {
         LoaderSet(info = "배송지 로딩중", semantics = "배송지 로딩중")
     }
+
+    Log.e("Address", "Here!")
+    if (customTextFieldDialogState.value!!.isShowDialog == true) {
+        Log.e("Address", "Wow!")
+
+        AddressDialog(
+            initialText = customTextFieldDialogState.value!!.text,
+            onClickCancel = customTextFieldDialogState.value!!.onClickCancel,
+            onClickConfirm = customTextFieldDialogState.value!!.onClickConfirm
+        )
+    }
 }
 
 
@@ -187,12 +234,13 @@ fun SettingAddress(
     addressId: Int,
     address: String,
     editable: Boolean,
+    flag: Boolean,
     whichAddress: MutableState<Int>
 ){
     Column(
         modifier = Modifier
             .semantics(mergeDescendants = true){
-                text = AnnotatedString("배송지 주소는 서울특별시 서대문구 독립문로 129-1 가나다 아파트세상 203동 1104호 입니다. 배송지를 수정하시려면 다음에 나오는 배송지 수정 버튼을 눌러주세요.")
+                text = AnnotatedString("")
             }
             .fillMaxWidth()
             .height(120.dp)
@@ -202,7 +250,7 @@ fun SettingAddress(
             )
             .clip(RoundedCornerShape(7.dp))
             .border(
-                width = if(whichAddress.value == addressId){
+                width = if(flag){
                     2.dp
                 } else {
                     0.dp
@@ -279,6 +327,101 @@ fun SettingAddress(
                         modifier = Modifier
 
                     )
+                }
+            }
+        }
+    }
+}
+
+
+data class AddressDialogState(
+    var text: String? = null,
+    var isShowDialog: Boolean = false,
+    val onClickConfirm: (text: String) -> Unit,
+    val onClickCancel: () -> Unit,
+)
+
+@Composable
+fun AddressDialog(
+    initialText: String?,
+    onClickCancel: () -> Unit,
+    onClickConfirm: (text: String) -> Unit
+) {
+
+    val text = remember { mutableStateOf(initialText ?: "") }
+
+    Dialog(
+        onDismissRequest = { onClickCancel() },
+    ) {
+        Card(
+            shape = RoundedCornerShape(8.dp), // Card의 모든 꼭지점에 8.dp의 둥근 모서리 적용
+        ) {
+            Column(
+                modifier = Modifier
+                    .width(300.dp)
+                    .wrapContentHeight()
+                    .background(
+                        color = Color.White,
+                    )
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+
+                Text(text = "후기를 입력해주세요.")
+
+                Spacer(modifier = Modifier.height(15.dp))
+
+                // TextField
+                BasicTextField(
+                    value = text.value,
+                    onValueChange = { text.value = it },
+                    singleLine = true,
+                    textStyle = TextStyle(
+                        color = Color.Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal,
+                    ),
+                    decorationBox = { innerTextField ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    color = Color(0xFFBAE5F5),
+                                    shape = RoundedCornerShape(size = 16.dp)
+                                )
+                                .padding(all = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Create,
+                                contentDescription = "",
+                                tint = Color.DarkGray,
+                            )
+                            Spacer(modifier = Modifier.width(width = 8.dp))
+                            innerTextField()
+                        }
+                    },
+                )
+
+                Spacer(modifier = Modifier.height(15.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    Button(onClick = {
+                        onClickCancel()
+                    }) {
+                        Text(text = "취소")
+                    }
+
+                    Spacer(modifier = Modifier.width(5.dp))
+
+                    Button(onClick = {
+                        onClickConfirm(text.value)
+                    }) {
+                        Text(text = "확인")
+                    }
                 }
             }
         }
