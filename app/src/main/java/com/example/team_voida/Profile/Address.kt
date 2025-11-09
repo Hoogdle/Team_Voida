@@ -56,6 +56,7 @@ import androidx.navigation.NavController
 import com.example.team_voida.Basket.ComposableLifecycle
 import com.example.team_voida.Notification.Notification
 import com.example.team_voida.Payment.PaymentAddress
+import com.example.team_voida.ProfileServer.AddAddress
 import com.example.team_voida.ProfileServer.Address
 import com.example.team_voida.ProfileServer.AddressList
 import com.example.team_voida.ProfileServer.CardAdd
@@ -82,12 +83,15 @@ fun Address(
     homeNavFlag: MutableState<Boolean>,
     productFlag: MutableState<Boolean>,
 ){
+    val context = LocalContext.current
+
     Log.e("Address", "Recycle")
 
     val scrollState = rememberScrollState()
 
     val addressList: MutableState<List<Address>?> = remember { mutableStateOf<List<Address>?>(null) }
     val whichAddress: MutableState<Int> = remember { mutableStateOf(-1) }
+    val addAddressText: MutableState<String> = remember { mutableStateOf("") }
 
     val customTextFieldDialogState: MutableState<AddressDialogState> = remember {
         mutableStateOf(
@@ -130,9 +134,26 @@ fun Address(
 
             AddressDialog(
                 introduction = "배송지 추가 팝업 입니다. 아래에 새로운 배송지를 입력해주세요.",
-                initialText = customTextFieldDialogState.value.text,
+                address = addAddressText,
                 onClickCancel = {customTextFieldDialogState.value = customTextFieldDialogState.value.copy(isShowDialog = false)},
-                onClickConfirm = {}
+                onClickConfirm = {
+
+                    runBlocking {
+                        val job = GlobalScope.launch{
+                            addressList.value = AddAddress(
+                                session_id = session.sessionId.value,
+                                address = addAddressText.value
+                            )
+                        }
+                    }
+
+                    Thread.sleep(2000L)
+
+                    if(addressList.value!![0].address_id != -1){
+                        Toast.makeText(context, "새로운 주소가 추가되었습니다.", Toast.LENGTH_SHORT).show()
+                        customTextFieldDialogState.value = customTextFieldDialogState.value.copy(isShowDialog = false)
+                    }
+                }
             )
         }
 
@@ -171,6 +192,8 @@ fun Address(
                     whichAddress = whichAddress,
                     flag = it.flag
                 )
+
+                Spacer(Modifier.height(10.dp))
             }
 
             Button(
@@ -327,12 +350,11 @@ data class AddressDialogState(
 @Composable
 fun AddressDialog(
     introduction: String,
-    initialText: String?,
+    address: MutableState<String>,
     onClickCancel: () -> Unit,
-    onClickConfirm: (text: String) -> Unit
+    onClickConfirm: () -> Unit
 ) {
 
-    val text = remember { mutableStateOf(initialText ?: "") }
 
     Dialog(
         onDismissRequest = { onClickCancel() },
@@ -365,8 +387,8 @@ fun AddressDialog(
 
                 // TextField
                 BasicTextField(
-                    value = text.value,
-                    onValueChange = { text.value = it },
+                    value = address.value,
+                    onValueChange = { address.value = it },
                     singleLine = true,
                     textStyle = TextStyle(
                         color = Color.Black,
@@ -430,7 +452,7 @@ fun AddressDialog(
                     Button(
                         contentPadding = PaddingValues(0.dp),
                         onClick = {
-                        onClickConfirm(text.value)
+                        onClickConfirm()
                         },
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonColors(
