@@ -118,13 +118,12 @@ fun Payment(
     val tmpRegisteredPayMethod = remember { mutableListOf("신용카드", "모바일 페이", "계좌이체") }
     val addAddressText: MutableState<String> = remember { mutableStateOf("") }
     val editAddressId: MutableState<Int> = remember { mutableStateOf(-1) }
-
+    val contactText: MutableState<String> = remember { mutableStateOf("") }
 
     // 결제 화면 하단 네비 Flag bit 설정 
     val paymentInfo:MutableState<PaymentPageInfo?> = remember { mutableStateOf<PaymentPageInfo?>(null) }
     val selectedCardId = cardID
     val whichAddress:MutableState<Int> = remember { mutableStateOf(-1) }
-
     ComposableLifecycle { source, event ->
         if (event == Lifecycle.Event.ON_PAUSE) {
             Log.e("123","on_pause")
@@ -156,6 +155,16 @@ fun Payment(
         )
     }
 
+    val editContactDialog: MutableState<AddressDialogState> = remember {
+        mutableStateOf(
+            AddressDialogState(
+                text = "",
+                isShowDialog = false,
+            )
+        )
+    }
+
+
 
     // 서버로 부터 해당 계정의 결제정보를 요청
     runBlocking {
@@ -174,6 +183,7 @@ fun Payment(
                         product_id = productID.value
 
                     )
+
                 } else {
                     paymentInfo.value = PaymentServerMultiple(
                         session_id = session.sessionId.value
@@ -183,6 +193,7 @@ fun Payment(
                         selectedCardId.value = paymentInfo.value!!.cards[0].card_id
                     }
 
+
                     Log.e("BasketPay", paymentInfo.value.toString())
                 }
             }
@@ -191,6 +202,14 @@ fun Payment(
 
 
 
+    // very first time
+    if(paymentInfo.value != null && whichAddress.value == -1){
+        paymentInfo.value!!.address.forEach {
+            if(it.flag){
+                whichAddress.value = it.address_id
+            }
+        }
+    }
 
     Log.e("payment",productID.value.toString())
     // 결제 정보를 받은 경우 결제 페이지 정보 제공
@@ -228,6 +247,26 @@ fun Payment(
             )
         }
 
+        if (editContactDialog.value.isShowDialog) {
+
+            contactText.value = paymentUserInfo.value.cell
+
+            AddressDialog(
+                introduction = "연락처 수정 팝업 입니다. 아래에 입력란 새로운 전화번호를 대쉬(-) 없이 입력해주세요.",
+                address = contactText,
+                onClickCancel = {editContactDialog.value = editContactDialog.value.copy(isShowDialog = false)},
+                onClickConfirm = {
+
+                    paymentUserInfo.value.cell = contactText.value
+                    paymentInfo.value = paymentInfo.value!!.copy(phone = contactText.value)
+                    editContactDialog.value = editContactDialog.value.copy(isShowDialog = false)
+                }
+            )
+        }
+
+
+
+
 
         var price = 0F
 
@@ -238,12 +277,17 @@ fun Payment(
 
 
         paymentInfo.value!!.address.forEach {
-            if(it.flag){
+            if(it.address_id == whichAddress.value){
                 paymentUserInfo.value.address = it.address_text
             }
         }
+
         paymentUserInfo.value.cell = paymentInfo.value!!.phone
         paymentUserInfo.value.email = paymentInfo.value!!.email
+
+        Log.e("ZXC",paymentUserInfo.value.cell)
+        Log.e("ZXC",paymentUserInfo.value.email)
+        Log.e("ZXC",paymentUserInfo.value.address)
 
         Column (
             modifier = Modifier
@@ -286,7 +330,8 @@ fun Payment(
             PaymentContact(
                 cell = paymentInfo.value!!.phone,
                 email = paymentInfo.value!!.email,
-                editable = true
+                editable = true,
+                editState = editContactDialog
             )
             Spacer(Modifier.height(15.dp))
 
@@ -432,7 +477,8 @@ fun PaymentAddress(
 fun PaymentContact(
     cell: String,
     email: String,
-    editable: Boolean
+    editable: Boolean,
+    editState: MutableState<AddressDialogState> = mutableStateOf(AddressDialogState())
 ){
     Column(
         modifier = Modifier
@@ -492,7 +538,9 @@ fun PaymentContact(
             )
             if(editable){
                 Button(
-                    onClick = {},
+                    onClick = {
+                        editState.value = editState.value.copy(isShowDialog = true)
+                    },
                     modifier = Modifier
                         .size(30.dp)
                         .width(1.dp)
