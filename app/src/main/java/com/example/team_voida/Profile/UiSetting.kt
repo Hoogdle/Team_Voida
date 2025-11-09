@@ -21,6 +21,7 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -37,6 +38,7 @@ import androidx.navigation.NavController
 import com.example.team_voida.Basket.ComposableLifecycle
 import com.example.team_voida.Notification.Notification
 import com.example.team_voida.R
+import com.example.team_voida.theme
 import com.example.team_voida.ui.theme.Selected
 import com.example.team_voida.ui.theme.TextLittleDark
 
@@ -79,6 +81,7 @@ fun UiSetting(
 
         Spacer(Modifier.height(10.dp))
 
+        ContrastRow(0)
         ContrastRow(1)
         ContrastRow(2)
         ContrastRow(3)
@@ -86,6 +89,40 @@ fun UiSetting(
     }
 }
 
+
+fun UiSetName(codeNum: Int):String{
+    lateinit var result:String
+    when(codeNum){
+        0 -> result = "하얀 · 파랑(기본값)"
+        1 -> result = "    남색 · 연분홍"
+        2 -> result = "     청록 · 노랑"
+        3 -> result = "    차색 · 연하늘"
+    }
+
+    return result
+}
+
+fun UiSetIcon(codeNum: Int):Int{
+    var result: Int = R.drawable.high_default
+    when(codeNum){
+        0 -> result = R.drawable.high_default
+        1 -> result = R.drawable.high_bluepink
+        2 -> result = R.drawable.high_greenyellow
+        3 -> result = R.drawable.high_redskyblue
+    }
+
+    return result
+}
+
+fun UiSetHelper(codeNum: Int){
+    when(codeNum){
+        0 -> theme.themeId.value = 0
+        1 -> theme.themeId.value = 1
+        2 -> theme.themeId.value = 2
+        3 -> theme.themeId.value = 3
+        4 -> theme.themeId.value = 4
+    }
+}
 @Composable
 fun ContrastRow(
     whichColor: Int
@@ -109,27 +146,32 @@ fun ContrastRow(
         )
         ,
         onClick = {
+            UiSetHelper(whichColor)
         }
     ){
         Row(
-            horizontalArrangement = Arrangement.Center
-        ){  }
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
 
-        Image(
-            modifier = Modifier.size(35.dp),
-            painter = painterResource(R.drawable.high_redskyblue),
-            contentDescription = ""
-        )
-
-        Spacer(Modifier.width(5.dp))
-        Text(
-            textAlign = TextAlign.Center,
-            text = "Settings",
-            color = TextLittleDark,
-            style = TextStyle(
-                fontSize = 20.sp,
-                fontFamily = FontFamily(Font(R.font.roboto_regular)),
+            Spacer(Modifier.width(30.dp))
+            Image(
+                modifier = Modifier.size(30.dp),
+                painter = painterResource(UiSetIcon(whichColor)),
+                contentDescription = ""
             )
-        )
+            Spacer(Modifier.width(50.dp))
+
+            Text(
+                textAlign = TextAlign.Center,
+                text = UiSetName(whichColor).toString(),
+                color = TextLittleDark,
+                style = TextStyle(
+                    fontSize = 15.sp,
+                    fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                )
+            )
+        }
     }
 }
