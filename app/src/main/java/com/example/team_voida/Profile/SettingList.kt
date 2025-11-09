@@ -150,6 +150,15 @@ fun Profile(
                 ),
             color = SearchBarColor
         )
+        ProfileButton("화면 디자인 설정",{navController.navigate("uiSetting")})
+        HorizontalDivider(
+            modifier = Modifier
+                .padding(
+                    start = 10.dp,
+                    end = 10.dp
+                ),
+            color = SearchBarColor
+        )
     }
 }
 

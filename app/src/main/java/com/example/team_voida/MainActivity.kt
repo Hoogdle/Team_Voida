@@ -30,6 +30,11 @@ object session{
     var sessionId = mutableStateOf("")
 }
 
+// session 관리
+object theme{
+    val themeId = mutableStateOf(0)
+}
+
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,8 +44,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val navController = rememberNavController()
-            StartNav()
-//            HomeNav()
+//            StartNav()
+            HomeNav()
         }
     }
 }

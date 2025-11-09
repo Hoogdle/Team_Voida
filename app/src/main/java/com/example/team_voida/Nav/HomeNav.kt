@@ -83,6 +83,7 @@ import com.example.team_voida.Profile.PaymentHistory
 import com.example.team_voida.Profile.PaymentHistoryList
 import com.example.team_voida.Profile.PaymentSetting
 import com.example.team_voida.Profile.Profile
+import com.example.team_voida.Profile.UiSetting
 import com.example.team_voida.R
 import com.example.team_voida.SearchResult.SearchResult
 import com.example.team_voida.Start.Guide
@@ -448,7 +449,7 @@ fun HomeNav(){
                         translationY = offsetY
                     },
                 navController = navController,
-                startDestination = "home"
+                startDestination = "uiSetting"
             ) {
                 // HomeNav에서 갈 수 있는 모든 페이지의 네비게이션 등록
                 composable("home") {
@@ -632,6 +633,15 @@ fun HomeNav(){
 
                 composable("address") {
                     Address(
+                        navController = navController,
+                        basketFlag = basketFlag,
+                        homeNavFlag = homeNavFlag,
+                        productFlag = productFlag
+                    )
+                }
+
+                composable("uiSetting") {
+                    UiSetting(
                         navController = navController,
                         basketFlag = basketFlag,
                         homeNavFlag = homeNavFlag,
