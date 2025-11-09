@@ -623,7 +623,6 @@ fun CustomAlertDialog(
         }
     }
 }
-// 출처: https://dev-inventory.com/27 [개발자가 들려주는 IT 이야기:티스토리]
 
 
 @Composable

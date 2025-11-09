@@ -55,7 +55,7 @@ suspend fun SearchResultServer(
         if (connection.responseCode == HttpURLConnection.HTTP_OK) {
             val inputStream = connection.inputStream.bufferedReader().use { it.readText() }
             val json = Json.decodeFromString<List<SearchResultItem>?>(inputStream) // edit3
-            Log.e("Search","O")
+            Log.e("Search",json.toString())
             return json
         } else {
             Log.e("Search","!")

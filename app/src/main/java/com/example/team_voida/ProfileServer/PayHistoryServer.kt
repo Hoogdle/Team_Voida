@@ -9,6 +9,8 @@ import org.json.JSONObject
 import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
 import java.net.URL
+import java.sql.Timestamp
+import java.util.Date
 
 @Serializable
 data class PayHistoryList(
@@ -46,6 +48,15 @@ data class PayDetailHistory(
     val item_list: List<BasketInfo>
 )
 
+@Serializable
+data class PaymentDetailInfo(
+    val order_num: String,
+    val address: String,
+    val cell: String,
+    val email: String,
+    val items: List<BasketInfo>
+)
+
 
 suspend fun PayHistoryListServer(
     session_id: String
@@ -57,7 +68,7 @@ suspend fun PayHistoryListServer(
     val jsonObjectString = jsonObject.toString()
 
     try {
-        val url = URL(" https://fluent-marmoset-immensely.ngrok-free.app/PayHistoryList") // edit1
+        val url = URL("https://fluent-marmoset-immensely.ngrok-free.app/PayHistoryList") // edit1
         val connection = url.openConnection() as java.net.HttpURLConnection
         connection.doOutput = true // 서버로 보내기 위해 doOutPut 옵션 활성화
         connection.doInput = true
@@ -84,7 +95,7 @@ suspend fun PayHistoryListServer(
             val json = Json.decodeFromString<List<PayHistoryList>>(inputStream) // edit3
             return json
         } else {
-            Log.e("xxx","else")
+            Log.e("PayInfo","else")
             return listOf(
                 PayHistoryList(
                     card_id = -1,
@@ -104,7 +115,7 @@ suspend fun PayHistoryListServer(
             )
         }
     } catch (e: Exception) {
-        Log.e("xxx","catch")
+        Log.e("PayInfo","catch")
 
         e.printStackTrace()
         return listOf(
@@ -131,7 +142,7 @@ suspend fun PayHistoryListServer(
 suspend fun PayDetailHistoryListServer(
     session_id: String,
     order_num: String
-): PaymentInfo?{
+): PaymentDetailInfo?{
 
     val jsonObject = JSONObject()
     jsonObject.put("session_id", session_id)
@@ -164,7 +175,7 @@ suspend fun PayDetailHistoryListServer(
 
         if (connection.responseCode == HttpURLConnection.HTTP_OK) {
             val inputStream = connection.inputStream.bufferedReader().use { it.readText() }
-            val json = Json.decodeFromString<PaymentInfo?>(inputStream) // edit3
+            val json = Json.decodeFromString<PaymentDetailInfo>(inputStream) // edit3
             return json
         } else {
             Log.e("xxx","else")

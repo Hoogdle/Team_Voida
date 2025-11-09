@@ -122,7 +122,7 @@ fun Profile(
                 ),
             color = SearchBarColor
         )
-        ProfileButton("배송지",{})
+        ProfileButton("배송지",{navController.navigate("address")})
         HorizontalDivider(
             modifier = Modifier
                 .padding(
