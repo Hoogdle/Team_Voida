@@ -101,7 +101,8 @@ fun Payment(
     isPayPage: MutableState<Boolean>,
     paymentUserInfo: MutableState<PaymentUserInfo>,
     dynamicTotalPrice: MutableState<String>,
-    cardID: MutableState<Int>
+    cardID: MutableState<Int>,
+
 ){
     val scrollState = rememberScrollState()
 
@@ -183,6 +184,10 @@ fun Payment(
                         product_id = productID.value
 
                     )
+
+                    if (!paymentInfo.value!!.cards.isEmpty()) {
+                        selectedCardId.value = paymentInfo.value!!.cards[0].card_id
+                    }
 
                 } else {
                     paymentInfo.value = PaymentServerMultiple(

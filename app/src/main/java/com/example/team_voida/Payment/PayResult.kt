@@ -85,6 +85,7 @@ fun PayRegister(
     isPayPage: MutableState<Boolean>,
     paymentUserInfo: MutableState<PaymentUserInfo>,
     cardId: MutableState<Int>
+
 ){
     val scrollState = rememberScrollState()
     val orderResponse: MutableState<OrderResponse?> = remember { mutableStateOf(null) }
@@ -114,16 +115,24 @@ fun PayRegister(
     }
 
 
-    if(basketInfo.value == null){
+    if(orderResponse.value == null){
         runBlocking {
             val job = GlobalScope.launch {
                 if(isPayOne.value){
+
+
+                    val price = PayOneHelper(product_id = productID.value)
+
+                    Thread.sleep(800L)
+
                     orderResponse.value = AddOneOrder(
                         session_id = session.sessionId.value,
                         address = paymentUserInfo.value.address,
                         email = paymentUserInfo.value.email,
                         cell = paymentUserInfo.value.cell,
-                        productId = productID.value
+                        price = price,
+                        product_id = productID.value,
+                        card_id = cardId.value
                     )
                 } else {
                     runBlocking {
