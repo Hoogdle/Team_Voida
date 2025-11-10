@@ -38,7 +38,8 @@ import androidx.navigation.NavController
 import com.example.team_voida.Basket.ComposableLifecycle
 import com.example.team_voida.Notification.Notification
 import com.example.team_voida.R
-import com.example.team_voida.theme
+import com.example.team_voida.Tools.MainViewModel
+import com.example.team_voida.themeInStart
 import com.example.team_voida.ui.theme.BackGroundWhite
 import com.example.team_voida.ui.theme.BasketPaymentColor
 import com.example.team_voida.ui.theme.ButtonBlackColor
@@ -74,6 +75,7 @@ fun UiSetting(
     basketFlag: MutableState<Boolean>,
     homeNavFlag: MutableState<Boolean>,
     productFlag: MutableState<Boolean>,
+    viewModel: MainViewModel
 ) {
     val context = LocalContext.current
 
@@ -108,10 +110,10 @@ fun UiSetting(
 
         Spacer(Modifier.height(10.dp))
 
-        ContrastRow(0)
-        ContrastRow(1)
-        ContrastRow(2)
-        ContrastRow(3)
+        ContrastRow(0,viewModel)
+        ContrastRow(1,viewModel)
+        ContrastRow(2,viewModel)
+        ContrastRow(3,viewModel)
 
     }
 }
@@ -141,29 +143,38 @@ fun UiSetIcon(codeNum: Int):Int{
     return result
 }
 
-fun UiSetHelper(codeNum: Int){
+fun UiSetHelper(
+    codeNum: Int,
+    viewModel: MainViewModel
+){
     when(codeNum){
         0 -> {
             defaultColor()
-            theme.themeId.value = 0
+            themeInStart.themeId.value = 0
+            viewModel.setTheme(0)
         }
         1 -> {
             themeNavyPink()
-            theme.themeId.value = 1
+            themeInStart.themeId.value = 1
+            viewModel.setTheme(1)
         }
         2 -> {
             themeGreenYellow()
-            theme.themeId.value = 2
+            themeInStart.themeId.value = 2
+            viewModel.setTheme(2)
         }
         3 -> {
             themeRedSkyBlue()
-            theme.themeId.value = 3
+            themeInStart.themeId.value = 3
+            viewModel.setTheme(3)
         }
     }
 }
+
 @Composable
 fun ContrastRow(
-    whichColor: Int
+    whichColor: Int,
+    viewModel: MainViewModel
 ){
     Button(
         modifier = Modifier
@@ -184,7 +195,7 @@ fun ContrastRow(
         )
         ,
         onClick = {
-            UiSetHelper(whichColor)
+            UiSetHelper(whichColor, viewModel)
         }
     ){
         Row(

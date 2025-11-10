@@ -1,7 +1,6 @@
 package com.example.team_voida.ui.theme
 
 import androidx.compose.ui.graphics.Color
-import com.example.team_voida.theme
 
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)

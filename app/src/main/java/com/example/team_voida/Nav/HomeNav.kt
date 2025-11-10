@@ -89,6 +89,7 @@ import com.example.team_voida.SearchResult.SearchResult
 import com.example.team_voida.Start.Guide
 import com.example.team_voida.Start.Start
 import com.example.team_voida.Tools.LoaderSet
+import com.example.team_voida.Tools.MainViewModel
 import com.example.team_voida.session
 import com.example.team_voida.ui.theme.BackGroundWhite
 import kotlinx.coroutines.GlobalScope
@@ -132,7 +133,9 @@ val navItemList = listOf(
 )
 @SuppressLint("RememberReturnType", "UnrememberedMutableState")
 @Composable
-fun HomeNav(){
+fun HomeNav(
+    viewModel: MainViewModel
+){
 
     // 각 화면에서 사용할 변수들 선언 ex) 네비게이션, 하단네비 Flag bit, 검색 입력란 ...
     val navController = rememberNavController() // home nav
@@ -450,7 +453,7 @@ fun HomeNav(){
                         translationY = offsetY
                     },
                 navController = navController,
-                startDestination = "uiSetting"
+                startDestination = "home"
             ) {
                 // HomeNav에서 갈 수 있는 모든 페이지의 네비게이션 등록
                 composable("home") {
@@ -541,7 +544,8 @@ fun HomeNav(){
                         basketFlag = basketFlag,
                         homeNavFlag = homeNavFlag,
                         productFlag = productFlag,
-                        selectedIndex = selectedIndex
+                        selectedIndex = selectedIndex,
+                        viewModel = viewModel
                     )
                 }
 
@@ -551,7 +555,7 @@ fun HomeNav(){
                         basketFlag = basketFlag,
                         homeNavFlag = homeNavFlag,
                         productFlag = productFlag,
-                        selectedIndex = selectedIndex
+                        selectedIndex = selectedIndex,
                     )
                 }
                 composable("partList") {
@@ -646,7 +650,8 @@ fun HomeNav(){
                         navController = navController,
                         basketFlag = basketFlag,
                         homeNavFlag = homeNavFlag,
-                        productFlag = productFlag
+                        productFlag = productFlag,
+                        viewModel = viewModel
                     )
                 }
             }
