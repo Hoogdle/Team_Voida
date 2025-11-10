@@ -35,6 +35,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
@@ -216,10 +218,10 @@ fun HomeSearchBar(
     input: MutableState<String>
 ){
     Row(
-        modifier = Modifier.semantics(mergeDescendants = true){
-            text = AnnotatedString("우측에 음성 검색 버튼이 있습니다.")
-        }
-
+        modifier = Modifier
+            .clearAndSetSemantics {
+                contentDescription = "우측에 음성 검색 버튼이 있습니다."
+            }
 
     ){
         Text(
@@ -276,9 +278,10 @@ fun HomeBar(
 ){
     Row (
         modifier = Modifier
-            .semantics(mergeDescendants = true){
-                text = AnnotatedString("우측에 모두 보기를 통해 ${title} 상품들을 만나보세요.")
+            .clearAndSetSemantics {
+                contentDescription = "우측에 모두 보기를 통해 ${title} 상품들을 만나보세요."
             }
+
             .fillMaxWidth()
             .padding(20.dp),
         horizontalArrangement = Arrangement.SpaceBetween
@@ -458,10 +461,10 @@ fun HomeCard(
 
     Box(
         modifier = Modifier
-            // ScreenReader를 위해 텍스트를 한 묶음으로 처리
-            .semantics(mergeDescendants = true){
-                text = AnnotatedString(name + "상품 입니다." + "상품의 가격은" + price.toInt() + "입니다.")
+            .clearAndSetSemantics {
+                contentDescription = name + "상품 입니다." + "상품의 가격은" + price.toInt() + "입니다."
             }
+
             .width(180.dp)
             .padding(
                 start = 10.dp,

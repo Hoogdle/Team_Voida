@@ -83,59 +83,6 @@ data class PaymentItemHistory(
     val price: String,
     val flag: Int // buy or refund
 )
-val tmpPaymentItemHistory = listOf(
-    PaymentItemHistory(
-        year = "2025",
-        month = "04",
-        date = "25",
-        time = "12:25",
-        orderNum = "#92287157",
-        price = "27000",
-        flag = 1
-    ),
-    PaymentItemHistory(
-        year = "2025",
-        month = "04",
-        date = "28",
-        time = "15:15",
-        orderNum = "#92287192",
-        price = "8750",
-        flag = 1
-    ),PaymentItemHistory(
-        year = "2025",
-        month = "06",
-        date = "13",
-        time = "10:25",
-        orderNum = "#92287245",
-        price = "12500",
-        flag = 1
-    ),PaymentItemHistory(
-        year = "2025",
-        month = "06",
-        date = "25",
-        time = "15:25",
-        orderNum = "#92287300",
-        price = "12500",
-        flag = 2
-    ),PaymentItemHistory(
-        year = "2025",
-        month = "08",
-        date = "03",
-        time = "16:25",
-        orderNum = "#92287400",
-        price = "18000",
-        flag = 1
-    ),PaymentItemHistory(
-        year = "2025",
-        month = "09",
-        date = "01",
-        time = "01:25",
-        orderNum = "#92287423",
-        price = "7250",
-        flag = 1
-    ),
-
-)
 
 @Composable
 fun PaymentHistory(

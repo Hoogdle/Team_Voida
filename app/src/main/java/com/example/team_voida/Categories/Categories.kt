@@ -189,7 +189,7 @@ fun CategoryRow(
     val buttonArrow = remember { mutableStateOf(R.drawable.basket_down) }
     val buttonShadow = remember { mutableStateOf(DefaultShadowColor) }
 
-    Column {
+    Column{
         Button (
             contentPadding = PaddingValues(0.dp),
             colors = ButtonColors(

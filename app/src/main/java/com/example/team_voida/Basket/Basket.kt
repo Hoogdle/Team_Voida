@@ -33,7 +33,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalAccessibilityManager
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
@@ -162,8 +166,8 @@ fun BasketCartNum(
 
     Row (
         modifier = Modifier
-            .semantics(mergeDescendants = true){
-                text = AnnotatedString("현재 장바구니에는 ${cartNum.value} 개의 상품이 담겨 있습니다.")
+            .clearAndSetSemantics {
+                contentDescription = "현재 장바구니에는 ${cartNum.value} 개의 상품이 담겨 있습니다."
             }
             .fillMaxWidth()
             .padding(20.dp),
@@ -215,10 +219,13 @@ fun BasketItem(
     price: String,
     basketInfo: MutableState<List<BasketInfo>?>
 ){
+
+    val view = LocalView.current
+
     Row (
         modifier = Modifier
             .semantics(mergeDescendants = true){
-                text = AnnotatedString(name + "상품이 총" + num + "개 담겨 있습니다. 상품 가격은" + price + "입니다.")
+                contentDescription = name + "상품이 총" + num + "개 담겨 있습니다. 상품 가격은" + price + "입니다."
             }
             .fillMaxWidth()
             .padding(
@@ -291,14 +298,14 @@ fun BasketItem(
                                 )
                             }
                         }
+                        view.announceForAccessibility(name + "이 장바구니에 삭제되었습니다.")
+
                     }
                 ) {
                     Image(
                         painter = painterResource(R.drawable.basket_del),
                         contentDescription = "상품 제거 버튼",
-                        modifier = Modifier
-//                            .width(30.dp)
-//                            .height(30.dp)
+
                     )
                 }
                 Spacer(Modifier.width(10.dp))
@@ -371,6 +378,8 @@ fun BasketItem(
                                     )
                                 }
                             }
+                            view.announceForAccessibility("1개 감소되었습니다.")
+
                         },
                         contentPadding = PaddingValues(0.dp),
                         colors = ButtonColors(
@@ -421,6 +430,7 @@ fun BasketItem(
                                     )
                                 }
                             }
+                            view.announceForAccessibility("1개 증가되었습니다.")
                         },
                         contentPadding = PaddingValues(0.dp),
                         colors = ButtonColors(
@@ -494,11 +504,11 @@ fun BasketPaymentButton(
     Row (
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
-            .semantics(mergeDescendants = true){
-                if(isPayPage.value == false) {
-                    text = AnnotatedString("총 ${price.value}원을 결제합니다. 우측의 결제하기 버튼을 눌러 결제 페이지로 이동해주세요.")
+            .clearAndSetSemantics {
+                contentDescription = if(isPayPage.value == false) {
+                    "총 ${price.value}원을 결제합니다. 우측의 결제하기 버튼을 눌러 결제 페이지로 이동해주세요."
                 } else {
-                    text = AnnotatedString("총 ${price.value}원을 결제합니다. 우측의 결제하기 버튼을 눌러 최종 결제를 진행해주세요.")
+                    "총 ${price.value}원을 결제합니다. 우측의 결제하기 버튼을 눌러 최종 결제를 진행해주세요."
                 }
             }
             .background(
