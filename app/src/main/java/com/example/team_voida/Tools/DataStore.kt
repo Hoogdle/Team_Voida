@@ -23,6 +23,7 @@ class DataStoreManager(private val context: Context) {
         val IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
         val USER_TOKEN = stringPreferencesKey("user_token")
         val THEME_MODE = intPreferencesKey("theme_mode")
+        val NOTY_MODE = booleanPreferencesKey("noty_mode")
     }
 
     // Save login session
@@ -40,6 +41,13 @@ class DataStoreManager(private val context: Context) {
         }
     }
 
+    // Save login session
+    suspend fun setNoty(value: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[NOTY_MODE] = value
+        }
+    }
+
     // Check if user is logged in
     val isLoggedIn: Flow<Boolean> = context.dataStore.data.map { prefs ->
         prefs[IS_LOGGED_IN] ?: false
@@ -50,6 +58,10 @@ class DataStoreManager(private val context: Context) {
         prefs[USER_TOKEN]
     }
 
+    // Get user token
+    val notyMode: Flow<Boolean?> = context.dataStore.data.map { prefs ->
+        prefs[NOTY_MODE] ?: true
+    }
 
     // Save theme preference
     suspend fun saveThemeMode(mode: Int) {
@@ -84,6 +96,9 @@ class MainViewModel(private val dataStoreManager: DataStoreManager) : ViewModel(
     val themeMode = dataStoreManager.themeMode
         .stateIn(viewModelScope, SharingStarted.Eagerly, -1)
 
+    val notyMode = dataStoreManager.notyMode
+        .stateIn(viewModelScope, SharingStarted.Eagerly, true)
+
     fun login(token: String) {
         viewModelScope.launch {
             dataStoreManager.saveLoginSession(token)
@@ -99,6 +114,13 @@ class MainViewModel(private val dataStoreManager: DataStoreManager) : ViewModel(
     fun setTheme(code: Int){
         viewModelScope.launch {
             dataStoreManager.setTheme(code)
+        }
+    }
+
+
+    fun setNoty(value: Boolean){
+        viewModelScope.launch {
+            dataStoreManager.setNoty(value)
         }
     }
 

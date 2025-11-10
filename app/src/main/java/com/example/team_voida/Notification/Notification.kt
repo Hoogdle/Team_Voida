@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.team_voida.R
+import com.example.team_voida.notifySwitch
 import com.example.team_voida.ui.theme.NotifyBlock
 import com.example.team_voida.ui.theme.TextColor
 
@@ -27,25 +28,26 @@ fun Notification(
     top: Dp = 30.dp,
     bottom: Dp = 10.dp
 ){
-    Text(
-        modifier = Modifier
-            .padding(
-                start = 10.dp,
-                top = top,
-                end = 10.dp,
-                bottom = bottom
-            )
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(15.dp))
-            .background(color = NotifyBlock)
-            .padding(15.dp)
-        ,
-        text = text,
-        color = TextColor,
-        style = TextStyle(
+    if(notifySwitch.switch.value) {
+        Text(
+            modifier = Modifier
+                .padding(
+                    start = 10.dp,
+                    top = top,
+                    end = 10.dp,
+                    bottom = bottom
+                )
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(15.dp))
+                .background(color = NotifyBlock)
+                .padding(15.dp),
+            text = text,
             color = TextColor,
-            fontSize = 10.sp,
-            fontFamily = FontFamily(Font(R.font.pretendard_light))
+            style = TextStyle(
+                color = TextColor,
+                fontSize = 10.sp,
+                fontFamily = FontFamily(Font(R.font.pretendard_light))
+            )
         )
-    )
+    }
 }

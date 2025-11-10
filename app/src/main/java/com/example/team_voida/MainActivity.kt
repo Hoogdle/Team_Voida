@@ -49,6 +49,10 @@ object themeInStart{
     val themeId = mutableStateOf(0)
 }
 
+object notifySwitch{
+    val switch = mutableStateOf(true)
+}
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,6 +72,7 @@ class MainActivity : ComponentActivity() {
             val isLoggedIn by viewModel.isLoggedIn.collectAsState()
             val sessionInDb by viewModel.userToken.collectAsState()
             val themeCode by viewModel.themeMode.collectAsState()
+            val notyMode by viewModel.notyMode.collectAsState()
 
             Log.e("Main",isLoggedIn.toString())
             Log.e("Main",sessionInDb.toString())
@@ -76,6 +81,9 @@ class MainActivity : ComponentActivity() {
             themeInStart.themeId.value = themeCode!!
 
             if(themeCode != -1) {
+                Log.e("Noty", notifySwitch.switch.value.toString())
+                notifySwitch.switch.value = notyMode!!
+
                 when(themeInStart.themeId.value){
                     0 -> defaultColor()
                     1 -> themeNavyPink()

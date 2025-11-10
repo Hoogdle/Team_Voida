@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -39,6 +40,7 @@ import com.example.team_voida.Basket.ComposableLifecycle
 import com.example.team_voida.Notification.Notification
 import com.example.team_voida.R
 import com.example.team_voida.Tools.MainViewModel
+import com.example.team_voida.notifySwitch
 import com.example.team_voida.themeInStart
 import com.example.team_voida.ui.theme.BackGroundWhite
 import com.example.team_voida.ui.theme.BasketPaymentColor
@@ -110,11 +112,86 @@ fun UiSetting(
 
         Spacer(Modifier.height(10.dp))
 
+
+        Text(
+            modifier = Modifier
+                .padding(
+                    start = 18.dp
+                ),
+            text = "안내 메시지 설정",
+            color = TextLittleDark,
+            style = TextStyle(
+                fontSize = 20.sp,
+                fontFamily = FontFamily(Font(R.font.pretendard_bold))
+            )
+        )
+        Spacer(Modifier.height(3.dp))
+
+
+        // 안내 메시지 버튼
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp)
+                .padding(
+                    horizontal = 15.dp,
+                    vertical = 10.dp
+                )
+                .shadow(elevation = 7.dp, shape = RoundedCornerShape(15.dp))
+            ,
+            shape = RoundedCornerShape(8.dp),
+            colors = ButtonColors(
+                containerColor = BackGroundWhite,
+                contentColor = TextLittleDark,
+                disabledContainerColor = Color.LightGray,
+                disabledContentColor = Color.Gray
+            )
+            ,
+            onClick = {
+                if(notifySwitch.switch.value){
+                    viewModel.setNoty(false)
+                } else {
+                    viewModel.setNoty(true)
+                }
+            }
+        ){
+            Text(
+                textAlign = TextAlign.Center,
+                text = if(notifySwitch.switch.value){
+                    "안내메시지 비활성화"
+                } else {
+                  "안내메시지 활성화"
+                },
+                color = TextLittleDark,
+                style = TextStyle(
+                    fontSize = 15.sp,
+                    fontFamily = FontFamily(Font(R.font.pretendard_semibold)),
+                )
+            )
+        }
+
+        Spacer(Modifier.height(10.dp))
+
+        Text(
+            modifier = Modifier
+                .padding(
+                    start = 18.dp
+                ),
+            text = "고대비 테마",
+            color = TextLittleDark,
+            style = TextStyle(
+                fontSize = 20.sp,
+                fontFamily = FontFamily(Font(R.font.pretendard_bold))
+            )
+        )
+        Spacer(Modifier.height(3.dp))
         ContrastRow(0,viewModel)
         ContrastRow(1,viewModel)
         ContrastRow(2,viewModel)
         ContrastRow(3,viewModel)
 
+        
+        
     }
 }
 
