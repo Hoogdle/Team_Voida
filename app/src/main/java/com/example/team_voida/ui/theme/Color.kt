@@ -36,9 +36,12 @@ var
 
 val HighContrastGreen = Color(24,63,62)
 val HighContrastPink = Color(246,206,204)
-val DeepHighContrastPink = Color(232,159,156)
 
 val HighContrastBlue = Color(28,52,98)
 val HighContrastLightBlue = Color(207,228,230)
 val HighContrastRed = Color(142,26,29)
 val HighContrastYellow = Color(246,237,93)
+
+val DeepHighContrastPink = Color(232,159,156)
+val DeepHighContrastGreen = Color(49,118,117)
+val DeepHighContrastRed = Color(175,5,9)

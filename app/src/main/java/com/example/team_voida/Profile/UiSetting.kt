@@ -44,10 +44,16 @@ import com.example.team_voida.ui.theme.BasketPaymentColor
 import com.example.team_voida.ui.theme.ButtonBlackColor
 import com.example.team_voida.ui.theme.ButtonBlue
 import com.example.team_voida.ui.theme.CancelColor
+import com.example.team_voida.ui.theme.DeepHighContrastGreen
 import com.example.team_voida.ui.theme.DeepHighContrastPink
+import com.example.team_voida.ui.theme.DeepHighContrastRed
 import com.example.team_voida.ui.theme.DisabledText
 import com.example.team_voida.ui.theme.HighContrastBlue
+import com.example.team_voida.ui.theme.HighContrastGreen
+import com.example.team_voida.ui.theme.HighContrastLightBlue
 import com.example.team_voida.ui.theme.HighContrastPink
+import com.example.team_voida.ui.theme.HighContrastRed
+import com.example.team_voida.ui.theme.HighContrastYellow
 import com.example.team_voida.ui.theme.IconBlue
 import com.example.team_voida.ui.theme.LightPink
 import com.example.team_voida.ui.theme.LoginTextFiled
@@ -145,9 +151,14 @@ fun UiSetHelper(codeNum: Int){
             themeNavyPink()
             theme.themeId.value = 1
         }
-        2 -> theme.themeId.value = 2
-        3 -> theme.themeId.value = 3
-        4 -> theme.themeId.value = 4
+        2 -> {
+            themeGreenYellow()
+            theme.themeId.value = 2
+        }
+        3 -> {
+            themeRedSkyBlue()
+            theme.themeId.value = 3
+        }
     }
 }
 @Composable
@@ -249,46 +260,48 @@ fun themeNavyPink(){
     BackGroundWhite = HighContrastPink
 }
 
-// 청록 노랑
+// 청록(배경) 노랑(글자)
 fun themeGreenYellow(){
-    ButtonBlue = Color(0,76,255)
-    NotifyBlock = Color(249,249,249)
-    Selected = Color(229,235,252)
-    TextColor = Color.Black
-    IconBlue = Color(0,76,255)
-    WishButton = Color(249,249,249)
-    TextWhite = Color(243,243,243)
-    TextLittleDark = Color(32,32,32)
-    LoginTextFiled = Color(248,248,248)
-    SearchBarColor = Color(248,248,248)
-    BasketPaymentColor = Color(245,245,245)
-    ButtonBlackColor = Color(32,32,32)
-    SkyBlue = Color(229,235,252)
-    LightPink = Color(255,235,235)
-    Unselected = Color(249,249,249)
-    DisabledText = Color(188,188,188)
-    PaymentCard = Color(241,244,254)
+    ButtonBlue = HighContrastYellow
+    NotifyBlock = DeepHighContrastGreen
+    Selected = HighContrastGreen
+    TextColor = HighContrastYellow
+    IconBlue = HighContrastYellow
+    WishButton = HighContrastGreen
+    TextWhite = HighContrastGreen
+    TextLittleDark = HighContrastYellow
+    LoginTextFiled = HighContrastGreen
+    SearchBarColor = HighContrastGreen
+    BasketPaymentColor = HighContrastGreen
+    ButtonBlackColor = HighContrastYellow
+    SkyBlue = HighContrastGreen
+    LightPink = HighContrastGreen
+    Unselected = HighContrastGreen
+    DisabledText = HighContrastGreen
+    PaymentCard = HighContrastGreen
     CancelColor = Color(248,17,64)
+    BackGroundWhite = HighContrastGreen
 }
 
-// 차색 연하늘
+// 차색(배경) 연하늘(글자)
 fun themeRedSkyBlue(){
-    ButtonBlue = Color(0,76,255)
-    NotifyBlock = Color(249,249,249)
-    Selected = Color(229,235,252)
-    TextColor = Color.Black
-    IconBlue = Color(0,76,255)
-    WishButton = Color(249,249,249)
-    TextWhite = Color(243,243,243)
-    TextLittleDark = Color(32,32,32)
-    LoginTextFiled = Color(248,248,248)
-    SearchBarColor = Color(248,248,248)
-    BasketPaymentColor = Color(245,245,245)
-    ButtonBlackColor = Color(32,32,32)
-    SkyBlue = Color(229,235,252)
-    LightPink = Color(255,235,235)
-    Unselected = Color(249,249,249)
-    DisabledText = Color(188,188,188)
-    PaymentCard = Color(241,244,254)
+    ButtonBlue = HighContrastLightBlue
+    NotifyBlock = DeepHighContrastRed
+    Selected = HighContrastRed
+    TextColor = HighContrastLightBlue
+    IconBlue = HighContrastLightBlue
+    WishButton = HighContrastRed
+    TextWhite = HighContrastRed
+    TextLittleDark = HighContrastLightBlue
+    LoginTextFiled = HighContrastRed
+    SearchBarColor = HighContrastRed
+    BasketPaymentColor = HighContrastRed
+    ButtonBlackColor = HighContrastLightBlue
+    SkyBlue = HighContrastRed
+    LightPink = HighContrastRed
+    Unselected = HighContrastRed
+    DisabledText = HighContrastRed
+    PaymentCard = HighContrastRed
     CancelColor = Color(248,17,64)
+    BackGroundWhite = HighContrastRed
 }

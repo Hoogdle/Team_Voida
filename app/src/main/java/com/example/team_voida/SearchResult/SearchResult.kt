@@ -402,10 +402,16 @@ fun SearchCard(
         Image(
             painter = painterResource(
                 if(theme.themeId.value == 0){
-                R.drawable.home_rec
-                } else if(theme.themeId.value == 1){
+                    R.drawable.home_rec
+
+                } else if(theme.themeId.value == 1) {
                     R.drawable.home_rec_pink
-                } else{
+                } else if(theme.themeId.value == 2) {
+                    R.drawable.home_rec_green
+                } else if(theme.themeId.value == 3){
+                    R.drawable.home_rec_red
+                }
+                else {
                     R.drawable.home_rec
                 }
             ),
