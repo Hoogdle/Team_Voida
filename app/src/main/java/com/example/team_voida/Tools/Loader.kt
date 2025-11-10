@@ -16,6 +16,7 @@ import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.example.team_voida.ProductInfo.Loader
+import com.example.team_voida.ui.theme.BackGroundWhite
 
 @Composable
 fun LoaderSet(
@@ -25,7 +26,7 @@ fun LoaderSet(
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize().background(Color.White)
+        modifier = Modifier.fillMaxSize().background(BackGroundWhite)
             .semantics(mergeDescendants = true){
                 text = AnnotatedString(semantics)
             }

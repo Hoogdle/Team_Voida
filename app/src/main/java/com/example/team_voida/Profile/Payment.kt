@@ -75,6 +75,7 @@ import com.example.team_voida.ProfileServer.CardListServer
 import com.example.team_voida.R
 import com.example.team_voida.Tools.LoaderSet
 import com.example.team_voida.session
+import com.example.team_voida.ui.theme.BackGroundWhite
 import com.example.team_voida.ui.theme.ButtonBlue
 import com.example.team_voida.ui.theme.Selected
 import com.example.team_voida.ui.theme.SkyBlue
@@ -134,7 +135,7 @@ fun PaymentSetting(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(BackGroundWhite)
                 .verticalScroll(scrollState)
 
         ) {
@@ -521,7 +522,7 @@ fun CustomAlertDialog(
                     .width(300.dp)
                     .wrapContentHeight()
                     .background(
-                        color = Color.White,
+                        color = BackGroundWhite,
                     ),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -532,7 +533,7 @@ fun CustomAlertDialog(
                     text = title,
                     textAlign = TextAlign.Center,
                     style = TextStyle(
-                        color = Color.Black,
+                        color = TextColor,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -544,7 +545,7 @@ fun CustomAlertDialog(
                     text = description,
                     textAlign = TextAlign.Center,
                     style = TextStyle(
-                        color = Color.LightGray,
+                        color = TextColor,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Normal
                     )
@@ -556,7 +557,7 @@ fun CustomAlertDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(1.dp)
-                        .background(color = Color.LightGray)
+                        .background(color = TextColor)
                 )
                 Row(
                     modifier = Modifier
@@ -570,10 +571,10 @@ fun CustomAlertDialog(
                             .weight(1f)
                             .fillMaxHeight(),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.White, // 버튼 배경색상
-                            contentColor = Color.Black, // 버튼 텍스트 색상
+                            containerColor = BackGroundWhite, // 버튼 배경색상
+                            contentColor = TextColor, // 버튼 텍스트 색상
                             disabledContainerColor = Color.Gray, // 버튼 비활성화 배경 색상
-                            disabledContentColor = Color.White, // 버튼 비활성화 텍스트 색상
+                            disabledContentColor = TextWhite, // 버튼 비활성화 텍스트 색상
                         ),
 
                         ) {
@@ -603,10 +604,10 @@ fun CustomAlertDialog(
                             .weight(1f)
                             .fillMaxHeight(),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.White, // 버튼 배경색상
+                            containerColor = BackGroundWhite, // 버튼 배경색상
                             contentColor = Color.Red, // 버튼 텍스트 색상
                             disabledContainerColor = Color.Gray, // 버튼 비활성화 배경 색상
-                            disabledContentColor = Color.White, // 버튼 비활성화 텍스트 색상
+                            disabledContentColor = BackGroundWhite, // 버튼 비활성화 텍스트 색상
                         ),
                     ) {
                         Text(
@@ -653,7 +654,7 @@ fun CardDeleteDialog(
                     .width(300.dp)
                     .wrapContentHeight()
                     .background(
-                        color = Color.White,
+                        color = BackGroundWhite,
                     ),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -664,7 +665,7 @@ fun CardDeleteDialog(
                     text = title,
                     textAlign = TextAlign.Center,
                     style = TextStyle(
-                        color = Color.Black,
+                        color = TextColor,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -676,7 +677,7 @@ fun CardDeleteDialog(
                     text = description,
                     textAlign = TextAlign.Center,
                     style = TextStyle(
-                        color = Color.LightGray,
+                        color = TextColor,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Normal
                     )
@@ -702,10 +703,10 @@ fun CardDeleteDialog(
                             .weight(1f)
                             .fillMaxHeight(),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.White, // 버튼 배경색상
-                            contentColor = Color.Black, // 버튼 텍스트 색상
+                            containerColor = BackGroundWhite, // 버튼 배경색상
+                            contentColor = TextColor, // 버튼 텍스트 색상
                             disabledContainerColor = Color.Gray, // 버튼 비활성화 배경 색상
-                            disabledContentColor = Color.White, // 버튼 비활성화 텍스트 색상
+                            disabledContentColor = BackGroundWhite, // 버튼 비활성화 텍스트 색상
                         ),
 
                         ) {
@@ -747,10 +748,10 @@ fun CardDeleteDialog(
                             .weight(1f)
                             .fillMaxHeight(),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.White, // 버튼 배경색상
+                            containerColor = BackGroundWhite, // 버튼 배경색상
                             contentColor = Color.Red, // 버튼 텍스트 색상
                             disabledContainerColor = Color.Gray, // 버튼 비활성화 배경 색상
-                            disabledContentColor = Color.White, // 버튼 비활성화 텍스트 색상
+                            disabledContentColor = BackGroundWhite, // 버튼 비활성화 텍스트 색상
                         ),
                     ) {
                         Text(

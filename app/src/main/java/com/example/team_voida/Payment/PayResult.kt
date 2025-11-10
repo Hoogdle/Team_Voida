@@ -61,6 +61,7 @@ import com.example.team_voida.Notification.Notification
 import com.example.team_voida.R
 import com.example.team_voida.Tools.LoaderSet
 import com.example.team_voida.session
+import com.example.team_voida.ui.theme.BackGroundWhite
 import com.example.team_voida.ui.theme.ButtonBlue
 import com.example.team_voida.ui.theme.Selected
 import com.example.team_voida.ui.theme.TextLittleDark
@@ -173,7 +174,7 @@ fun PayRegister(
         Column (
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(BackGroundWhite)
         ){
             Notification("결제가 완료되었습니다. 아래에 주문 정보를 확인해주세요.")
             Spacer(Modifier.height(25.dp))
@@ -249,7 +250,7 @@ fun PayFinishRow(
 
                             .border(
                                 width = 5.dp,
-                                color = Color.White,
+                                color = BackGroundWhite,
                                 shape = CircleShape
                             )
                     )
@@ -271,7 +272,7 @@ fun PayFinishRow(
                                 .height(30.dp)
                                 .border(
                                     width = 3.dp,
-                                    color = Color.White,
+                                    color = BackGroundWhite,
                                     shape = CircleShape
                                 )
                                 .offset(

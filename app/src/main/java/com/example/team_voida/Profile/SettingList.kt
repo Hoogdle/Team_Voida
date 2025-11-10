@@ -36,6 +36,7 @@ import androidx.navigation.NavController
 import com.example.team_voida.Basket.ComposableLifecycle
 import com.example.team_voida.Notification.Notification
 import com.example.team_voida.R
+import com.example.team_voida.ui.theme.BackGroundWhite
 import com.example.team_voida.ui.theme.SearchBarColor
 import com.example.team_voida.ui.theme.TextLittleDark
 
@@ -75,7 +76,7 @@ fun Profile(
     Column (
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(BackGroundWhite)
             .verticalScroll(scrollState)
 
     ){

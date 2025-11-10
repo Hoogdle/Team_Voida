@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.team_voida.R
 import com.example.team_voida.ui.theme.NotifyBlock
+import com.example.team_voida.ui.theme.TextColor
 
 // 모든 페이지에 설정되는 상단 알림바 모듈화 컴포저블
 @Composable
@@ -40,9 +41,9 @@ fun Notification(
             .padding(15.dp)
         ,
         text = text,
-        color = Color.Black,
+        color = TextColor,
         style = TextStyle(
-            color = Color.Black,
+            color = TextColor,
             fontSize = 10.sp,
             fontFamily = FontFamily(Font(R.font.pretendard_light))
         )

@@ -39,8 +39,28 @@ import com.example.team_voida.Basket.ComposableLifecycle
 import com.example.team_voida.Notification.Notification
 import com.example.team_voida.R
 import com.example.team_voida.theme
+import com.example.team_voida.ui.theme.BackGroundWhite
+import com.example.team_voida.ui.theme.BasketPaymentColor
+import com.example.team_voida.ui.theme.ButtonBlackColor
+import com.example.team_voida.ui.theme.ButtonBlue
+import com.example.team_voida.ui.theme.CancelColor
+import com.example.team_voida.ui.theme.DeepHighContrastPink
+import com.example.team_voida.ui.theme.DisabledText
+import com.example.team_voida.ui.theme.HighContrastBlue
+import com.example.team_voida.ui.theme.HighContrastPink
+import com.example.team_voida.ui.theme.IconBlue
+import com.example.team_voida.ui.theme.LightPink
+import com.example.team_voida.ui.theme.LoginTextFiled
+import com.example.team_voida.ui.theme.NotifyBlock
+import com.example.team_voida.ui.theme.SearchBarColor
 import com.example.team_voida.ui.theme.Selected
+import com.example.team_voida.ui.theme.SkyBlue
+import com.example.team_voida.ui.theme.TextColor
 import com.example.team_voida.ui.theme.TextLittleDark
+import com.example.team_voida.ui.theme.TextWhite
+import com.example.team_voida.ui.theme.Unselected
+import com.example.team_voida.ui.theme.WishButton
+import com.example.team_voida.ui.theme.PaymentCard
 
 @Composable
 fun UiSetting(
@@ -68,12 +88,13 @@ fun UiSetting(
 
         } else if (event == Lifecycle.Event.ON_RESUME) {
         }
+
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(BackGroundWhite)
             .verticalScroll(scrollState)
 
     ) {
@@ -116,8 +137,14 @@ fun UiSetIcon(codeNum: Int):Int{
 
 fun UiSetHelper(codeNum: Int){
     when(codeNum){
-        0 -> theme.themeId.value = 0
-        1 -> theme.themeId.value = 1
+        0 -> {
+            defaultColor()
+            theme.themeId.value = 0
+        }
+        1 -> {
+            themeNavyPink()
+            theme.themeId.value = 1
+        }
         2 -> theme.themeId.value = 2
         3 -> theme.themeId.value = 3
         4 -> theme.themeId.value = 4
@@ -139,7 +166,7 @@ fun ContrastRow(
         ,
         shape = RoundedCornerShape(8.dp),
         colors = ButtonColors(
-            containerColor = Color.White,
+            containerColor = BackGroundWhite,
             contentColor = TextLittleDark,
             disabledContainerColor = Color.LightGray,
             disabledContentColor = Color.Gray
@@ -169,9 +196,99 @@ fun ContrastRow(
                 color = TextLittleDark,
                 style = TextStyle(
                     fontSize = 15.sp,
-                    fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                    fontFamily = FontFamily(Font(R.font.pretendard_semibold)),
                 )
             )
         }
     }
+}
+
+
+fun defaultColor(){
+    ButtonBlue = Color(0,76,255)
+    NotifyBlock = Color(249,249,249)
+    Selected = Color(229,235,252)
+    TextColor = Color.Black
+    IconBlue = Color(0,76,255)
+    WishButton = Color(249,249,249)
+    TextWhite = Color(243,243,243)
+    TextLittleDark = Color(32,32,32)
+    LoginTextFiled = Color(248,248,248)
+    SearchBarColor = Color(248,248,248)
+    BasketPaymentColor = Color(245,245,245)
+    ButtonBlackColor = Color(32,32,32)
+    SkyBlue = Color(229,235,252)
+    LightPink = Color(255,235,235)
+    Unselected = Color(249,249,249)
+    DisabledText = Color(188,188,188)
+    PaymentCard = Color(241,244,254)
+    CancelColor = Color(248,17,64)
+    BackGroundWhite = Color.White
+}
+
+// 파랑 분홍
+fun themeNavyPink(){
+    ButtonBlue = HighContrastBlue
+    NotifyBlock = DeepHighContrastPink
+    Selected = HighContrastPink
+    TextColor = HighContrastBlue
+    IconBlue = HighContrastBlue
+    WishButton = HighContrastPink
+    TextWhite = HighContrastPink
+    TextLittleDark = HighContrastBlue
+    LoginTextFiled = HighContrastPink
+    SearchBarColor = HighContrastPink
+    BasketPaymentColor = HighContrastPink
+    ButtonBlackColor = HighContrastBlue
+    SkyBlue = HighContrastPink
+    LightPink = HighContrastPink
+    Unselected = HighContrastPink
+    DisabledText = HighContrastPink
+    PaymentCard = HighContrastPink
+    CancelColor = Color(248,17,64)
+    BackGroundWhite = HighContrastPink
+}
+
+// 청록 노랑
+fun themeGreenYellow(){
+    ButtonBlue = Color(0,76,255)
+    NotifyBlock = Color(249,249,249)
+    Selected = Color(229,235,252)
+    TextColor = Color.Black
+    IconBlue = Color(0,76,255)
+    WishButton = Color(249,249,249)
+    TextWhite = Color(243,243,243)
+    TextLittleDark = Color(32,32,32)
+    LoginTextFiled = Color(248,248,248)
+    SearchBarColor = Color(248,248,248)
+    BasketPaymentColor = Color(245,245,245)
+    ButtonBlackColor = Color(32,32,32)
+    SkyBlue = Color(229,235,252)
+    LightPink = Color(255,235,235)
+    Unselected = Color(249,249,249)
+    DisabledText = Color(188,188,188)
+    PaymentCard = Color(241,244,254)
+    CancelColor = Color(248,17,64)
+}
+
+// 차색 연하늘
+fun themeRedSkyBlue(){
+    ButtonBlue = Color(0,76,255)
+    NotifyBlock = Color(249,249,249)
+    Selected = Color(229,235,252)
+    TextColor = Color.Black
+    IconBlue = Color(0,76,255)
+    WishButton = Color(249,249,249)
+    TextWhite = Color(243,243,243)
+    TextLittleDark = Color(32,32,32)
+    LoginTextFiled = Color(248,248,248)
+    SearchBarColor = Color(248,248,248)
+    BasketPaymentColor = Color(245,245,245)
+    ButtonBlackColor = Color(32,32,32)
+    SkyBlue = Color(229,235,252)
+    LightPink = Color(255,235,235)
+    Unselected = Color(249,249,249)
+    DisabledText = Color(188,188,188)
+    PaymentCard = Color(241,244,254)
+    CancelColor = Color(248,17,64)
 }

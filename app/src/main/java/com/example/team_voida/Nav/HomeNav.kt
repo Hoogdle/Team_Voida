@@ -90,6 +90,7 @@ import com.example.team_voida.Start.Guide
 import com.example.team_voida.Start.Start
 import com.example.team_voida.Tools.LoaderSet
 import com.example.team_voida.session
+import com.example.team_voida.ui.theme.BackGroundWhite
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -298,7 +299,7 @@ fun HomeNav(){
                                 width = 1.dp,
                                 color = Color.LightGray
                             ),
-                        containerColor = Color.White
+                        containerColor = BackGroundWhite
                     ){
                         navItemList.forEachIndexed { index, item ->
                             var tmpIndex = 0.dp
