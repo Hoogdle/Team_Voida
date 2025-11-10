@@ -53,6 +53,7 @@ import com.example.team_voida.Nav.navItemList
 import com.example.team_voida.Notification.Notification
 import com.example.team_voida.R
 import com.example.team_voida.Tools.LoaderSet
+import com.example.team_voida.theme
 import com.example.team_voida.ui.theme.BackGroundWhite
 import com.example.team_voida.ui.theme.TextColor
 import kotlinx.coroutines.GlobalScope
@@ -399,7 +400,15 @@ fun SearchCard(
             }
     ){
         Image(
-            painter = painterResource(R.drawable.home_rec),
+            painter = painterResource(
+                if(theme.themeId.value == 0){
+                R.drawable.home_rec
+                } else if(theme.themeId.value == 1){
+                    R.drawable.home_rec_pink
+                } else{
+                    R.drawable.home_rec
+                }
+            ),
             contentDescription = "",
             modifier = Modifier.shadow(elevation = 15.dp, shape = RoundedCornerShape(15.dp))
         )
