@@ -83,12 +83,15 @@ import com.example.team_voida.Profile.PaymentHistory
 import com.example.team_voida.Profile.PaymentHistoryList
 import com.example.team_voida.Profile.PaymentSetting
 import com.example.team_voida.Profile.Profile
+import com.example.team_voida.Profile.UiSetting
 import com.example.team_voida.R
 import com.example.team_voida.SearchResult.SearchResult
 import com.example.team_voida.Start.Guide
 import com.example.team_voida.Start.Start
 import com.example.team_voida.Tools.LoaderSet
+import com.example.team_voida.Tools.MainViewModel
 import com.example.team_voida.session
+import com.example.team_voida.ui.theme.BackGroundWhite
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -130,7 +133,9 @@ val navItemList = listOf(
 )
 @SuppressLint("RememberReturnType", "UnrememberedMutableState")
 @Composable
-fun HomeNav(){
+fun HomeNav(
+    viewModel: MainViewModel
+){
 
     // 각 화면에서 사용할 변수들 선언 ex) 네비게이션, 하단네비 Flag bit, 검색 입력란 ...
     val navController = rememberNavController() // home nav
@@ -297,7 +302,7 @@ fun HomeNav(){
                                 width = 1.dp,
                                 color = Color.LightGray
                             ),
-                        containerColor = Color.White
+                        containerColor = BackGroundWhite
                     ){
                         navItemList.forEachIndexed { index, item ->
                             var tmpIndex = 0.dp
@@ -539,7 +544,8 @@ fun HomeNav(){
                         basketFlag = basketFlag,
                         homeNavFlag = homeNavFlag,
                         productFlag = productFlag,
-                        selectedIndex = selectedIndex
+                        selectedIndex = selectedIndex,
+                        viewModel = viewModel
                     )
                 }
 
@@ -549,7 +555,7 @@ fun HomeNav(){
                         basketFlag = basketFlag,
                         homeNavFlag = homeNavFlag,
                         productFlag = productFlag,
-                        selectedIndex = selectedIndex
+                        selectedIndex = selectedIndex,
                     )
                 }
                 composable("partList") {
@@ -636,6 +642,16 @@ fun HomeNav(){
                         basketFlag = basketFlag,
                         homeNavFlag = homeNavFlag,
                         productFlag = productFlag
+                    )
+                }
+
+                composable("uiSetting") {
+                    UiSetting(
+                        navController = navController,
+                        basketFlag = basketFlag,
+                        homeNavFlag = homeNavFlag,
+                        productFlag = productFlag,
+                        viewModel = viewModel
                     )
                 }
             }

@@ -40,6 +40,7 @@ import com.example.team_voida.Login.ForgotPw2
 import com.example.team_voida.Login.Login
 import com.example.team_voida.Start.Guide
 import com.example.team_voida.Start.Start
+import com.example.team_voida.Tools.MainViewModel
 import com.example.team_voida.session
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -48,7 +49,9 @@ import java.util.Locale
 
 // 시작화면에서 사용되는 Navigation
 @Composable
-fun StartNav(){
+fun StartNav(
+    viewModel: MainViewModel
+){
 
     val navController = rememberNavController()
 
@@ -99,8 +102,8 @@ fun StartNav(){
             address = address
         )
         }
-        composable("guide") { Guide(navController = navController) }
-        composable("home") { HomeNav() }
+        composable("guide") { Guide(navController = navController, viewModel) }
+        composable("home") { HomeNav(viewModel) }
     }
 }
 

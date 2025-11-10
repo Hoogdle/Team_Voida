@@ -73,6 +73,7 @@ import com.example.team_voida.ProfileServer.PaymentDetailInfo
 import com.example.team_voida.R
 import com.example.team_voida.Tools.LoaderSet
 import com.example.team_voida.session
+import com.example.team_voida.ui.theme.BackGroundWhite
 import com.example.team_voida.ui.theme.IconBlue
 import com.example.team_voida.ui.theme.Selected
 import com.example.team_voida.ui.theme.TextColor
@@ -101,7 +102,8 @@ fun Payment(
     isPayPage: MutableState<Boolean>,
     paymentUserInfo: MutableState<PaymentUserInfo>,
     dynamicTotalPrice: MutableState<String>,
-    cardID: MutableState<Int>
+    cardID: MutableState<Int>,
+
 ){
     val scrollState = rememberScrollState()
 
@@ -183,6 +185,10 @@ fun Payment(
                         product_id = productID.value
 
                     )
+
+                    if (!paymentInfo.value!!.cards.isEmpty()) {
+                        selectedCardId.value = paymentInfo.value!!.cards[0].card_id
+                    }
 
                 } else {
                     paymentInfo.value = PaymentServerMultiple(
@@ -292,7 +298,7 @@ fun Payment(
         Column (
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(BackGroundWhite)
                 .verticalScroll(scrollState)
 
         ){

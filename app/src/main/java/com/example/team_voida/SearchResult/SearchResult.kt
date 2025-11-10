@@ -53,6 +53,9 @@ import com.example.team_voida.Nav.navItemList
 import com.example.team_voida.Notification.Notification
 import com.example.team_voida.R
 import com.example.team_voida.Tools.LoaderSet
+import com.example.team_voida.themeInStart
+import com.example.team_voida.ui.theme.BackGroundWhite
+import com.example.team_voida.ui.theme.TextColor
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -114,7 +117,7 @@ fun SearchResult(
         Column (
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(BackGroundWhite)
                 .verticalScroll(scrollState)
 
         ) {
@@ -239,7 +242,7 @@ fun RealSearchProducts(
             Spacer(Modifier.width(3.dp))
             Text(
                 text = "상품 더보기",
-                color = Color.Black,
+                color = TextColor,
                 style = TextStyle(
                     fontSize = 15.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
@@ -348,7 +351,7 @@ fun SearchProducts(
             Spacer(Modifier.width(3.dp))
             Text(
                 text = "상품 더보기",
-                color = Color.Black,
+                color = TextColor,
                 style = TextStyle(
                     fontSize = 15.sp,
                     fontFamily = FontFamily(Font(R.font.pretendard_regular)),
@@ -397,7 +400,21 @@ fun SearchCard(
             }
     ){
         Image(
-            painter = painterResource(R.drawable.home_rec),
+            painter = painterResource(
+                if(themeInStart.themeId.value == 0){
+                    R.drawable.home_rec
+
+                } else if(themeInStart.themeId.value == 1) {
+                    R.drawable.home_rec_pink
+                } else if(themeInStart.themeId.value == 2) {
+                    R.drawable.home_rec_green
+                } else if(themeInStart.themeId.value == 3){
+                    R.drawable.home_rec_red
+                }
+                else {
+                    R.drawable.home_rec
+                }
+            ),
             contentDescription = "",
             modifier = Modifier.shadow(elevation = 15.dp, shape = RoundedCornerShape(15.dp))
         )
@@ -428,7 +445,7 @@ fun SearchCard(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.width(140.dp),
                     text = name.substring(1,name.length-1),
-                    color = Color.Black,
+                    color = TextColor,
                     style = TextStyle(
                         fontSize = 10.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_regular)),
@@ -440,7 +457,7 @@ fun SearchCard(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     text = textPrice+"원",
-                    color = Color.Black,
+                    color = TextColor,
                     style = TextStyle(
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.pretendard_bold)),

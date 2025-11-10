@@ -31,6 +31,7 @@ import com.example.team_voida.Home.Popular
 import com.example.team_voida.Notification.Notification
 import com.example.team_voida.SearchResult.SearchProducts
 import com.example.team_voida.Tools.LoaderSet
+import com.example.team_voida.ui.theme.BackGroundWhite
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -92,7 +93,7 @@ fun CategoryList(
         Column (
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(BackGroundWhite)
                 .verticalScroll(scrollState)
 
         ) {

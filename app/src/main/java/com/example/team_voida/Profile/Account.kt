@@ -64,6 +64,7 @@ import com.example.team_voida.ProfileServer.ChangeAccountInfoServer
 import com.example.team_voida.R
 import com.example.team_voida.Tools.LoaderSet
 import com.example.team_voida.session
+import com.example.team_voida.ui.theme.BackGroundWhite
 import com.example.team_voida.ui.theme.ButtonBlackColor
 import com.example.team_voida.ui.theme.ButtonBlue
 import com.example.team_voida.ui.theme.DisabledText
@@ -135,7 +136,7 @@ fun Account(
         Column (
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(BackGroundWhite)
                 .verticalScroll(scrollState)
 
         ){
@@ -311,7 +312,7 @@ fun AccountProfileImg(){
 
                 .border(
                     width = 5.dp,
-                    color = Color.White,
+                    color = BackGroundWhite,
                     shape = CircleShape
                 )
         )
@@ -336,7 +337,7 @@ fun AccountProfileImg(){
                     .height(30.dp)
                     .border(
                         width = 3.dp,
-                        color = Color.White,
+                        color = BackGroundWhite,
                         shape = CircleShape
                     )
                     .clickable {  }

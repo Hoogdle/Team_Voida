@@ -58,6 +58,7 @@ import com.example.team_voida.ProfileServer.PayHistoryListServer
 import com.example.team_voida.R
 import com.example.team_voida.Tools.LoaderSet
 import com.example.team_voida.session
+import com.example.team_voida.ui.theme.BackGroundWhite
 import com.example.team_voida.ui.theme.IconBlue
 import com.example.team_voida.ui.theme.Selected
 import com.example.team_voida.ui.theme.TextColor
@@ -195,7 +196,7 @@ fun PaymentHistory(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(BackGroundWhite)
                 .verticalScroll(scrollState)
 
         ) {

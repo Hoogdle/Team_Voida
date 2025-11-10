@@ -66,11 +66,13 @@ import com.example.team_voida.Payment.PaymentServerOne
 import com.example.team_voida.R
 import com.example.team_voida.Tools.LoaderSet
 import com.example.team_voida.session
+import com.example.team_voida.ui.theme.BackGroundWhite
 import com.example.team_voida.ui.theme.ButtonBlackColor
 import com.example.team_voida.ui.theme.ButtonBlue
 import com.example.team_voida.ui.theme.IconBlue
 import com.example.team_voida.ui.theme.NotifyBlock
 import com.example.team_voida.ui.theme.SearchBarColor
+import com.example.team_voida.ui.theme.TextColor
 import com.example.team_voida.ui.theme.TextLittleDark
 import com.example.team_voida.ui.theme.TextWhite
 import kotlinx.coroutines.GlobalScope
@@ -233,7 +235,7 @@ fun ProductInfo(
         Column (
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(BackGroundWhite)
                 .verticalScroll(scrollState)
 
         ){
@@ -269,7 +271,7 @@ fun ProductInfo(
                         start = 20.dp,
                         end = 20.dp
                     ),
-                color = Color.Black
+                color = TextColor
             )
             Spacer(Modifier.height(5.dp))
             Text(
@@ -306,7 +308,7 @@ fun ProductInfo(
                         start = 20.dp,
                         end = 20.dp
                     ),
-                color = Color.Black
+                color = TextColor
             )
             Spacer(Modifier.height(5.dp))
             if(detailedResult.value != null){
@@ -348,7 +350,7 @@ fun ProductInfo(
                         start = 20.dp,
                         end = 20.dp
                     ),
-                color = Color.Black
+                color = TextColor
             )
             Spacer(Modifier.height(5.dp))
 
@@ -423,7 +425,7 @@ fun ProductInfo(
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize().background(Color.White)
+            modifier = Modifier.fillMaxSize().background(BackGroundWhite)
                 .semantics(mergeDescendants = true){
                     text = AnnotatedString("AI가 상품 정보를 요약하는 중입니다. 잠시만 기다려주세요.")
                 }

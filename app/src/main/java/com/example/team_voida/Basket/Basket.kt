@@ -57,6 +57,7 @@ import com.example.team_voida.Payment.PaymentInfo
 import com.example.team_voida.R
 import com.example.team_voida.Tools.LoaderSet
 import com.example.team_voida.session
+import com.example.team_voida.ui.theme.BackGroundWhite
 import com.example.team_voida.ui.theme.BasketPaymentColor
 import com.example.team_voida.ui.theme.ButtonBlue
 import com.example.team_voida.ui.theme.Selected
@@ -127,7 +128,7 @@ fun Basket(
         Column (
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(BackGroundWhite)
                 .verticalScroll(scrollState)
 
         ){
@@ -235,7 +236,7 @@ fun BasketItem(
                 .border(
                     width = 4.dp,
                     shape = RoundedCornerShape(14.dp),
-                    color = Color.White
+                    color = BackGroundWhite
                 )
                 .shadow(elevation = 15.dp, shape = RoundedCornerShape(15.dp))
         )

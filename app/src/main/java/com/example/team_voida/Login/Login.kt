@@ -48,6 +48,7 @@ import androidx.navigation.NavController
 import com.example.team_voida.CreateAccount.CheckEmail
 import com.example.team_voida.Notification.Notification
 import com.example.team_voida.R
+import com.example.team_voida.Tools.MainViewModel
 import com.example.team_voida.session
 import com.example.team_voida.ui.theme.ButtonBlue
 import com.example.team_voida.ui.theme.LoginTextFiled
@@ -62,7 +63,7 @@ import kotlinx.coroutines.runBlocking
 // 로그인 메인 컴포저블
 @Composable
 fun Login(
-    navController: NavController
+    navController: NavController,
 ){
     val email = remember{ mutableStateOf("") }
     val pw = remember{ mutableStateOf("") }
@@ -314,7 +315,7 @@ fun LoginForgotPW(
 fun LogIntButton(
     email: MutableState<String>,
     pw: MutableState<String>,
-    navController: NavController
+    navController: NavController,
 ){
     val context = LocalContext.current
 

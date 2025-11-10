@@ -69,9 +69,11 @@ import com.example.team_voida.ProfileServer.PayHistoryListServer
 import com.example.team_voida.R
 import com.example.team_voida.Tools.LoaderSet
 import com.example.team_voida.session
+import com.example.team_voida.ui.theme.BackGroundWhite
 import com.example.team_voida.ui.theme.ButtonBlue
 import com.example.team_voida.ui.theme.IconBlue
 import com.example.team_voida.ui.theme.Selected
+import com.example.team_voida.ui.theme.TextColor
 import com.example.team_voida.ui.theme.TextLittleDark
 import com.example.team_voida.ui.theme.TextWhite
 import com.example.team_voida.ui.theme.WishButton
@@ -249,7 +251,7 @@ fun Address(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(BackGroundWhite)
                 .verticalScroll(scrollState)
 
         ) {
@@ -505,7 +507,7 @@ fun AddressDialog(
                     .width(300.dp)
                     .wrapContentHeight()
                     .background(
-                        color = Color.White,
+                        color = BackGroundWhite,
                     )
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -529,7 +531,7 @@ fun AddressDialog(
                     onValueChange = { address.value = it },
                     singleLine = true,
                     textStyle = TextStyle(
-                        color = Color.Black,
+                        color = TextColor,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Normal,
                     ),
@@ -547,7 +549,7 @@ fun AddressDialog(
                             Icon(
                                 imageVector = Icons.Default.Create,
                                 contentDescription = "",
-                                tint = Color.DarkGray,
+                                tint = TextColor,
                             )
                             Spacer(modifier = Modifier.width(width = 8.dp))
                             innerTextField()
@@ -577,7 +579,7 @@ fun AddressDialog(
                         Text(
                             text = "취소",
                             textAlign = TextAlign.Center,
-                            color = Color.White,
+                            color = TextWhite,
                             style = TextStyle(
                                 fontSize = 13.sp,
                                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
@@ -603,7 +605,7 @@ fun AddressDialog(
                         Text(
                             text = "확인",
                             textAlign = TextAlign.Center,
-                            color = Color.White,
+                            color = TextWhite,
                             style = TextStyle(
                                 fontSize = 13.sp,
                                 fontFamily = FontFamily(Font(R.font.pretendard_bold)),
