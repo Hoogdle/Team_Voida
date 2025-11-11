@@ -553,13 +553,17 @@ fun BasketPaymentButton(
                 ,
             shape = RoundedCornerShape(15.dp),
             onClick = {
-                if(isPayPage.value == false) {
-                    isPayOne.value = false
-                    navController.navigate("payment")
-                    view.announceForAccessibility("결제 화면 페이지입니다. 화면 최상단에서 안내메시지를 제공받으세요.")
+                if(totalPrice=="0"){
+                    view.announceForAccessibility("장바구니에 상품이 담겨있지 않습니다.")
                 } else {
-                    navController.navigate("payRegister")
-                    view.announceForAccessibility("결제 진행중입니다.")
+                    if (isPayPage.value == false) {
+                        isPayOne.value = false
+                        navController.navigate("payment")
+                        view.announceForAccessibility("결제 화면 페이지입니다. 화면 최상단에서 안내메시지를 제공받으세요.")
+                    } else {
+                        navController.navigate("payRegister")
+                        view.announceForAccessibility("결제 진행중입니다.")
+                    }
                 }
             },
             colors = ButtonColors(
