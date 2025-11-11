@@ -34,6 +34,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.DefaultShadowColor
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -220,6 +222,8 @@ fun CategoryRow(
                     spotColor = buttonShadow.value,
                     elevation = 5.dp
                 )
+                .semantics(mergeDescendants = true){
+                }
 
         ){
             Row (
@@ -275,7 +279,11 @@ fun CategoryRow(
                             .size(8.dp)
                         ,
                         painter = painterResource(buttonArrow.value),
-                        contentDescription = "",
+                        contentDescription = if(buttonArrow.value == R.drawable.basket_down){
+                            "버튼을 클릭하여 아래에 세부 카테고리를 만나보세요"
+                        } else {
+                            "세부 카테고리가 활성화 되었습니다. 아래에 세부 카테고리를 선택해주세요"
+                        }
                     )
                 }
             }

@@ -28,6 +28,7 @@ fun Notification(
     top: Dp = 30.dp,
     bottom: Dp = 10.dp
 ){
+
     if(notifySwitch.switch.value) {
         Text(
             modifier = Modifier

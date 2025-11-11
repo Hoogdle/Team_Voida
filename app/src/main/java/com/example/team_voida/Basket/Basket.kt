@@ -90,6 +90,9 @@ fun Basket(
     val scrollState = rememberScrollState()
 
     isPayPage.value = false
+    
+    val view = LocalView.current
+    view.announceForAccessibility("장바구니 화면입니다. 화면 최상단에서 안내메세지를 제공받으세요.")
 
     // 장바구니 개수
     val cartNum = remember { mutableStateOf(0)}
@@ -225,7 +228,7 @@ fun BasketItem(
     Row (
         modifier = Modifier
             .semantics(mergeDescendants = true){
-                contentDescription = name + "상품이 총" + num + "개 담겨 있습니다. 상품 가격은" + price + "입니다."
+                contentDescription = name + "상품이 총" + num + "개 담겨 있습니다. 상품 가격은" + price + "원 입니다."
             }
             .fillMaxWidth()
             .padding(
@@ -493,6 +496,7 @@ fun BasketPaymentButton(
     navController: NavController,
     isPayPage: MutableState<Boolean>,
 ){
+    val view = LocalView.current
 
     var totalPrice = ""
     if(price.value != ""){
@@ -504,7 +508,7 @@ fun BasketPaymentButton(
     Row (
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
-            .clearAndSetSemantics {
+            .semantics(mergeDescendants = true){
                 contentDescription = if(isPayPage.value == false) {
                     "총 ${price.value}원을 결제합니다. 우측의 결제하기 버튼을 눌러 결제 페이지로 이동해주세요."
                 } else {
@@ -546,8 +550,10 @@ fun BasketPaymentButton(
                 if(isPayPage.value == false) {
                     isPayOne.value = false
                     navController.navigate("payment")
+                    view.announceForAccessibility("결제 화면 페이지입니다. 화면 최상단에서 안내메시지를 제공받으세요.")
                 } else {
                     navController.navigate("payRegister")
+                    view.announceForAccessibility("결제 진행중입니다.")
                 }
             },
             colors = ButtonColors(

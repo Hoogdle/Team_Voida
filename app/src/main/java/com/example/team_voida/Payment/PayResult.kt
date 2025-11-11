@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.text
@@ -88,6 +89,9 @@ fun PayRegister(
     cardId: MutableState<Int>
 
 ){
+    val view = LocalView.current
+
+    view.announceForAccessibility("주문이 완료되었습니다. 화면 최상단에서 안내메시지를 제공받으세요.")
     val scrollState = rememberScrollState()
     val orderResponse: MutableState<OrderResponse?> = remember { mutableStateOf(null) }
     val basketInfo: MutableState<List<BasketInfo>?> = remember { mutableStateOf<List<BasketInfo>?>(null) }
@@ -185,7 +189,7 @@ fun PayRegister(
             ){
                 Image(
                     painter = painterResource(R.drawable.pay_success),
-                    contentDescription = "",
+                    contentDescription = "아래에 주문완료된 상품 리스트를 확인하세요.",
                     modifier = Modifier.size(50.dp)
 
                     )

@@ -37,7 +37,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
@@ -107,6 +110,9 @@ fun Payment(
 ){
     val scrollState = rememberScrollState()
 
+    val view = LocalView.current
+    view.announceForAccessibility("결제화면입니다. 화면 최상단에서 안내메세지를 제공받으세요.")
+    
     DisposableEffect(Unit) {
 
         // Component를 벗어날 때 수행
@@ -379,7 +385,7 @@ fun PaymentAddress(
     Column(
         modifier = Modifier
             .semantics(mergeDescendants = true){
-                text = AnnotatedString("배송지 주소는 서울특별시 서대문구 독립문로 129-1 가나다 아파트세상 203동 1104호 입니다. 배송지를 수정하시려면 다음에 나오는 배송지 수정 버튼을 눌러주세요.")
+                text = AnnotatedString("배송지는" + address + "입니다." + "배송지를 수정하려면 바로 오른편에 있는 수정 아이콘을 클릭해주세요.")
             }
             .width(270.dp)
             .height(100.dp)
@@ -489,7 +495,7 @@ fun PaymentContact(
     Column(
         modifier = Modifier
             .semantics(mergeDescendants = true){
-                text = AnnotatedString("주문자의 전화번호는 010-1234-5678이며, 메일 주소는 123456@gmail.com 입니다. 연락처 정보를 수정하시려면 다음에 나오는 연락처 수정 버튼을 눌러주세요.")
+                text = AnnotatedString("이메일 : " + email + "전화번호 : " + cell + "입니다" + "바로 오른편 전화번호 수정 버튼을 통해 전화번호를 수정할 수 있습니다. 이메일은 수정하지 못합니다.")
             }
             .fillMaxWidth()
             .padding(
@@ -565,7 +571,7 @@ fun PaymentContact(
                 ) {
                     Image(
                         painter = painterResource(R.drawable.payment_edit),
-                        contentDescription = "연락처 수정 버튼",
+                        contentDescription = "전화번호 수정 버튼",
                         modifier = Modifier
 
                     )
@@ -584,8 +590,8 @@ fun PaymentNum(
 
     Row (
         modifier = Modifier
-            .semantics(mergeDescendants = true) {
-                text = AnnotatedString("현재 결제 목록에는 ${cartNum} 개의 상품이 존재합니다.")
+            .clearAndSetSemantics{
+                contentDescription ="현재 결제 목록에는 ${cartNum} 개의 상품이 존재합니다."
             }
             .fillMaxWidth()
             .padding(20.dp),
@@ -640,8 +646,8 @@ fun PaymentRow(
         Column {
             Row(
                 modifier = Modifier
-                    .semantics(mergeDescendants = true){
-                        text = AnnotatedString("${item.name} 상품이 총 ${item.number} 개 담겨 있습니다. 상품 가격은 ${item.price.toInt()}원 입니다.")
+                    .clearAndSetSemantics{
+                        contentDescription = "${item.name} 상품이 총 ${item.number} 개 담겨 있습니다. 상품 가격은 ${item.price.toInt()}원 입니다."
                     }
                     .padding(
                         start = 10.dp,
@@ -872,8 +878,8 @@ fun PaymentMethod(){
     Row (
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
-            .semantics(mergeDescendants = true){
-                text = AnnotatedString("아래에 원하시는 결제 방법을 선택해주세요. 결제 방법을 수정하시려며 다음에 나오는 결제 방법 변경 버튼을 눌러주세요.")
+            .clearAndSetSemantics{
+                contentDescription= "아래에 원하시는 결제 방법을 선택해주세요. 결제 방법을 수정하시려며 다음에 나오는 결제 방법 변경 버튼을 눌러주세요."
             }
             .fillMaxWidth()
             .padding(
@@ -994,6 +1000,7 @@ fun PaymentSmallCard(
     selectedCardId: MutableState<Int>
 ){
     val logo = PaymentLogoSelector(company)
+    val view = LocalView.current
 
     Box(
         modifier = Modifier
@@ -1017,6 +1024,10 @@ fun PaymentSmallCard(
             .background(color= com.example.team_voida.ui.theme.PaymentCard)
             .clickable {
                 selectedCardId.value = cardID
+                view.announceForAccessibility(company + paymentNumber.substring(12,16) + "카드가 결제수단으로 등록되었습니다.")
+            }
+            .clearAndSetSemantics { 
+                contentDescription = company + "카드 뒤 네 자리는" +paymentNumber.substring(12,16) + "입니다" + "클릭하여 해당카드를 결제에 사용하세요"
             }
 
     ){

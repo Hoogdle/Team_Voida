@@ -34,6 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -88,6 +89,9 @@ fun Home(
     isItemWhichPart: MutableState<Int>,
     barPrice: MutableState<Float>
 ){
+    val view = LocalView.current
+    view.announceForAccessibility("홈 화면입니다. 화면 최상단에서 안내메세지를 제공받으세요.")
+
     val scrollState = rememberScrollState()
     Log.e("zxz",result.toString())
     ComposableLifecycle { source, event ->
@@ -462,7 +466,7 @@ fun HomeCard(
     Box(
         modifier = Modifier
             .clearAndSetSemantics {
-                contentDescription = name + "상품 입니다." + "상품의 가격은" + price.toInt() + "입니다."
+                contentDescription = name + "상품 입니다." + "상품의 가격은" + price.toInt() + "원 입니다."
             }
 
             .width(180.dp)

@@ -44,7 +44,10 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
@@ -92,7 +95,7 @@ fun ProductInfo(
     isItemWhichPart: MutableState<Int>,
 ){
 
-
+    val view = LocalView.current
     var requiredDetail = true
 
     DisposableEffect(Unit) {
@@ -232,6 +235,8 @@ fun ProductInfo(
 
     // 서버로 부터 정보를 받은 경우 결과 출력
     if(result.value != null){
+        view.announceForAccessibility("AI 요약이 완료되었습니다. 화면 최상단에서 안내메시지를 제공받으세요.")
+
         Column (
             modifier = Modifier
                 .fillMaxSize()
@@ -312,6 +317,8 @@ fun ProductInfo(
             )
             Spacer(Modifier.height(5.dp))
             if(detailedResult.value != null){
+                view.announceForAccessibility("상품 상세정보가 완성되었습니다.")
+
                 Text(
                     modifier = Modifier
                         .padding(
@@ -400,6 +407,7 @@ fun ProductInfo(
                     Spacer(Modifier.height(5.dp))
                     LoaderSet(info = "리뷰 로딩중", semantics = "AI가 상품 정보를 요약하는 중입니다. 잠시만 기다려주세요.")
                 } else {
+                    view.announceForAccessibility("리뷰 정보 요약이 완료되었습니다. 화면 하단부에서 리뷰 정보를 조회하세요.")
                     Text(
                         modifier = Modifier
                             .padding(
@@ -426,8 +434,8 @@ fun ProductInfo(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize().background(BackGroundWhite)
-                .semantics(mergeDescendants = true){
-                    text = AnnotatedString("AI가 상품 정보를 요약하는 중입니다. 잠시만 기다려주세요.")
+                .clearAndSetSemantics{
+                    contentDescription = "AI가 상품 정보를 요약하는 중입니다. 잠시만 기다려주세요."
                 }
         ){
             LoaderSet(semantics = "AI가 상품 이미지 정보를 텍스트로 요약하는 중입니다. 잠시만 기다려주세요.")

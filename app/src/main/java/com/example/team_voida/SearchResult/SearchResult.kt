@@ -31,6 +31,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
@@ -384,8 +386,8 @@ fun SearchCard(
     Box(
         modifier = Modifier
             // screen reader를 위해 텍스트를 한 묶음으로 처리
-            .semantics(mergeDescendants = true){
-                text = AnnotatedString(name + "상품 입니다." +"상품의 가격은" + price + "입니다.")
+            .clearAndSetSemantics {
+                contentDescription = name + "상품 입니다." + "상품의 가격은" + price.toInt() + "원 입니다."
             }
             /////////////////////////
             .width(180.dp)
