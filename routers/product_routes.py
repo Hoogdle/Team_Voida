@@ -19,6 +19,7 @@ from PIL import Image
 # LLM Model 라이브러리
 from transformers import AutoTokenizer, AutoModelForCausalLM, LlavaOnevisionForConditionalGeneration, AutoProcessor
 import torch
+from scipy import misc
 
 
 
@@ -243,24 +244,26 @@ def review_info(payload: schemas.ReviewRequest, db: Session = Depends(get_db)):
 '''
 
 # vlm 모델 호출 함수
-def call_ai(name, info, img, return_list, stop_event):
+def call_ai(name, info, img: list[str], return_list, stop_event):
     # 모델에 사용되는 프롬프트 설정
 
     if(img[0] == '\"'): image_url = img[1:-1]
     else: image_url = img
 
     # For Debugging
-    print(image_url)
+    print(img)
 
     conversation = [
     {
         "role": "user",
-        "content": [
-            {"type" : "image", "url" : image_url},
-            {"type": "text", "text": "상품명 : " +name+ "먼저, 주어진 상품 이미지 정보를 잘 분석해주고, 주요 정보만을 추출하여 500자 이내에 상품 설명문 만들어줘, 이미지의 내용을 그대로 읽는게 아니라  상품을 '설명하는' 느낌으로 핵심 정보만을 잘 추출해서 만들어줘. 주로 글자로 구성된 이미지의 경우에는 텍스트를 잘 추출해서 핵심 정보만을 살려서 요약문을 만들어줘, 정보를 요약해야 한다는거 잊지마."},
-        ],
+        "content": [],
     },
     ]
+
+    for item in img:
+        conversation[0]["content"].append({"type" : "image", "url" : item})
+
+    conversation[0]["content"].append({"type": "text","text": "상품명 : " + name + "먼저, 주어진 상품 이미지 정보를 잘 분석해주고, 주요 정보만을 추출하여 500자 이내에 상품 설명문 만들어줘, 이미지의 내용을 그대로 읽는게 아니라  상품을 '설명하는' 느낌으로 핵심 정보만을 잘 추출해서 만들어줘. 주로 글자로 구성된 이미지의 경우에는 텍스트를 잘 추출해서 핵심 정보만을 살려서 요약문을 만들어줘, 정보를 요약해야 한다는거 잊지마."})
 
     inputs = processor.apply_chat_template(
         conversation,
@@ -280,22 +283,22 @@ def call_ai(name, info, img, return_list, stop_event):
     return_list.append(output.strip("<|im_end|>"))
 
 # Call Detailed VLM
-def d_call_ai(name, info, img, return_list, stop_event):
+def d_call_ai(name, info, img: list[str], return_list, stop_event):
     # 모델에 사용되는 프롬프트 설정
 
     if(img[0] == '\"'): image_url = img[1:-1]
     else: image_url = img
 
-
     conversation = [
-    {
-        "role": "user",
-        "content": [
-            {"type" : "image", "url" : image_url},
-            {"type": "text", "text": "상품명 : " +name+ "먼저, 주어진 상품 이미지 정보를 잘 분석해주고, 주요 정보만을 추출하여 500자 이내에 상품 설명문 만들어줘, 이미지의 내용을 그대로 읽는게 아니라  상품을 '설명하는' 느낌으로 핵심 정보만을 잘 추출해서 만들어줘. 주로 글자로 구성된 이미지의 경우에는 텍스트를 잘 추출해서 핵심 정보만을 살려서 요약문을 만들어줘, 정보를 요약해야 한다는거 잊지마."},
-        ],
-    },
+        {
+            "role": "user",
+            "content": [],
+        },
     ]
+
+    for item in img:
+        conversation[0]["content"].append({"type": "image", "url": item})
+    conversation[0]["content"].append({"type": "text","text": "상품명 : " + name + "먼저, 주어진 상품 이미지 정보를 잘 분석해주고, 주요 정보만을 추출하여 500자 이내에 상품 설명문 만들어줘, 이미지의 내용을 그대로 읽는게 아니라  상품을 '설명하는' 느낌으로 핵심 정보만을 잘 추출해서 만들어줘. 주로 글자로 구성된 이미지의 경우에는 텍스트를 잘 추출해서 핵심 정보만을 살려서 요약문을 만들어줘, 정보를 요약해야 한다는거 잊지마."})
 
     inputs = d_processor.apply_chat_template(
         conversation,
@@ -318,8 +321,8 @@ def d_call_ai(name, info, img, return_list, stop_event):
 @router.post("/ProductInfo", response_model=schemas.ProductDetail)
 def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db)):
     prod = db.query(models.Product).filter(models.Product.id == payload.product_id).first()
-    img = db.query(models.Image).filter(models.Image.product_id == payload.product_id).first()
-
+    img = db.query(models.Image).filter(models.Image.product_id == payload.product_id).all()
+    img = [item.imageulr for item in img]
 
     # TODO 큰사이즈 사진 처리, 일단은 1장 처리하게 구현
     if not prod:
@@ -331,7 +334,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     stop_event = threading.Event()
 
     # Call AI
-    ai_process = threading.Thread(target = call_ai, args = (prod.title,prod.description, img.image_url, ai_info, stop_event))
+    ai_process = threading.Thread(target = call_ai, args = (prod.title,prod.description, img, ai_info, stop_event))
 
     # Setting Stop Flag
     stop_flags[pid] = stop_event
@@ -355,7 +358,8 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
 @router.post("/ProductDetailedInfo", response_model=schemas.ProductDetail)
 def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db)):
     prod = db.query(models.Product).filter(models.Product.id == payload.product_id).first()
-    img = db.query(models.Image).filter(models.Image.product_id == payload.product_id).first()
+    img = db.query(models.Image).filter(models.Image.product_id == payload.product_id).all()
+    img = [item.imageulr for item in img]
 
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -365,7 +369,7 @@ def product_info(payload: schemas.ProductIDRequest, db: Session = Depends(get_db
     stop_event = threading.Event()
 
     # Call AI
-    ai_process = threading.Thread(target = d_call_ai, args = (prod.title,prod.description, img.image_url, ai_info, stop_event))
+    ai_process = threading.Thread(target = d_call_ai, args = (prod.title,prod.description, img, ai_info, stop_event))
 
     # Setting Stop Flag
     stop_flags[pid] = stop_event
@@ -797,3 +801,6 @@ def product_info(payload: schemas.CancelAIRequest, db: Session = Depends(get_db)
         del stop_flags[session_review]
 
 
+
+# if given img size big, cut the img
+def cut_image():
