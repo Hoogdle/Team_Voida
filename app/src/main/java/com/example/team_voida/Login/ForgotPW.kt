@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -32,6 +33,15 @@ fun ForgotPw(
 ){
     val email = remember{ mutableStateOf("") }
     val cell = remember{ mutableStateOf("") }
+
+    val rememberPage = remember { mutableStateOf(false) }
+
+    val view = LocalView.current
+
+    if(rememberPage.value == false){
+        view.announceForAccessibility("비밀번호 재설정 페이지입니다. 화면 최상단에서 안내메세지를 제공받으세요.")
+        rememberPage.value = true
+    }
 
     Column (
         modifier = Modifier

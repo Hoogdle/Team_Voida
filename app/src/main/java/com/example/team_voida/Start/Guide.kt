@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.text
@@ -60,6 +61,15 @@ fun Guide(
     navController: NavController,
     viewModel: MainViewModel
 ){
+    val rememberPage = remember { mutableStateOf(false) }
+
+    val view = LocalView.current
+
+    if(rememberPage.value == false){
+        view.announceForAccessibility("앱 사용 안내 페이지입니다. 화면 최상단에서 안내메세지를 제공받으세요.")
+        rememberPage.value = true
+    }
+    
     var tabIndex by remember { mutableStateOf(0) }
     val tabs = listOf("1","2","3","4")
     Column (

@@ -47,6 +47,7 @@ import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -98,6 +99,15 @@ fun PaymentSetting(
 
     val scrollState = rememberScrollState()
     val isAdding = remember { mutableStateOf(false) }
+
+    val rememberPage = remember { mutableStateOf(false) }
+
+    val view = LocalView.current
+
+    if(rememberPage.value == false){
+        view.announceForAccessibility("결제수단 설정 화면입니다. 화면 최상단에서 안내메세지를 제공받으세요.")
+        rememberPage.value = true
+    }
 
     // 유저 정보 페이지에 해당하는 하단 네비 Flag Bit 활성화
     ComposableLifecycle { source, event ->

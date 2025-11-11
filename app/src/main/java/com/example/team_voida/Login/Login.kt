@@ -34,6 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -68,6 +69,16 @@ fun Login(
     val email = remember{ mutableStateOf("") }
     val pw = remember{ mutableStateOf("") }
     val passwordVisibility = remember { mutableStateOf(false) }
+    
+    val rememberPage = remember { mutableStateOf(false) }
+
+    val view = LocalView.current
+
+    if(rememberPage.value == false){
+        view.announceForAccessibility("로그인 화면입니다. 화면 최상단에서 안내메세지를 제공받으세요.")
+        rememberPage.value = true
+    }
+
 
     Column (
         modifier = Modifier

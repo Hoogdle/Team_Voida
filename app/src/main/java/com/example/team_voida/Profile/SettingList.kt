@@ -21,9 +21,12 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -52,6 +55,15 @@ fun Profile(
 ){
 
     val scrollState = rememberScrollState()
+
+    val rememberPage = remember { mutableStateOf(false) }
+
+    val view = LocalView.current
+
+    if(rememberPage.value == false){
+        view.announceForAccessibility("설정 페이지입니다. 화면 최상단에서 안내메세지를 제공받으세요.")
+        rememberPage.value = true
+    }
 
     ComposableLifecycle { source, event ->
         if (event == Lifecycle.Event.ON_PAUSE) {

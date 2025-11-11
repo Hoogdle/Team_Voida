@@ -109,10 +109,14 @@ fun Payment(
 
 ){
     val scrollState = rememberScrollState()
+    val rememberPage = remember { mutableStateOf(false) }
 
     val view = LocalView.current
-    view.announceForAccessibility("결제화면입니다. 화면 최상단에서 안내메세지를 제공받으세요.")
-    
+
+    if(rememberPage.value == false) {
+        view.announceForAccessibility("결제화면입니다. 화면 최상단에서 안내메세지를 제공받으세요.")
+        rememberPage.value = true
+    }
     DisposableEffect(Unit) {
 
         // Component를 벗어날 때 수행

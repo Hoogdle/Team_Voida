@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.text
@@ -89,49 +90,15 @@ fun PaymentHistoryList(
     orderNumber: MutableState<String>
 ){
     val scrollState = rememberScrollState()
-    val paymentInfo: MutableState<PaymentInfo?> = remember { mutableStateOf(PaymentInfo(
-        address = "서울특별시 서대문구 독립문로 129-1 가나다 아파트세상 203동 1104호",
-        phone = "010-1234-5678",
-        email = "1234@gmail.com",
-        item = listOf(
-            BasketInfo(
-                product_id = 1,
-                img = "https://product-image.kurly.com/hdims/resize/%5E%3E360%20%20%20%20%20x%3E468/cropcenter/360x468/quality/85/src/product/image/25ac1ec1-005e-44a3-a00f-4224d25bcc96.jpg",
-                name = "[KF365] 햇 감자 1kg",
-                price = 3990F,
-                number = 1
-            ),
-            BasketInfo(
-                product_id = 1,
-                img = "https://product-image.kurly.com/hdims/resize/%5E%3E360%20%20%20%20%20x%3E468/cropcenter/360x468/quality/85/src/product/image/25ac1ec1-005e-44a3-a00f-4224d25bcc96.jpg",
-                name = "[KF365] 햇 감자 1kg",
-                price = 3990F,
-                number = 1
-            ),
-            BasketInfo(
-                product_id = 1,
-                img = "https://product-image.kurly.com/hdims/resize/%5E%3E360%20%20%20%20%20x%3E468/cropcenter/360x468/quality/85/src/product/image/25ac1ec1-005e-44a3-a00f-4224d25bcc96.jpg",
-                name = "[KF365] 햇 감자 1kg",
-                price = 3990F,
-                number = 1
-            ),BasketInfo(
-                product_id = 1,
-                img = "https://product-image.kurly.com/hdims/resize/%5E%3E360%20%20%20%20%20x%3E468/cropcenter/360x468/quality/85/src/product/image/25ac1ec1-005e-44a3-a00f-4224d25bcc96.jpg",
-                name = "[KF365] 햇 감자 1kg",
-                price = 3990F,
-                number = 1
-            ),
-            ),
-        cards = listOf(
-            CardInfo(
-                card_id = -1,
-                company = "",
-                card_code = "",
-                date = "",
-                card_num = 0
-            )
-        )
-    )) }
+    
+    val rememberPage = remember { mutableStateOf(false) }
+
+    val view = LocalView.current
+
+    if(rememberPage.value == false){
+        view.announceForAccessibility("결제 세부정보 화면입니다. 화면 최상단에서 안내메세지를 제공받으세요.")
+        rememberPage.value = true
+    }
 
     val payDetailHistory: MutableState<PaymentDetailInfo?> = remember { mutableStateOf<PaymentDetailInfo?>(null) }
 

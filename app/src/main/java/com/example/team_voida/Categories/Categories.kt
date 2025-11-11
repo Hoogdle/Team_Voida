@@ -33,6 +33,7 @@ import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.DefaultShadowColor
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -56,15 +57,7 @@ import com.example.team_voida.ui.theme.TextLittleDark
 import kotlin.math.ceil
 
 
-//1. 식품
-//2. 술
-//3. 생활
-//4. 스포츠,레저,캠핑
-//5. 반려동물
-//6. 뷰티
-//7. 패션
 
-// 카테고리 메인 컴포저블
 @Composable
 fun Categories(
     navController: NavController,
@@ -75,6 +68,15 @@ fun Categories(
     categoryCode: MutableState<String>,
     isItemWhichPart: MutableState<Int>,
 ){
+
+    val rememberPage = remember { mutableStateOf(false) }
+
+    val view = LocalView.current
+
+    if(rememberPage.value == false){
+        view.announceForAccessibility("카테고리 화면입니다. 화면 최상단에서 안내메세지를 제공받으세요.")
+        rememberPage.value = true
+    }
 
     isItemWhichPart.value = 0
     // 카테고리 해당 하단 네비 활성화
