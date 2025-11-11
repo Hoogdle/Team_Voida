@@ -473,6 +473,9 @@ fun ProductInfoBottomBar(
     isPayOne: MutableState<Boolean>,
     isLoading: MutableState<Boolean>
 ){
+
+    val view = LocalView.current
+
     Row (
         modifier = Modifier
             .fillMaxWidth()
@@ -531,6 +534,7 @@ fun ProductInfoBottomBar(
                             product_id = productID.value
                         )
                     }
+                    view.announceForAccessibility("장바구니에 상품이 1개 추가되었습니다.")
                     Log.e("value", "product id : " +productID.value.toString())
                     Log.e("value", "iswhich id : " +isItemWhichPart.value.toString())
 
@@ -565,6 +569,8 @@ fun ProductInfoBottomBar(
             onClick = {
                 isPayOne.value = true
                 navController.navigate("payment")
+                view.announceForAccessibility("결제 페이지로 이동합니다. 화면 최상단에 안내메시지를 확인해주세요.")
+
             },
             modifier = Modifier
                 .fillMaxWidth()
