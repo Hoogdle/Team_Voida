@@ -114,11 +114,6 @@ fun Account(
                 accountInfo.value = AccountInfoServer(session.sessionId.value)
             }
         }
-        accountInfo.value = AccountInfo(
-            un = "후그들형님",
-            email = "123@gmail.com",
-            cell = "1234"
-        )
     }
 
     // 유저 정보 페이지에 해당하는 하단 네비 Flag Bit 활성화
@@ -235,10 +230,31 @@ fun Account(
                     fontFamily = FontFamily(Font(R.font.roboto_regular)),
                 )
             )
-            AccountTextField(
-                placeholder = accountInfo.value!!.cell,
-                input = cell
+
+
+            Text(
+                modifier = Modifier
+                    .offset(
+                        y = -6.dp
+                    )
+                    .fillMaxWidth()
+                    .padding(10.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(SearchBarColor)
+                    .padding(
+                        start = 25.dp,
+                        top = 25.dp,
+                        bottom = 25.dp
+                    )
+                ,
+                text = accountInfo.value!!.cell,
+                color = DisabledText,
+                style = TextStyle(
+                    fontSize = 15.sp,
+                    fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                )
             )
+
             Spacer(Modifier.height(18.dp))
             AccountPWTextField(
                 placeholder = "비밀번호 재설정",
@@ -267,7 +283,6 @@ fun Account(
                             result = ChangeAccountInfoServer(
                                 session.sessionId.value,
                                 cell.value,
-                                pw.value
                             )
                         }
                         Thread.sleep(2000L)

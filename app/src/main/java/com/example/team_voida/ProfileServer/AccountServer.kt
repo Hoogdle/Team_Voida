@@ -72,13 +72,11 @@ suspend fun AccountInfoServer(
 
 suspend fun ChangeAccountInfoServer(
     session_id: String,
-    cell: String,
     pw: String
 ): Boolean{
 
     val jsonObject = JSONObject()
     jsonObject.put("session_id", session_id)
-    jsonObject.put("cell", cell)
     jsonObject.put("pw", pw)
 
 

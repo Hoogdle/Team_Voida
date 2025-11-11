@@ -311,6 +311,7 @@ fun PaymentRegisterLastButton(
     cardList: MutableState<List<CardInfo>?>
 ){
     val context = LocalContext.current
+    val view = LocalView.current
 
     Button(
         shape = RoundedCornerShape(10.dp),
@@ -327,29 +328,35 @@ fun PaymentRegisterLastButton(
 
         ,
         onClick = {
-            var result: List<CardInfo>? = null
-
-            runBlocking {
-                val job = GlobalScope.launch{
-                    result = CardAdd(
-                        session_id = session.sessionId.value,
-                        cardCompany = cardCompany,
-                        cardNum = cardNum,
-                        cardDate = cardDate,
-                        cardCvv = cardCvv
-                    )
-                }
-            }
-            Thread.sleep(2000L)
-
-            if (result == null){
-                Toast.makeText(context, "카드 등록에 실패하였습니다.", Toast.LENGTH_SHORT).show()
+            if(cardNum.length != 16){
+                view.announceForAccessibility("카드 번호를 확인해주세요. 카드번호는 16자리 이어야 합니다.")
+            } else if(cardDate.length != 4){
+                view.announceForAccessibility("유효기간을 확인해주세요, 각 유효기간의 월,일은 2자리 숫자이어야 합니다.")
             } else {
-                cardList.value = result
-            }
+                var result: List<CardInfo>? = null
 
-            lastCheck.value = true
-            isAdding.value = false
+                runBlocking {
+                    val job = GlobalScope.launch {
+                        result = CardAdd(
+                            session_id = session.sessionId.value,
+                            cardCompany = cardCompany,
+                            cardNum = cardNum,
+                            cardDate = cardDate,
+                            cardCvv = cardCvv
+                        )
+                    }
+                }
+                Thread.sleep(2000L)
+
+                if (result == null) {
+                    Toast.makeText(context, "카드 등록에 실패하였습니다.", Toast.LENGTH_SHORT).show()
+                } else {
+                    cardList.value = result
+                }
+
+                lastCheck.value = true
+                isAdding.value = false
+            }
         }
     ) {
         Text(
