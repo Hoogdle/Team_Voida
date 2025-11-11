@@ -269,3 +269,12 @@ class RequestWithSessionAndAddressAndId(BaseModel):
 class PayOneHelperRequest(BaseModel):
 	product_id: int
 
+
+class AccountInfoResponse(BaseModel):
+	un: str
+	email: str
+	cell: str
+
+class AccountInfoRequestPw(BaseModel):
+	session_id: str
+	pw: str

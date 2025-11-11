@@ -250,3 +250,35 @@ def set_user_name(
 		)
 		for item in address_list
 	]	
+
+
+@router.post("/AccountInfo", response_model=schemas.AccountInfoResponse)
+def set_user_name(
+        payload: schemas.RequestWithSession,
+        db: Session = Depends(get_db)
+):
+
+	user = check_session(db,payload.session_id)
+	
+	return schemas.AccountInfoResponse(
+		un = user.un,
+		email = user.email,
+		cell = user.cell
+	)
+
+@router.post("/ChangeAccountInfo", response_model=bool)
+def set_user_name(
+        payload: schemas.AccountInfoRequestPw,
+        db: Session = Depends(get_db)
+):
+
+	user = check_session(db,payload.session_id)
+
+	if not user:
+		return False
+	hashed_pw = bcrypt.hashpw(payload.pw.encode("utf-8"), bcrypt.gensalt())
+	
+	user.pw = hashed_pw.decode("utf-8")
+	db.commit()
+	
+	return True
