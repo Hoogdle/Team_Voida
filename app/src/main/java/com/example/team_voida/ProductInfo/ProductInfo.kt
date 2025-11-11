@@ -93,12 +93,20 @@ fun ProductInfo(
     selectedIndex: MutableState<Int>,
     productID: MutableState<Int>,
     isItemWhichPart: MutableState<Int>,
+    isLoading: MutableState<Boolean>
 ){
 
+    isLoading.value = true
     val view = LocalView.current
     var requiredDetail = true
 
+    val memorizePage = remember { mutableStateOf(false) }
+    val memorizeSimple = remember { mutableStateOf(false) }
+    val memorizeDetail = remember { mutableStateOf(false) }
+    val memorizeReview = remember { mutableStateOf(false) }
+
     DisposableEffect(Unit) {
+        memorizePage.value = false
         Log.e("enter","xxx")
 
         // Component를 벗어날 때 수행
@@ -110,6 +118,7 @@ fun ProductInfo(
                     CancelAI(session_id = session.sessionId.value)
                 }
             }
+            isLoading.value = false
             Log.e("enter","xxx")
         }
     }
@@ -235,8 +244,12 @@ fun ProductInfo(
 
     // 서버로 부터 정보를 받은 경우 결과 출력
     if(result.value != null){
-        view.announceForAccessibility("AI 요약이 완료되었습니다. 화면 최상단에서 안내메시지를 제공받으세요.")
+        isLoading.value = false
+        if(memorizePage.value == false) {
+            view.announceForAccessibility("AI 요약이 완료되었습니다. 화면 최상단에서 안내메시지를 제공받으세요.")
+        }
 
+        memorizePage.value = true
         Column (
             modifier = Modifier
                 .fillMaxSize()
@@ -317,8 +330,10 @@ fun ProductInfo(
             )
             Spacer(Modifier.height(5.dp))
             if(detailedResult.value != null){
-                view.announceForAccessibility("상품 상세정보가 완성되었습니다.")
-
+                if(memorizeDetail.value == false) {
+                    view.announceForAccessibility("상품 상세정보가 완성되었습니다.")
+                }
+                memorizeDetail.value = true
                 Text(
                     modifier = Modifier
                         .padding(
@@ -407,7 +422,10 @@ fun ProductInfo(
                     Spacer(Modifier.height(5.dp))
                     LoaderSet(info = "리뷰 로딩중", semantics = "AI가 상품 정보를 요약하는 중입니다. 잠시만 기다려주세요.")
                 } else {
-                    view.announceForAccessibility("리뷰 정보 요약이 완료되었습니다. 화면 하단부에서 리뷰 정보를 조회하세요.")
+                    if(memorizeReview.value == false) {
+                        view.announceForAccessibility("리뷰 정보 요약이 완료되었습니다. 화면 하단부에서 리뷰 정보를 조회하세요.")
+                    }
+                    memorizeReview.value = true
                     Text(
                         modifier = Modifier
                             .padding(
@@ -452,14 +470,19 @@ fun ProductInfoBottomBar(
     productID: MutableState<Int>,
     isItemWhichPart: MutableState<Int>,
     navController: NavController,
-    isPayOne: MutableState<Boolean>
+    isPayOne: MutableState<Boolean>,
+    isLoading: MutableState<Boolean>
 ){
     Row (
         modifier = Modifier
             .fillMaxWidth()
             .background(SearchBarColor)
             .semantics(mergeDescendants = true){
-                text = AnnotatedString("상품 가격은 ${price}원 입니다. 우측에 장바구니 버튼과 구매하기 버튼이 있습니다.")
+                contentDescription = if(isLoading.value){
+                    "AI가 상품 대체텍스트를 생성하는 중입니다. 잠시만 기다려주세요"
+                } else {
+                    "상품 가격은 ${price}원 입니다. 우측에 장바구니 버튼과 구매하기 버튼이 있습니다."
+                }
             }
             .padding(
                 top = 20.dp,

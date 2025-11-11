@@ -29,7 +29,7 @@ fun LoaderSet(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize().background(BackGroundWhite)
-            .clearAndSetSemantics {
+            .semantics (mergeDescendants = true){
                 contentDescription = semantics
             }
     ){

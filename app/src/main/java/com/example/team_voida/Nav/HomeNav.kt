@@ -156,6 +156,8 @@ fun HomeNav(
     var offsetX by remember { mutableStateOf(0f) }
     var offsetY by remember { mutableStateOf(0f) }
 
+    val isLoading = remember { mutableStateOf(false) }
+
 
     val context = LocalContext.current
     val view = LocalView.current
@@ -282,7 +284,8 @@ fun HomeNav(
                         dynamicTotalPrice,
                         isPayOne,
                         navController,
-                        isPayPage
+                        isPayPage,
+                        isLoading
                     )
                 }
                 if(productFlag.value){
@@ -292,7 +295,8 @@ fun HomeNav(
                         productID,
                         isItemWhichPart,
                         navController,
-                        isPayOne
+                        isPayOne,
+                        isLoading
                     )
                 }
                 if(homeNavFlag.value){
@@ -507,6 +511,7 @@ fun HomeNav(
                         selectedIndex = selectedIndex,
                         productID = productID,
                         isItemWhichPart = isItemWhichPart,
+                        isLoading
                     )
                 }
                 composable("categories") {

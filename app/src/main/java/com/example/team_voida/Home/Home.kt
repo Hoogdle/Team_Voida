@@ -87,7 +87,7 @@ fun Home(
     isWhichPart: MutableState<Int>,
     productID: MutableState<Int>,
     isItemWhichPart: MutableState<Int>,
-    barPrice: MutableState<Float>
+    barPrice: MutableState<Float>,
 ){
     val view = LocalView.current
     view.announceForAccessibility("홈 화면입니다. 화면 최상단에서 안내메세지를 제공받으세요.")
@@ -223,7 +223,7 @@ fun HomeSearchBar(
 ){
     Row(
         modifier = Modifier
-            .clearAndSetSemantics {
+            .semantics(mergeDescendants = true){
                 contentDescription = "우측에 음성 검색 버튼이 있습니다."
             }
 
@@ -282,7 +282,7 @@ fun HomeBar(
 ){
     Row (
         modifier = Modifier
-            .clearAndSetSemantics {
+            .semantics(mergeDescendants = true){
                 contentDescription = "우측에 모두 보기를 통해 ${title} 상품들을 만나보세요."
             }
 
