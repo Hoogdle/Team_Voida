@@ -166,9 +166,16 @@ def card_del(payload: schemas.CardDeleteRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User profile not found")
 
     card = db.query(models.Card).filter(models.Card.id == payload.card_id).first()
-
+  
     if not card:
         raise HTTPException(status_code=404, detail="Card Not Exits")
+   
+    orders = db.query(models.Order).filter(models.Order.card_id == card.id).all()
+    
+    for order in orders:
+        db.query(models.OrderItem).filter(models.OrderItem.order_id == order.id).delete()
+
+    db.query(models.Order).filter(models.Order.card_id == card.id).delete()
 
     db.delete(card)
     db.commit()
