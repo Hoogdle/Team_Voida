@@ -306,6 +306,7 @@ fun CategoryRow(
                                 disabledContainerColor = BackGroundWhite
                             ),
                             onClick = {
+//                                Log.e("Category",categoryItem.subCategories[i*2])
                                 categoryCode.value = "Vegetable"
                                 navController.navigate("categoryList")
                             },

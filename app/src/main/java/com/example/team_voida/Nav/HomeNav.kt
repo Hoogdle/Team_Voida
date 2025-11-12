@@ -164,6 +164,7 @@ fun HomeNav(
 
     val upPressed = remember { mutableStateOf(false) }
     val downPressed = remember { mutableStateOf(false) }
+    val themeApplyer = remember{ mutableStateOf(false) }
 
 
     // 화면 최소/최대 확대 비율 설정
@@ -299,7 +300,8 @@ fun HomeNav(
                         isLoading
                     )
                 }
-                if(homeNavFlag.value){
+                if(themeApplyer.value || homeNavFlag.value){
+                    Log.e("ThemeCycle","!")
                     NavigationBar(
                         modifier = Modifier
                             .border(
@@ -396,7 +398,7 @@ fun HomeNav(
         }
     ){ inner ->
         if(isAssistantWorking.value){
-            LoaderSet(info = "AI Asssitant", semantics = "A I Assistant가 정보를 분석하는 중입니다. 잠시만 기다려주세요.")
+            LoaderSet(info = "AI Asssitant", semantics = "AI Assistant가 정보를 분석하는 중입니다. 잠시만 기다려주세요.")
         }else {
             NavHost(
                 modifier = Modifier
@@ -656,7 +658,8 @@ fun HomeNav(
                         basketFlag = basketFlag,
                         homeNavFlag = homeNavFlag,
                         productFlag = productFlag,
-                        viewModel = viewModel
+                        viewModel = viewModel,
+                        themeApplyer = themeApplyer
                     )
                 }
             }

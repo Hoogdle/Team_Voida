@@ -21,6 +21,7 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,9 +42,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
 import com.example.team_voida.Basket.ComposableLifecycle
 import com.example.team_voida.Notification.Notification
+import com.example.team_voida.ProductInfo.CancelAI
 import com.example.team_voida.R
 import com.example.team_voida.Tools.MainViewModel
 import com.example.team_voida.notifySwitch
+import com.example.team_voida.session
 import com.example.team_voida.themeInStart
 import com.example.team_voida.ui.theme.BackGroundWhite
 import com.example.team_voida.ui.theme.BasketPaymentColor
@@ -73,6 +76,9 @@ import com.example.team_voida.ui.theme.TextWhite
 import com.example.team_voida.ui.theme.Unselected
 import com.example.team_voida.ui.theme.WishButton
 import com.example.team_voida.ui.theme.PaymentCard
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun UiSetting(
@@ -80,17 +86,33 @@ fun UiSetting(
     basketFlag: MutableState<Boolean>,
     homeNavFlag: MutableState<Boolean>,
     productFlag: MutableState<Boolean>,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    themeApplyer: MutableState<Boolean>
 ) {
     val context = LocalContext.current
+
+    DisposableEffect(Unit) {
+
+        // Component를 벗어날 때 수행
+        onDispose {
+            themeApplyer.value = false
+        }
+    }
 
     val rememberPage = remember { mutableStateOf(false) }
 
     val view = LocalView.current
 
+    val isThemeApplied = remember{ mutableStateOf(false) }
+
     if(rememberPage.value == false){
         view.announceForAccessibility("화면 디자인 설정 페이지입니다. 화면 최상단에서 안내메세지를 제공받으세요.")
         rememberPage.value = true
+    }
+
+    if(themeApplyer.value == true){
+        view.announceForAccessibility("고대비 테마가 적용되었습니다. 뒤로 가기를 누르시면 고대비 테마가 시작됩니다.")
+        isThemeApplied.value = false
     }
 
     Log.e("Address", "Recycle")
@@ -197,10 +219,10 @@ fun UiSetting(
             )
         )
         Spacer(Modifier.height(3.dp))
-        ContrastRow(0,viewModel)
-        ContrastRow(1,viewModel)
-        ContrastRow(2,viewModel)
-        ContrastRow(3,viewModel)
+        ContrastRow(0,viewModel,themeApplyer,isThemeApplied)
+        ContrastRow(1,viewModel,themeApplyer,isThemeApplied)
+        ContrastRow(2,viewModel,themeApplyer,isThemeApplied)
+        ContrastRow(3,viewModel,themeApplyer,isThemeApplied)
 
         
         
@@ -234,28 +256,38 @@ fun UiSetIcon(codeNum: Int):Int{
 
 fun UiSetHelper(
     codeNum: Int,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    themeApplyer: MutableState<Boolean>,
+    isThemeApplied: MutableState<Boolean>
 ){
     when(codeNum){
         0 -> {
             defaultColor()
             themeInStart.themeId.value = 0
             viewModel.setTheme(0)
+            themeApplyer.value = true
+            isThemeApplied.value = true
         }
         1 -> {
             themeNavyPink()
             themeInStart.themeId.value = 1
             viewModel.setTheme(1)
+            themeApplyer.value = true
+            isThemeApplied.value = true
         }
         2 -> {
             themeGreenYellow()
             themeInStart.themeId.value = 2
             viewModel.setTheme(2)
+            themeApplyer.value = true
+            isThemeApplied.value = true
         }
         3 -> {
             themeRedSkyBlue()
             themeInStart.themeId.value = 3
             viewModel.setTheme(3)
+            themeApplyer.value = true
+            isThemeApplied.value = true
         }
     }
 }
@@ -263,7 +295,9 @@ fun UiSetHelper(
 @Composable
 fun ContrastRow(
     whichColor: Int,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    themeApplyer: MutableState<Boolean>,
+    isThemeApplied: MutableState<Boolean>
 ){
     Button(
         modifier = Modifier
@@ -284,7 +318,7 @@ fun ContrastRow(
         )
         ,
         onClick = {
-            UiSetHelper(whichColor, viewModel)
+            UiSetHelper(whichColor, viewModel,themeApplyer,isThemeApplied)
         }
     ){
         Row(
